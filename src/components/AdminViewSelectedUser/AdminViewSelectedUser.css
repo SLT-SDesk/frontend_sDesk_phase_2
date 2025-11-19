@@ -1,0 +1,82 @@
+.AdminViewSelectedUser-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.AdminViewSelectedUser-content {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    width: 700px;
+    max-width: 95%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    max-height: 95vh;
+}
+
+.AdminViewSelectedUser-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.AdminViewSelectedUser-header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #333;
+}
+
+.AdminViewSelectedUser-header button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ef4444;
+}
+
+.AdminViewSelectedUser-header button:hover {
+    color: #b91c1c;
+}
+
+.AdminViewSelectedUser-grid {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+.AdminViewSelectedUser-section {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.AdminViewSelectedUser-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.AdminViewSelectedUser-field label {
+    font-weight: 500;
+    font-size: 14px;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.AdminViewSelectedUser-field span {
+    font-size: 14px;
+    color: #1f2937;
+    background: #f9fafb;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+}

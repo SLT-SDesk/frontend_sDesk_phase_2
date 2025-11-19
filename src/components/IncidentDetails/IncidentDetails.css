@@ -1,0 +1,303 @@
+  .AddInicident-content2-IncidentDetails {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    max-height: 45vh;
+    min-height: 40vh;
+    margin: 30px 10px 0px 0px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding-bottom: 10px;
+  }
+  
+  .AddInicident-content2-IncidentDetails-TitleBar {
+    font-size: 18px;
+    font-weight: bold;
+    padding: 0px 0px 0px 10px;
+  }
+  
+  .AddInicident-content2-IncidentDetails-IncidentInfoContainer {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 0px 10px 0px 10px;
+  }
+  
+  .AddInicident-content2-IncidentDetails-IncidentInfoContainer-userDetails {
+    font-size: 15px;
+    font-weight: bold;
+  }
+  
+  .AddInicident-content2-IncidentDetails-IncidentInfoContainer-selection {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    max-height: 8vh;
+    padding: 10px 10px 0px 0px;
+    gap: 20px;
+    position: relative;
+  }
+  
+  .AddInicident-content2-IncidentDetails-IncidentInfoContainer-selection
+    .AddInicident-content2-IncidentDetails-IncidentInfoContainer-userDetails {
+    font-size: 13px;
+    display: flex;
+    max-height: 5vh;
+    align-items: center;
+  }
+  
+  .category-container,
+  .location-container {
+    position: relative;
+    width: 400px;
+    padding-left: 20px;
+  }
+  
+  .category-icon,
+  .location-icon {
+    cursor: pointer;
+    margin-left: 5px;
+    font-size: 20px;
+    color: #ee3838;
+  }
+  
+  .AddInicident-content2-IncidentDetails-DescriptionContainer {
+    margin: 10px 0px 0px 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 0px 10px 0px;
+    font-weight: bold;
+  }
+  
+  .AddInicident-content2-IncidentDetails-DescriptionTextArea {
+    padding: 8px;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    font-family: inherit;
+    overflow-y: auto;
+    min-height: 14vh;
+    font-size: 12px;
+  }
+  
+  .AddInicident-content2-IncidentDetails-AttachmentContainer {
+    display: flex;
+    font-weight: bold;
+    font-size: 15px;
+    margin-top: 5px;
+  }
+  
+  .AddInicident-content2-IncidentDetails-AttachmentContainer-file-input {
+    display: none;
+  }
+  
+  .AddInicident-content2-IncidentDetails-AttachmentContainer-file-upload-button {
+    display: inline-block;
+    font-size: 8px;
+    padding: 5px 10px;
+    background-color: #fb7171;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 20px;
+    transition: background-color 0.3s;
+    width: 75px;
+    height: 25px;
+  }
+  
+  .AddInicident-content2-IncidentDetails-AttachmentContainer-file-upload-button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .AddInicident-content2-IncidentDetails-AttachmentContainer-file-selected-text {
+    margin-left: 20px;
+    font-size: 12px;
+    color: #555;
+  }
+  
+  .remove-file-button {
+    padding: 0 5px 0px 8px;
+    background: none;
+    border: none;
+    color: #ff3232;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .AddInicident-content2-IncidentDetails-Container3{
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    gap: 10vw;
+  }
+  .AddInicident-content2-IncidentDetails-AttachmentContainer {
+    display: flex;
+    font-weight: bold;
+    font-size: 15px;
+    margin-top: 5px;
+  }
+  .AddInicident-content2-IncidentDetails-Container3-dropdown-container {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    flex-grow: 1;
+    max-width: 25%;
+    align-items: center;
+    font-family: Arial, sans-serif;
+  }
+  
+  .AddInicident-content2-IncidentDetails-Container3-dropdown-container-label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-right: 20px;
+  }
+  
+  .priority-select {
+    padding: 3px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100px;
+    cursor: pointer;
+    background-color: #fff;
+  }
+  
+  .priority-select option[value=""] {
+    color: #999;
+    background-color: #f0f0f0;
+  }
+
+  .option-critical {
+    background-color: #ff4d4d; 
+    color: #fff;
+  }
+  
+  .option-high {
+    background-color: #ffd700; 
+    color : #333;
+  }
+  
+  .option-medium {
+    background-color: #32cd32; 
+    color: #fff;
+  }
+
+  .priority-select:focus {
+    outline: none;
+    border-color: #666;
+  }
+  /* Tablet View (768px and below) */
+@media (max-width: 768px) {
+  .AddInicident-content2-IncidentDetails {
+    margin: 20px 5px 0px 5px;
+    padding: 8px;
+  }
+
+  .AddInicident-content2-IncidentDetails-IncidentInfoContainer-selection {
+    flex-direction: column;
+    gap: 10px;
+    padding: 8px 0;
+  }
+
+  .category-container,
+  .location-container {
+    width: 100%;
+    padding-left: 0;
+  }
+
+  .AddInicident-content2-IncidentDetails-Container3 {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .AddInicident-content2-IncidentDetails-Container3-dropdown-container {
+    max-width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .AddInicident-content2-IncidentDetails-DescriptionTextArea {
+    min-height: 100px;
+  }
+
+  .AddInicident-content2-IncidentDetails-AttachmentContainer {
+      display: flex;
+    flex-wrap: wrap; /* allow items to wrap instead of stacking forcibly */
+    align-items: center;
+    gap: 10px; /* space between items */
+    font-size: 14px;
+  }
+
+  .AddInicident-content2-IncidentDetails-AttachmentContainer-file-upload-button {
+   margin: 0;
+  }
+
+  .AddInicident-content2-IncidentDetails-AttachmentContainer-file-selected-text {
+    margin: 0;
+  }
+}
+
+/* Mobile View (≤480px and ≤320px) */
+@media (max-width: 480px) {
+  .AddInicident-content2-IncidentDetails {
+    margin: 15px 5px;
+    padding: 6px;
+    max-height: none;
+    min-height: auto;
+    height: auto;
+    overflow-y: auto; /* Enable scrolling if content overflows */
+  }
+
+  .AddInicident-content2-IncidentDetails-TitleBar {
+    font-size: 18px;
+  }
+
+  .AddInicident-content2-IncidentDetails-IncidentInfoContainer-userDetails {
+    font-size: 13px;
+  }
+
+  .AddInicident-content2-IncidentDetails-Container3-dropdown-container-label {
+    font-size: 12px;
+    margin-right: 10px;
+  }
+
+  .priority-select {
+    width: 100%;
+    font-size: 12px;
+  }
+
+  .AddInicident-content2-IncidentDetails-AttachmentContainer {
+    font-size: 13px;
+  }
+
+  .AddInicident-content2-IncidentDetails-AttachmentContainer-file-upload-button {
+    width: 100%;
+    font-size: 11px;
+    height: auto;
+    padding: 6px;
+  }
+
+  .AddInicident-content2-IncidentDetails-AttachmentContainer-file-selected-text {
+    font-size: 11px;
+  }
+
+  .remove-file-button {
+    font-size: 14px;
+    padding-left: 5px;
+  }
+
+  .AddInicident-content2-IncidentDetails-DescriptionTextArea {
+    font-size: 11px;
+    min-height: auto;
+    max-height: none;
+    height: auto;
+  }
+
+  .AddInicident-content2-IncidentDetails-IncidentInfoContainer,
+  .AddInicident-content2-IncidentDetails-IncidentInfoContainer-selection {
+    max-height: none;
+    min-height: auto;
+    height: auto;
+  }
+}

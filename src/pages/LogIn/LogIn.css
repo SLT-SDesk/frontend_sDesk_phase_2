@@ -1,0 +1,271 @@
+
+
+.signup-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1E3A8A 0%, #0EA5E9 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+    position: relative;
+}
+
+
+.slt-header {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+.slt-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.slt-logo-image {
+    height: 90px;
+    width: auto;
+    max-width: 320px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+
+.logo-icon {
+    display: none;
+    gap: 3px;
+}
+
+.logo-square {
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+}
+
+.logo-square.red {
+    background-color: #E31E24;
+}
+
+.logo-square.blue {
+    background-color: #1E3A8A;
+}
+
+.logo-text {
+    display: none;
+    align-items: center;
+    font-weight: bold;
+    font-size: 26px;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.slt-text {
+    color: #FFE6E6;
+}
+
+.mobitel-text {
+    color: #E6F0FF;
+}
+
+
+.signup-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 420px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 60px;
+}
+
+.signup-title {
+    text-align: center;
+    margin-bottom: 8px;
+    font-size: 28px;
+    font-weight: 600;
+    color: #1E3A8A;
+}
+
+.login-subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+
+.register-button {
+    width: 100%;
+    padding: 16px 20px;
+    background: #1E3A8A !important;
+    color: white !important;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    margin-top: 10px;
+}
+
+.register-button:hover {
+    background: #1E40AF !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(30, 58, 138, 0.4);
+}
+
+.register-button:active {
+    transform: translateY(0);
+}
+
+.register-button:disabled {
+    background: #9CA3AF !important;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+.microsoft-icon {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 1px;
+    width: 18px;
+    height: 18px;
+}
+
+.microsoft-square {
+    width: 8px;
+    height: 8px;
+    border-radius: 1px;
+}
+
+.red-square {
+    background-color: #f25022;
+}
+
+.green-square {
+    background-color: #7fba00;
+}
+
+.blue-square {
+    background-color: #00a4ef;
+}
+
+.yellow-square {
+    background-color: #ffb900;
+}
+
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    color: #333;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #1E3A8A;
+    box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.25);
+}
+
+.signin-link {
+    text-align: center;
+    margin-top: 16px;
+}
+
+.signin-link button {
+    background: none;
+    border: none;
+    color: #1E3A8A;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.signin-link button:hover {
+    text-decoration: underline;
+}
+
+
+.error {
+    color: #E31E24;
+    background: rgba(227, 30, 36, 0.1);
+    padding: 12px;
+    border-radius: 6px;
+    margin-top: 16px;
+    font-size: 14px;
+    border: 1px solid rgba(227, 30, 36, 0.2);
+    text-align: center;
+}
+
+
+@media (max-width: 480px) {
+    .signup-container {
+        padding: 15px;
+    }
+    
+    .signup-card {
+        padding: 30px 20px;
+        max-width: 100%;
+        margin-top: 80px;
+    }
+    
+    .signup-title {
+        font-size: 24px;
+    }
+    
+    .slt-logo-image {
+        height: 65px;
+        max-width: 260px;
+    }
+    
+    .slt-header {
+        top: 20px;
+    }
+}
+
+@media (max-height: 600px) {
+    .slt-header {
+        position: static;
+        transform: none;
+        margin-bottom: 20px;
+    }
+    
+    .signup-card {
+        margin-top: 0;
+    }
+    
+    .slt-logo-image {
+        height: 60px;
+        max-width: 240px;
+    }
+}

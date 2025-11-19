@@ -1,0 +1,200 @@
+body {
+  font-size: 15px;
+}
+
+.update-status-container {
+  margin: 2% auto;
+  width: 95%;
+  max-width: 1200px;
+  transition: margin 0.3s ease, width 0.3s ease, margin-top 0.3s ease;
+}
+
+.update-status-card {
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  box-sizing: border-box;
+  transition: padding 0.3s ease;
+}
+
+
+.update-status-card-modern {
+    border: none;
+    border-radius: 0.75rem;
+}
+
+.update-status-card-modern .form-label {
+    font-weight: 500;
+}
+
+.update-status-card-modern .clickable-icon {
+    cursor: pointer;
+    color: #0d6efd;
+    transition: color 0.2s;
+}
+
+.update-status-card-modern .clickable-icon:hover {
+    color: #0a58ca;
+}
+
+
+@media (max-width: 992px) {
+  .update-status-container {
+    width: 95%;
+    margin: 1% auto;
+  }
+}
+
+.update-status-title {
+  font-size: 20px;
+  margin-bottom: 1rem;
+  
+  transition: font-size 0.3s ease, margin-bottom 0.3s ease, margin-left 0.3s ease;
+}
+
+.update-status-title span {
+  font-weight: bold;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -0.5rem;
+}
+
+.form-group {
+  flex: 1;
+  padding: 0.5rem;
+  transition: padding 0.3s ease;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.3rem;
+  font-size: 12px;
+  transition: padding 0.3s ease, margin-top 0.3s ease, font-size 0.3s ease;
+}
+
+.file-upload-container {
+  width: 100%;
+  padding: 0.5rem;
+  transition: padding 0.3s ease;
+}
+
+.file-upload-controls {
+  display: flex;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.file-input {
+  display: none;
+}
+
+.choose-file-button {
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  width: 100px;
+  height: 40px;
+  color: white;
+  border: none;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  margin-right: 1rem;
+  font-size: 12px;
+  transition: padding 0.3s ease, width 0.3s ease, height 0.3s ease, font-size 0.3s ease, margin-right 0.3s ease;
+}
+
+.file-name {
+  margin-left: 1rem;
+  font-size: 12px;
+  transition: margin-left 0.3s ease, font-size 0.3s ease;
+}
+
+.required {
+  color: red;
+  font-size: 15px;
+  margin-left: 10px;
+  transition: font-size 0.3s ease, margin-left 0.3s ease;
+}
+
+.notify-user {
+  margin-left: 0.5rem;
+  font-size: 12px;
+  transition: margin-left 0.3s ease, font-size 0.3s ease;
+}
+
+.priority-critical {
+  background-color: #c91111;
+}
+
+.priority-high {
+  background-color: yellow;
+}
+
+.priority-medium {
+  background-color: greenyellow;
+}
+
+@media (max-width: 992px) {
+  body {
+    font-size: 14px;
+  }
+
+  .update-status-container {
+    width: 95%;
+    margin: 1% auto;
+    margin-top: 10px;
+  }
+
+  .update-status-card {
+    padding: 0.8rem;
+  }
+
+  .update-status-title {
+    font-size: 18px;
+    margin-bottom: 0.8rem;
+    margin-left: -15px;
+  }
+
+  .form-group {
+    padding: 0.4rem;
+  }
+
+  .form-control {
+    padding: 0.4rem;
+    margin-top: 0.4rem;
+    font-size: 11px;
+  }
+
+  .file-upload-container {
+    padding: 0.4rem;
+  }
+
+  .choose-file-button {
+    padding: 0.4rem 0.8rem;
+    width: 80px;
+    height: 30px;
+    font-size: 10px;
+    margin-right: 0.5rem;
+  }
+
+  .file-name {
+    font-size: 10px;
+    margin-left: 0.5rem;
+  }
+
+  .required {
+    font-size: 13px;
+    margin-left: 5px;
+  }
+
+  .notify-user {
+    font-size: 11px;
+    margin-left: 0.3rem;
+  }
+}

@@ -1,0 +1,64 @@
+.AdminUserDashBoard-main-content{
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    max-height: 100vh;
+}
+.AdminUserDashBoard-direction-bar {
+    display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #3333ff 0%, #ccddff 100%);
+  color: white;
+  height: 40px;
+  padding-left: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0px -20px 20px -3px;
+  border-radius: 0 0 15px 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+.AdminUserDashBoard-content2{
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin: 20px 20px 20px 20px;
+}
+.AdminUserDashBoard-content2-RoleCardGrid{
+    display: flex;
+    flex-grow: 1;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.AdminUserDashBoard-content2-RoleCardGrid-RoleCard {
+    margin: 30px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: row;
+    padding: 20px;
+    width: 40%;
+    height: 30vh;
+    border: 1px solid rgb(218, 202, 234);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  }
+  .AdminUserDashBoard-content2-RoleCardGrid-RoleCard-Icon{
+    display:flex;
+    font-size: 70px;
+  }
+  .AdminUserDashBoard-content2-RoleCardGrid-RoleCard-Info{
+    display: flex;
+    flex-direction: column;
+    padding: 0px 0px 0px 40px;
+  }
+  .AdminUserDashBoard-content2-RoleCardGrid-RoleCard-Name{
+    display: flex;
+    font-size: 40px;
+  }
+  .AdminUserDashBoard-content2-RoleCardGrid-RoleCard-Count{
+    display: flex;
+    font-size: 30px;
+    font-weight: bold;
+    padding-left: 2px;
+  }
+  .AdminUserDashBoard-content2-RoleCardGrid-RoleCard:hover {
+    transform: scale(1.05);
+  }

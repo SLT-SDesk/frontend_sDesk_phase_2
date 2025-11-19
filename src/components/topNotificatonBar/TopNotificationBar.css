@@ -1,0 +1,191 @@
+.TopNotificationBar-top-notification-bar {
+  width: 100%;
+  min-height: 47px;
+  max-height: 47px;
+  padding: 0 24px;
+  background-color: #084e8c;
+  color: #222;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+  border-bottom: 1px solid #e0e0e0;
+  z-index: 100;
+}
+
+.TopNotificationBar-notificationIcon-listIcon {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-left: 0;
+}
+
+/* Larger and bolder list icon */
+.TopNotificationBar-list-icon {
+  color: #6796c6;
+  cursor: pointer;
+  font-size: 2.1em !important;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.TopNotificationBar-list-icon:hover {
+  background: #e3f2fd;
+  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.15);
+}
+
+@media (min-width: 768px) {
+  .TopNotificationBar-list-icon {
+    display: none !important;
+  }
+}
+
+.TopNotificationBar-notification-container {
+  position: relative;
+}
+
+/* Larger and bolder notification icon */
+.TopNotificationBar-notification-icon {
+  color: #ef6c00;
+  background: #fff3e0;
+  border-radius: 20%;
+  padding: 3px;
+  font-size: 1.35em !important;
+  box-shadow: 0 2px 8px rgba(239, 108, 0, 0.08);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.TopNotificationBar-notification-icon:hover {
+  background: #ffe0b2;
+  box-shadow: 0 4px 16px rgba(239, 108, 0, 0.15);
+}
+
+.TopNotificationBar-notification-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #d32f2f;
+  color: #fff;
+  border-radius: 50%;
+  padding: 2px 7px;
+  font-size: 0.5em;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.15);
+}
+
+.TopNotificationBar-profile-section {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-right: 0;
+}
+
+.TopNotificationBar-userName {
+  font-weight: 600;
+  color: #f6f5c6;
+  font-size: 1.08em;
+  letter-spacing: 0.01em;
+  border-radius: 4px;
+  padding: 4px 12px;
+  margin-right: 4px;
+}
+
+.TopNotificationBar-role {
+  font-size: 1.2em;
+  color: #fdfeff;
+  border-radius: 4px;
+  padding: 4px 10px;
+  margin-left: 2px;
+  font-weight: 500;
+}
+
+.TopNotificationBar-logout-btn {
+  display: flex;
+  align-items: center;
+  background: #e91111aa;
+  border-radius: 4px;
+  padding: 4px 10px;
+  margin-left: 8px;
+  cursor: pointer;
+  border: #d5ecd4;
+  transition: background 0.2s, border 0.2s;
+}
+.TopNotificationBar-logout-btn:hover {
+  background: #4fb848;
+  border: 1.5px solid #e2d4d4;
+}
+
+.TopNotificationBar-logout-icon {
+  color: #d5ecd4;
+  margin-right: 4px;
+}
+
+.TopNotificationBar-logout-text {
+  color: #f8f8f8;
+  font-weight: 500;
+  font-size: 1em;
+}
+
+/* ConfirmPopup modal override for notification bar */
+.TopNotificationBar-logout-confirm-modal, .ConfirmPopup-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(44, 62, 80, 0.18);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.TopNotificationBar-logout-confirm-content, .ConfirmPopup-content {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(37, 132, 227, 0.795);
+  padding: 32px 28px 24px 28px;
+  min-width: 320px;
+  max-width: 90vw;
+  text-align: center;
+}
+
+.TopNotificationBar-logout-confirm-content p, .ConfirmPopup-content p {
+  font-size: 1.1em;
+  color: #222;
+  margin-bottom: 18px;
+}
+
+.TopNotificationBar-logout-confirm-yes, .ConfirmPopup-confirm {
+  background: #b71c1c;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 24px;
+  margin: 0 8px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.TopNotificationBar-logout-confirm-yes:hover, .ConfirmPopup-confirm:hover {
+  background: #d32f2f;
+}
+
+.TopNotificationBar-logout-confirm-no, .ConfirmPopup-cancel {
+  background: #e0e0e0;
+  color: #222;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 24px;
+  margin: 0 8px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.TopNotificationBar-logout-confirm-no:hover, .ConfirmPopup-cancel:hover {
+  background: #4fb848;
+}
+@media (max-width: 767px) {
+  .TopNotificationBar-role {
+    font-size: 12px;
+  }
+  .TopNotificationBar-userName {
+    font-size: 11px;
+    margin: 0px 0px 0px 10px;
+  }
+}

@@ -1,0 +1,28 @@
+.summary-container {
+  margin: 2% auto;
+  width: 95%;
+  max-width: 1200px;
+  position: relative;
+}
+
+.summary-card {
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+.summary-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.summary-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+
+.summary-container::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.1);
+}

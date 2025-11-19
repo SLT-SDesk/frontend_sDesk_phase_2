@@ -1,0 +1,208 @@
+.AdminAllIncidents-main-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100vh;
+    background-color: aquamarine;
+}
+
+.AdminAllIncidents-direction-bar {
+    display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #3333ff 0%, #ccddff 100%);
+  color: white;
+  height: 40px;
+  padding-left: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0px -20px 20px -3px;
+  border-radius: 0 0 15px 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.AdminAllIncidents-content2 {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+    padding-bottom: 20px;
+}
+
+.AdminAllIncidents-TitleBar {
+    display: flex;
+    flex-direction: row;
+    height: 50px;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.AdminAllIncidents-TitleBar-NameAndIcon {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 10px 0px 10px 20px;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.AdminAllIncidents-TitleBar-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 10px 20px 10px 0px;
+    gap: 20px;
+    font-size: 13px;
+}
+
+.AdminAllIncidents-TitleBar-buttons-ExportData {
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    border: 2px solid #ffffff;
+    gap: 5px;
+    font-weight: 600;
+    background-color: #b10e0e;
+    color: aliceblue;
+}
+
+.AdminAllIncidents-showSearchBar {
+    display: flex;
+    flex-direction: row;
+    height: 40px;
+    max-height: 40px;
+    align-items: center;
+    width: 100%;
+    background-color: rgb(255, 255, 255);
+    justify-content: space-between;
+}
+
+.AdminAllIncidents-showSearchBar-Show {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin: 0px 0px 0px 20px;
+    font-weight: 600;
+}
+
+.AdminAllIncidents-showSearchBar-Show-select {
+    display: flex;
+    border: 1px solid #ccc;
+    width: 80px;
+    font-size: 11px;
+    height: 25px;
+    border-radius: 5px;
+    margin-right: 20px;
+}
+
+.AdminAllIncidents-showSearchBar-Show-select2 {
+    display: flex;
+    border: 1px solid #ccc;
+    width: 100px;
+    font-size: 12px;
+    height: 25px;
+    border-radius: 5px;
+    margin-right: 20px;
+}
+
+.AdminAllIncidents-showSearchBar-SearchBar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin: 0px 20px 0px 0px;
+}
+
+.AdminAllIncidents-showSearchBar-SearchBar-input {
+    display: flex;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    width: 210px;
+    font-size: 13px;
+    height: 25px;
+    border-radius: 5px;
+}
+
+.AdminAllIncidents-table {
+    flex: 1;
+    height: 100%;
+    padding: 10px 20px 0px 20px;
+    max-height: 80%;
+    overflow-y: auto;
+}
+
+.AdminAllIncidents-table table {
+    border-collapse: collapse;
+    background-color: #f8f9fa;
+    width: 100%;
+}
+
+.AdminAllIncidents-table th,
+.AdminAllIncidents-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 12px;
+}
+
+.AdminAllIncidents-table th {
+    background-color: #e9ecef;
+    font-weight: bold;
+}
+
+.AdminAllIncidents-table td {
+    white-space: nowrap;
+}
+
+.AdminAllIncidents-table td:nth-child(3),
+.AdminAllIncidents-table td:nth-child(4),
+.AdminAllIncidents-table td:nth-child(5),
+.AdminAllIncidents-table td:nth-child(6) {
+    white-space: normal;
+    min-width: 100px;
+}
+
+.AdminAllIncidents-content3 {
+    display: flex;
+    flex-grow: 1;
+    max-height: 53px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px 12px 20px;
+    font-size: 12px;
+    font-weight: bold;
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+}
+
+.AdminAllIncidents-content3-team-pagination-buttons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.AdminAllIncidents-content3-team-pagination-buttons button {
+    padding: 2px 8px;
+    border: 1px solid #ddd;
+    background-color: white;
+    cursor: pointer;
+    border-radius: 3px;
+    min-width: 30px;
+}
+
+.AdminAllIncidents-content3-team-pagination-buttons button.active {
+    background-color: #df5050;
+    color: white;
+    border-color: #000000;
+}
+
+.AdminAllIncidents-content3-team-pagination-buttons button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.AdminAllIncidents-content3-team-pagination-buttons span {
+    padding: 5px 10px;
+    color: #666;
+}

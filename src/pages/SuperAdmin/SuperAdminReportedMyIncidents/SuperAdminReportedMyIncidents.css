@@ -1,0 +1,660 @@
+.SuperAdminReportedMyIncidents-main-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100vh;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.SuperAdminReportedMyIncidents-direction-bar {
+    display: flex;
+    align-items: center;
+    background-color: antiquewhite;
+    min-height: 30px;
+    padding: 10px 20px;
+    font-size: 15px;
+    flex-wrap: wrap;
+}
+
+.SuperAdminReportedMyIncidents-content2 {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+    padding-bottom: 20px;
+    width: 100%;
+    max-width: 100%;
+}
+
+.SuperAdminReportedMyIncidents-TitleBar {
+    display: flex;
+    flex-direction: row;
+    height: auto;
+    min-height: 50px;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 10px 0;
+}
+
+.SuperAdminReportedMyIncidents-TitleBar-NameAndIcon {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 10px 0px 10px 20px;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    flex: 1;
+    min-width: 200px;
+}
+
+.SuperAdminReportedMyIncidents-TitleBar-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 10px 20px 10px 0px;
+    gap: 20px;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.SuperAdminReportedMyIncidents-TitleBar-buttons-ExportData {
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    border: 2px solid #ffffff;
+    gap: 5px;
+    font-weight: 600;
+    background-color: #b10e0e;
+    color: aliceblue;
+    padding: 8px 12px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.SuperAdminReportedMyIncidents-TitleBar-buttons-ExportData:hover {
+    background-color: #8a0b0b;
+    transform: translateY(-1px);
+}
+
+.SuperAdminReportedMyIncidents-showSearchBar {
+    display: flex;
+    flex-direction: row;
+    height: auto;
+    min-height: 40px;
+    align-items: center;
+    width: 100%;
+    background-color: rgb(255, 255, 255);
+    justify-content: space-between;
+    padding: 10px 0;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.SuperAdminReportedMyIncidents-showSearchBar-Show {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin: 0px 0px 0px 20px;
+    font-weight: 600;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.SuperAdminReportedMyIncidents-showSearchBar-Show-select {
+    display: flex;
+    border: 1px solid #ccc;
+    width: 100px;
+    min-width: 80px;
+    font-size: 14px;
+    height: 25px;
+    border-radius: 5px;
+    margin-right: 10px;
+    box-sizing: border-box;
+}
+
+.SuperAdminReportedMyIncidents-showSearchBar-Show-select2 {
+    display: flex;
+    border: 1px solid #ccc;
+    width: 180px;
+    min-width: 140px;
+    font-size: 14px;
+    height: 25px;
+    border-radius: 5px;
+    margin-right: 10px;
+    box-sizing: border-box;
+}
+
+.SuperAdminReportedMyIncidents-showSearchBar-SearchBar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin: 0px 20px 0px 0px;
+    flex-shrink: 0;
+}
+
+.SuperAdminReportedMyIncidents-showSearchBar-SearchBar-input {
+    display: flex;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    width: 210px;
+    min-width: 150px;
+    font-size: 13px;
+    height: 25px;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.SuperAdminReportedMyIncidents-table {
+    flex: 1;
+    height: 100%;
+    padding: 10px 20px 0px 20px;
+    max-height: 80%;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.SuperAdminReportedMyIncidents-table-table {
+    border-collapse: collapse;
+    background-color: #f8f9fa;
+    width: 100%;
+    min-width: 600px;
+    table-layout: auto;
+}
+
+.SuperAdminReportedMyIncidents-table th,
+.SuperAdminReportedMyIncidents-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 12px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.SuperAdminReportedMyIncidents-table th {
+    background-color: #e9ecef;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.SuperAdminReportedMyIncidents-table td {
+    white-space: nowrap;
+}
+
+.SuperAdminReportedMyIncidents-table td:nth-child(2),
+.SuperAdminReportedMyIncidents-table td:nth-child(3),
+.SuperAdminReportedMyIncidents-table td:nth-child(4) {
+    white-space: normal;
+    min-width: 100px;
+    max-width: 200px;
+}
+
+.SuperAdminReportedMyIncidents-content3 {
+    display: flex;
+    flex-grow: 1;
+    max-height: 53px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px 12px 20px;
+    font-size: 12px;
+    font-weight: bold;
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+    background-color: white;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.SuperAdminReportedMyIncidents-content3-team-entry-info {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.SuperAdminReportedMyIncidents-content3-team-pagination-buttons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.SuperAdminReportedMyIncidents-content3-team-pagination-buttons button {
+    padding: 2px 8px;
+    border: 1px solid #ddd;
+    background-color: white;
+    cursor: pointer;
+    border-radius: 3px;
+    min-width: 30px;
+}
+
+.SuperAdminReportedMyIncidents-content3-team-pagination-buttons button.active {
+    background-color: #df5050;
+    color: white;
+    border-color: #000000;
+}
+
+.SuperAdminReportedMyIncidents-content3-team-pagination-buttons button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.SuperAdminReportedMyIncidents-content3-team-pagination-buttons span {
+    padding: 5px 10px;
+    color: #666;
+}
+.SuperAdminReportedMyIncidents-tickets-creator {
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.SuperAdminReportedMyIncidents-svr-desk {
+    font-weight: bold;
+    margin-right: 10px;
+    white-space: nowrap;
+}
+/* Large tablets and small desktops (992px and down) */
+@media (max-width: 1199.98px) {
+    .SuperAdminReportedMyIncidents-TitleBar-NameAndIcon {
+        font-size: 18px;
+        margin: 10px 0px 10px 15px;
+    }
+    
+    .SuperAdminReportedMyIncidents-table {
+        padding: 10px 15px 0px 15px;
+    }
+    
+    .SuperAdminReportedMyIncidents-content3 {
+        padding: 25px 20px 12px 15px;
+    }
+}
+
+/* Medium tablets (992px and down) */
+@media (max-width: 991.98px) {
+    .SuperAdminReportedMyIncidents-TitleBar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        height: auto;
+        padding: 15px 0;
+    }
+    
+    .SuperAdminReportedMyIncidents-TitleBar-NameAndIcon {
+        margin: 0px 0px 0px 20px;
+        font-size: 18px;
+    }
+    
+    .SuperAdminReportedMyIncidents-TitleBar-buttons {
+        margin: 0px 20px 0px 20px;
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .SuperAdminReportedMyIncidents-showSearchBar {
+        flex-direction: column;
+        height: auto !important;
+        max-height: none !important;
+        padding: 15px 0;
+        gap: 15px;
+    }
+
+    .SuperAdminReportedMyIncidents-showSearchBar-Show,
+    .SuperAdminReportedMyIncidents-showSearchBar-SearchBar {
+        margin: 0px 20px;
+        width: calc(100% - 40px);
+    }
+
+    .SuperAdminReportedMyIncidents-showSearchBar-Show {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .SuperAdminReportedMyIncidents-showSearchBar-Show-select,
+    .SuperAdminReportedMyIncidents-showSearchBar-Show-select2 {
+        width: auto;
+        min-width: 120px;
+        margin-right: 0px;
+        margin-left: 0px;
+        flex: 1;
+    }
+
+    .SuperAdminReportedMyIncidents-showSearchBar-SearchBar-input {
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .SuperAdminReportedMyIncidents-content3 {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        max-height: none;
+        padding: 20px;
+    }
+    
+    .SuperAdminReportedMyIncidents-content3-team-entry-info {
+        order: 2;
+        text-align: center;
+    }
+    
+    .SuperAdminReportedMyIncidents-content3-team-pagination-buttons {
+        order: 1;
+        justify-content: center;
+    }
+}
+
+/* Small tablets and large phones (768px and down) */
+@media (max-width: 767.98px) {
+    .SuperAdminReportedMyIncidents-direction-bar {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+    
+    .SuperAdminReportedMyIncidents-TitleBar-NameAndIcon {
+        font-size: 16px;
+        margin: 0px 0px 0px 15px;
+        gap: 8px;
+    }
+    
+    .SuperAdminReportedMyIncidents-TitleBar-buttons {
+        margin: 0px 15px 0px 15px;
+    }
+    
+    .SuperAdminReportedMyIncidents-TitleBar-buttons-ExportData {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .SuperAdminReportedMyIncidents-showSearchBar {
+        padding: 10px 0;
+        gap: 10px;
+    }
+
+    .SuperAdminReportedMyIncidents-showSearchBar-Show,
+    .SuperAdminReportedMyIncidents-showSearchBar-SearchBar {
+        margin: 0px 15px;
+        width: calc(100% - 30px);
+    }
+
+    .SuperAdminReportedMyIncidents-showSearchBar-Show {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .SuperAdminReportedMyIncidents-showSearchBar-Show > div {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .SuperAdminReportedMyIncidents-showSearchBar-Show-select,
+    .SuperAdminReportedMyIncidents-showSearchBar-Show-select2 {
+        width: 60%;
+        min-width: 100px;
+        flex: 1;
+    }
+
+    .SuperAdminReportedMyIncidents-table {
+        padding: 5px 10px 0px 10px;
+        overflow-x: auto;
+    }
+    
+    .SuperAdminReportedMyIncidents-table-table {
+        min-width: 500px;
+    }
+    
+    .SuperAdminReportedMyIncidents-table th,
+    .SuperAdminReportedMyIncidents-table td {
+        padding: 6px;
+        font-size: 11px;
+    }
+    
+    .SuperAdminReportedMyIncidents-content3 {
+        padding: 15px;
+        font-size: 11px;
+    }
+    
+    .SuperAdminReportedMyIncidents-content3-team-pagination-buttons button {
+        padding: 2px 6px;
+        font-size: 11px;
+        min-width: 25px;
+    }
+}
+
+/* Small phones (576px and down) */
+@media (max-width: 575.98px) {
+    .SuperAdminReportedMyIncidents-direction-bar {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+    
+    .SuperAdminReportedMyIncidents-TitleBar-NameAndIcon {
+        font-size: 15px;
+        margin: 0px 0px 0px 10px;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    
+    .SuperAdminReportedMyIncidents-TitleBar-buttons {
+        margin: 0px 10px 0px 10px;
+    }
+    
+    .SuperAdminReportedMyIncidents-TitleBar-buttons-ExportData {
+        padding: 5px 8px;
+        font-size: 11px;
+        gap: 3px;
+    }
+
+    .SuperAdminReportedMyIncidents-showSearchBar-Show,
+    .SuperAdminReportedMyIncidents-showSearchBar-SearchBar {
+        margin: 0px 10px;
+        width: calc(100% - 20px);
+    }
+
+    .SuperAdminReportedMyIncidents-showSearchBar-Show > div {
+        font-size: 13px;
+    }
+
+    .SuperAdminReportedMyIncidents-showSearchBar-Show-select,
+    .SuperAdminReportedMyIncidents-showSearchBar-Show-select2 {
+        font-size: 12px;
+        height: 22px;
+    }
+
+    .SuperAdminReportedMyIncidents-showSearchBar-SearchBar-input {
+        font-size: 12px;
+        height: 22px;
+        padding: 6px 8px;
+    }
+
+    .SuperAdminReportedMyIncidents-table {
+        padding: 5px 5px 0px 5px;
+    }
+    
+    .SuperAdminReportedMyIncidents-table-table {
+        min-width: 450px;
+    }
+    
+    .SuperAdminReportedMyIncidents-table th,
+    .SuperAdminReportedMyIncidents-table td {
+        padding: 4px;
+        font-size: 10px;
+    }
+    
+    .SuperAdminReportedMyIncidents-content3 {
+        padding: 10px;
+        font-size: 10px;
+        gap: 8px;
+    }
+    
+    .SuperAdminReportedMyIncidents-content3-team-pagination-buttons {
+        gap: 3px;
+    }
+    
+    .SuperAdminReportedMyIncidents-content3-team-pagination-buttons button {
+        padding: 1px 4px;
+        font-size: 10px;
+        min-width: 20px;
+    }
+}
+
+/* Extra small phones (480px and down) */
+@media (max-width: 479.98px) {
+    .SuperAdminReportedMyIncidents-TitleBar-NameAndIcon {
+        font-size: 14px;
+    }
+    
+    .SuperAdminReportedMyIncidents-table-table {
+        min-width: 400px;
+    }
+    
+    .SuperAdminReportedMyIncidents-table th,
+    .SuperAdminReportedMyIncidents-table td {
+        padding: 3px;
+        font-size: 9px;
+    }
+    
+    .SuperAdminReportedMyIncidents-content3-team-pagination-buttons button {
+        padding: 1px 3px;
+        font-size: 9px;
+        min-width: 18px;
+    }
+}
+
+/* Very small phones (360px and down) */
+@media (max-width: 359.98px) {
+    .SuperAdminReportedMyIncidents-TitleBar-NameAndIcon {
+        font-size: 13px;
+        margin: 0px 0px 0px 8px;
+    }
+    
+    .SuperAdminReportedMyIncidents-TitleBar-buttons {
+        margin: 0px 8px 0px 8px;
+    }
+    
+    .SuperAdminReportedMyIncidents-showSearchBar-Show,
+    .SuperAdminReportedMyIncidents-showSearchBar-SearchBar {
+        margin: 0px 8px;
+        width: calc(100% - 16px);
+    }
+    
+    .SuperAdminReportedMyIncidents-table {
+        padding: 3px 3px 0px 3px;
+    }
+    
+    .SuperAdminReportedMyIncidents-table-table {
+        min-width: 350px;
+    }
+}
+
+/* Popup responsive styles */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.popup-content {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    width: 100%;
+    max-width: 1100px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.popup-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: #d32f2f;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+    z-index: 1001;
+}
+
+
+@media (max-width: 991.98px) {
+    .popup-overlay {
+        padding: 15px;
+    }
+    
+    .popup-content {
+        max-width: 100%;
+        padding: 15px;
+        max-height: 85vh;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .popup-overlay {
+        padding: 10px;
+    }
+    
+    .popup-content {
+        padding: 10px;
+        max-height: 90vh;
+        border-radius: 5px;
+    }
+    
+    .popup-close {
+        top: 5px;
+        right: 10px;
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .popup-overlay {
+        padding: 5px;
+    }
+    
+    .popup-content {
+        padding: 8px;
+        max-height: 95vh;
+    }
+    
+    .popup-close {
+        top: 3px;
+        right: 8px;
+        font-size: 18px;
+    }
+    /* Remove hover effect for .popup-close */
+    .popup-close:hover {
+        background: #d32f2f;
+        color: #fff;
+    } }

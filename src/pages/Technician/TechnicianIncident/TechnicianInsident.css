@@ -1,0 +1,244 @@
+/* Success pop-up overlay for update message */
+.technician-success-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 0;
+    z-index: 99999;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.technician-success-popup-card {
+    margin-top: 24px;
+    background: #d4edda;
+    color: #155724;
+    border: 2px solid #28a745;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(40, 167, 69, 0.18);
+    padding: 18px 32px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideInDown 0.4s cubic-bezier(.42,0,.58,1);
+    pointer-events: auto;
+}
+
+.technician-success-popup-icon {
+    font-size: 2rem;
+    margin-right: 8px;
+}
+
+.technician-success-popup-text {
+    font-size: 1.1em;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+/* Shared gap for main sections */
+.section-gap {
+  margin-bottom: 32px;
+}
+
+/* Center pop-up card overlay */
+.technician-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.3); /* Optional: dim background */
+  z-index: 9999;
+}
+
+.technician-popup-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  max-width: 95vw;
+  width: 400px;
+  padding: 24px 18px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 575px) {
+  .technician-popup-overlay {
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+  }
+  .technician-popup-card {
+    width: 98vw;
+    max-width: 98vw;
+    min-width: 0;
+    padding: 12px 4px;
+    border-radius: 8px;
+    left: 0;
+    right: 0;
+    margin-left: 0;
+    margin-right: 10px;
+    position: relative;
+    box-sizing: border-box;
+    transform: translateX(10vw);
+  }
+}
+
+.section-title {
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.technician-dashboard {
+    display: flex; 
+    height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+
+.technician-dashboard-main {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; 
+    width: 100%;
+}
+
+
+.technician-main-content {
+    background-color: #f4f6f9; 
+    border-radius: 10px;
+    margin: 0 15px 15px 15px;
+    padding: 15px;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.technicianinsident-tickets-creator {
+    background-color: #f0f0f0; 
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+.technicianinsident-svr-desk {
+    font-weight: bold;
+    margin-right: 10px; 
+}
+
+.technicianinsident-created-ticket {
+    margin-left: 5px;
+}
+
+.technician-details-update-btn {
+    padding: 6px 14px;
+    margin-bottom: 3%;
+    background-color: #c91111;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background-color 0.3s;
+}
+
+.technician-details-update-btn:hover{
+    background-color: #555;
+}
+
+.success-message {
+    padding: 10px 15px;
+    margin-top: 15px;
+    border-radius: 5px;
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+@media (min-width: 992px) {
+  .technician-popup-card {
+    width: 98vw;
+    max-width: 98vw;
+    min-width: 0;
+    padding: 12px 4px;
+    border-radius: 8px;
+    left: 0;
+    right: 0;
+    position: relative;
+    box-sizing: border-box;
+    transform: translateX(10vw);
+  }
+  .technicianinsident-tickets-creator {
+    margin: 8px 8px 0 8px;
+  }
+}
+
+
+@media (max-width: 767px) {
+    .technician-dashboard {
+        flex-direction: column;
+    }
+    .technician-main-content {
+        margin: 0 3px 3px 3px;
+        padding: 8px;
+        border-radius: 7px;
+        font-size: 15px;
+        overflow-x: auto;
+    }
+    .technicianinsident-tickets-creator {
+        margin: 3px 3px 0 3px;
+        padding: 6px 8px;
+        font-size: 13px;
+    }
+    .technician-details-update-btn {
+        font-size: 13px;
+        padding: 4px 10px;
+    }
+}
+@media (max-width: 575px) {
+    .technician-dashboard-main {
+        padding: 0 2px;
+    }
+    .technician-main-content {
+        padding: 5px;
+        font-size: 13px;
+    }
+    .technician-details-update-btn {
+        padding: 3px 8px;
+        font-size: 12px;
+    }
+    .technicianinsident-svr-desk,
+    .technicianinsident-created-ticket {
+        font-size: 12px;
+    }
+    .technicianinsident-tickets-creator {
+        padding: 4px 6px;
+        font-size: 12px;
+    }
+}
+.Technician-layout-dashboard .technician-dashboard {
+    height: 100%;
+    width: 100%;
+}
+
+.Technician-layout-dashboard-main .technician-dashboard {
+    height: auto;
+    min-height: 100%;
+    flex-direction: column;
+}

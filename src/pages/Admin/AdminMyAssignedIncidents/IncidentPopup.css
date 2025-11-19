@@ -1,0 +1,70 @@
+/* Incident Popup Styles */
+.incident-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.incident-popup-content {
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 1200px; /* Increased max-width for a wider popup */
+    height: 90vh; /* Set height to 90% of the viewport height */
+    overflow-y: auto; /* Enable vertical scrolling if content overflows */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.incident-popup-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+}
+
+.incident-popup-close-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Custom scrollbar for the popup content */
+.incident-popup-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.incident-popup-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.incident-popup-content::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.incident-popup-content::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

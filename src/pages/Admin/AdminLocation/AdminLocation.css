@@ -1,0 +1,574 @@
+.AdminLocation-main-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  max-height: 92vh;
+}
+
+.AdminLocation-direction-bar {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #3333ff 0%, #ccddff 100%);
+  color: white;
+  height: 40px;
+  padding-left: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0px -20px 20px -3px;
+  border-radius: 0 0 15px 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.AdminLocation-content2 {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.AdminLocation-TitleBar {
+  display: flex;
+  flex-direction: row;
+  height: 50px;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.AdminLocation-TitleBar-NameAndIcon {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 10px 0px 10px 20px;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.AdminLocation-TitleBar-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 10px 20px 10px 0px;
+  gap: 20px;
+  font-size: 13px;
+}
+
+.AdminLocation-TitleBar-buttons-AddUser {
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  border: 2px solid #ffffff;
+  gap: 5px;
+  font-weight: 600;
+  background-color: #b10e0e;
+  color: aliceblue;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.AdminLocation-TitleBar-buttons-ExportData {
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  border: 2px solid #ffffff;
+  gap: 5px;
+  font-weight: 600;
+  background-color: #000000;
+  color: aliceblue;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.AdminLocation-filters {
+  display: flex;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin: 0 20px;
+}
+
+.AdminLocation-filters-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.AdminLocation-region-filter {
+  min-width: 200px;
+}
+
+.AdminLocation-region-select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 200px;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.AdminLocation-region-select:hover {
+  border-color: #b10e0e;
+}
+
+.AdminLocation-search-bar {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 8px 12px;
+  gap: 10px;
+  width: 300px;
+}
+
+.AdminLocation-search-bar .search-icon {
+  color: #666;
+}
+
+.AdminLocation-search-input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+}
+
+.AdminLocation-search-input::placeholder {
+  color: #999;
+}
+
+/* Mobile responsiveness for filters */
+@media (max-width: 768px) {
+  .AdminLocation-filters {
+    margin: 0 10px;
+    padding: 15px;
+  }
+
+  .AdminLocation-filters-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .AdminLocation-region-filter {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .AdminLocation-region-select {
+    width: 100%;
+  }
+
+  .AdminLocation-search-bar {
+    width: 100%;
+  }
+}
+
+.AdminLocation-showSearchBar {
+  display: flex;
+  flex-direction: row;
+  height: 40px;
+  max-height: 40px;
+  align-items: center;
+  width: 100%;
+  background-color: rgb(255, 255, 255);
+  justify-content: space-between;
+}
+
+.AdminLocation-showSearchBar-Show {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin: 0px 0px 0px 20px;
+  font-weight: 600;
+}
+
+.AdminLocation-showSearchBar-Show-select {
+  display: flex;
+  border: 1px solid #ccc;
+  width: 150px;
+  font-size: 14px;
+  height: 25px;
+  border-radius: 5px;
+}
+
+.AdminLocation-showSearchBar-SearchBar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin: 0px 20px 0px 0px;
+}
+
+.AdminLocation-showSearchBar-SearchBar-input {
+  display: flex;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  width: 210px;
+  font-size: 13px;
+  height: 25px;
+  border-radius: 5px;
+}
+
+.AdminLocation-table {
+  flex: 1;
+  height: 100%;
+  padding: 20px;
+  max-height: 80%;
+  overflow-x: auto;  /* Enable horizontal scrolling */
+  overflow-y: auto;  /* Keep vertical scrolling */
+  position: relative;
+  white-space: nowrap;  /* Prevent table content from wrapping */
+  -webkit-overflow-scrolling: touch;  /* Smooth scrolling on touch devices */
+}
+
+.AdminLocation-table table {
+  border-collapse: collapse;
+  background-color: #f8f9fa;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.AdminLocation-table th,
+.AdminLocation-table td {
+  padding: 12px 15px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.AdminLocation-table th {
+  background-color: #e9ecef;
+  font-weight: bold;
+  font-size: 15px;
+  text-align: center;
+}
+
+.AdminLocation-table td {
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+/* Column-specific alignment */
+.AdminLocation-table th:nth-child(1),
+.AdminLocation-table td:nth-child(1) {
+  text-align: center; /* Location Code - center */
+  font-weight: 600;
+}
+
+.AdminLocation-table th:nth-child(2),
+.AdminLocation-table td:nth-child(2) {
+  text-align: left; /* Location Name - left */
+  padding-left: 20px;
+}
+
+.AdminLocation-table th:nth-child(3),
+.AdminLocation-table td:nth-child(3) {
+  text-align: center; /* Region - center */
+}
+
+.AdminLocation-table th:nth-child(4),
+.AdminLocation-table td:nth-child(4) {
+  text-align: left; /* Province - left */
+  padding-left: 20px;
+}
+
+.AdminLocation-table th:nth-child(5),
+.AdminLocation-table td:nth-child(5) {
+  text-align: center; /* Actions - center */
+  white-space: nowrap;
+  display: inline-block;
+}
+
+/* Table row styling improvements */
+.AdminLocation-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.AdminLocation-table tbody tr:hover {
+  background-color: #f1f3f5;
+}
+
+.AdminLocation-table tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.AdminLocation-table tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+/* Table header improvements */
+.AdminLocation-table thead th {
+  position: sticky;
+  top: -20px;
+  z-index: 10;
+  background-color: #343a40;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.AdminLocation-table-edit-btn,
+.AdminLocation-table-delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+.AdminLocation-table-edit-btn {
+  color: #007bff;
+}
+
+.AdminLocation-table-edit-btn:hover {
+  color: #0056b3;
+}
+
+.AdminLocation-table-delete-btn {
+  color: #dc3545;
+}
+
+.AdminLocation-table-delete-btn:hover {
+  color: #a71d2a;
+}
+
+/* Action Buttons Styling */
+.AdminLocation-actions-cell {
+  padding: 8px 12px !important;
+  text-align: center;
+}
+
+.AdminLocation-actions-container {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.AdminLocation-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.AdminLocation-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.AdminLocation-action-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Edit Button */
+.AdminLocation-edit-btn {
+  background: linear-gradient(135deg, #4caf50, #45a049);
+  color: white;
+}
+
+.AdminLocation-edit-btn:hover {
+  background: linear-gradient(135deg, #45a049, #3d8b40);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+/* Delete Button */
+.AdminLocation-delete-btn {
+  background: linear-gradient(135deg, #f44336, #d32f2f);
+  color: white;
+}
+
+.AdminLocation-delete-btn:hover {
+  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}
+
+/* Ripple Effect */
+.AdminLocation-action-btn::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.AdminLocation-action-btn:active::before {
+  width: 100%;
+  height: 100%;
+}
+
+/* Tooltip on hover */
+.AdminLocation-action-btn[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .AdminLocation-action-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  .AdminLocation-actions-container {
+    gap: 6px;
+  }
+}
+
+/* Loading state for buttons */
+.AdminLocation-action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.AdminLocation-action-btn:disabled:hover {
+  box-shadow: none !important;
+  background: #ccc !important;
+}
+
+/* Mobile View */
+@media (max-width: 600px) {
+  .AdminLocation-TitleBar {
+    flex-direction: column;
+    height: auto;
+    align-items: center;
+  }
+
+  .AdminLocation-TitleBar-NameAndIcon {
+    margin: 10px 0;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .AdminLocation-TitleBar-buttons {
+    margin: 10px 0;
+    flex-direction: column;
+    gap: 10px;
+    width: 90%;
+  }
+
+  .AdminLocation-TitleBar-buttons-AddUser,
+  .AdminLocation-TitleBar-buttons-ExportData {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .AdminLocation-showSearchBar {
+    flex-direction: column;
+    height: auto;
+    padding: 10px 0;
+    gap: 10px;
+  }
+
+  .AdminLocation-showSearchBar-Show {
+    margin: 0;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .AdminLocation-showSearchBar-Show-select {
+    width: 90%;
+  }
+
+  .AdminLocation-showSearchBar-SearchBar {
+    margin: 0;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .AdminLocation-showSearchBar-SearchBar-input {
+    width: 90%;
+  }
+
+  .AdminLocation-table {
+    padding: 10px;
+    overflow-x: auto;
+  }
+
+  .AdminLocation-table th,
+  .AdminLocation-table td {
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  .AdminLocation-action-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .AdminLocation-actions-container {
+    gap: 4px;
+  }
+}
+
+/* Tablet View */
+@media (min-width: 601px) and (max-width: 700px) {
+  .AdminLocation-TitleBar-buttons {
+    gap: 10px;
+  }
+
+  .AdminLocation-showSearchBar {
+    padding: 0 10px;
+  }
+
+  .AdminLocation-showSearchBar-Show-select {
+    width: 120px;
+  }
+
+  .AdminLocation-showSearchBar-SearchBar-input {
+    width: 180px;
+  }
+
+  .AdminLocation-table {
+    padding: 15px;
+  }
+
+  .AdminLocation-table th,
+  .AdminLocation-table td {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .AdminLocation-action-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .AdminLocation-actions-container {
+    gap: 5px;
+  }
+}

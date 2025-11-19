@@ -1,0 +1,798 @@
+@media (max-width: 622px) {
+  .UserViewIncident-main-content {
+    padding: 0.5rem 0.2rem;
+    width: 100vw;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .UserViewIncident-content2 {
+    padding: 0.5rem 0.2rem;
+    width: 100vw;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .UserViewIncident-TitleBar {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+    width: 100%;
+  }
+  .UserViewIncident-TitleBar-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .UserViewIncident-table-table {
+    font-size: 12px;
+    width: 100vw;
+    min-width: 0;
+    display: block;
+    overflow-x: auto;
+    box-sizing: border-box;
+  }
+  .UserViewIncident-table-table thead,
+  .UserViewIncident-table-table tbody,
+  .UserViewIncident-table-table tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+  .UserViewIncident-table-table th,
+  .UserViewIncident-table-table td {
+    padding: 6px 4px;
+    font-size: 12px;
+    word-break: break-word;
+  }
+  .UserViewIncident-showSearchBar {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  .UserViewIncident-content3 {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+    font-size: 12px;
+  }
+  .UserViewIncident-content3-team-pagination-buttons button {
+    font-size: 12px;
+    padding: 2px 8px;
+    margin: 0 2px;
+  }
+  .UserViewIncident-TitleBar-buttons-ExportData {
+    width: auto;
+    font-size: 12px;
+    padding: 4px 12px;
+    margin: 0;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .UserViewIncident-refno {
+    font-size: 12px;
+    word-break: break-all;
+  }
+}
+/* UserViewIncident.css - Responsive version maintaining original UI */
+
+.UserViewIncident-main-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  height: 100vh;
+}
+
+.UserViewIncident-direction-bar {
+  display: flex;
+  align-items: center;
+  background-color: antiquewhite;
+  min-height: 30px;
+  padding-left: 20px;
+  font-size: 15px;
+}
+
+.UserViewIncident-content2 {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+  padding-bottom: 20px;
+}
+
+.UserViewIncident-TitleBar {
+  display: flex;
+  flex-direction: row;
+  height: 50px;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.UserViewIncident-TitleBar-NameAndIcon {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 10px 0px 10px 20px;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.UserViewIncident-TitleBar-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 10px 20px 10px 0px;
+  gap: 20px;
+  font-size: 13px;
+}
+
+.UserViewIncident-TitleBar-buttons-ExportData {
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  border: 2px solid #ffffff;
+  gap: 5px;
+  font-weight: 600;
+  background-color: #b10e0e;
+  color: aliceblue;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.UserViewIncident-showSearchBar {
+  display: flex;
+  flex-direction: row;
+  height: 40px;
+  max-height: 40px;
+  align-items: center;
+  width: 100%;
+  background-color: rgb(255, 255, 255);
+  justify-content: space-between;
+}
+
+.UserViewIncident-showSearchBar-Show {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin: 0px 0px 0px 20px;
+  font-weight: 600;
+}
+
+.UserViewIncident-showSearchBar-Show-select {
+  display: flex;
+  border: 1px solid #ccc;
+  width: 100px;
+  font-size: 14px;
+  height: 25px;
+  border-radius: 5px;
+  margin-right: 20px;
+}
+
+.UserViewIncident-showSearchBar-Show-select2 {
+  display: flex;
+  border: 1px solid #ccc;
+  width: 180px;
+  font-size: 14px;
+  height: 25px;
+  border-radius: 5px;
+  margin-right: 20px;
+}
+
+.UserViewIncident-showSearchBar-SearchBar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin: 0px 20px 0px 0px;
+}
+
+.UserViewIncident-showSearchBar-SearchBar-input {
+  display: flex;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  width: 210px;
+  font-size: 13px;
+  height: 25px;
+  border-radius: 5px;
+}
+
+.UserViewIncident-table {
+  flex: 1;
+  height: 100%;
+  padding: 10px 20px 0px 20px;
+  max-height: 81%;
+  overflow-y: auto;
+}
+
+.UserViewIncident-table-table {
+  border-collapse: collapse;
+  background-color: #f8f9fa;
+  width: 100%;
+}
+
+.UserViewIncident-table th,
+.UserViewIncident-table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  font-size: 12px;
+}
+
+.UserViewIncident-table th {
+  background-color: #e9ecef;
+  font-weight: bold;
+}
+
+.UserViewIncident-table td {
+  white-space: nowrap;
+}
+
+.UserViewIncident-table td:nth-child(2),
+.UserViewIncident-table td:nth-child(3),
+.UserViewIncident-table td:nth-child(4) {
+  white-space: normal;
+  min-width: 100px;
+}
+
+.UserViewIncident-refno {
+  cursor: pointer;
+  color: black;
+  text-decoration: none;
+}
+
+.UserViewIncident-content3 {
+  display: flex;
+  flex-grow: 1;
+  max-height: 53px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 30px 12px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
+}
+
+.UserViewIncident-content3-team-pagination-buttons {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.UserViewIncident-content3-team-pagination-buttons button {
+  padding: 2px 8px;
+  border: 1px solid #ddd;
+  background-color: white;
+  cursor: pointer;
+  border-radius: 3px;
+  min-width: 30px;
+}
+
+.UserViewIncident-content3-team-pagination-buttons button.active {
+  background-color: #df5050;
+  color: white;
+  border-color: #000000;
+}
+
+.UserViewIncident-content3-team-pagination-buttons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.UserViewIncident-content3-team-pagination-buttons span {
+  padding: 5px 10px;
+  color: #666;
+}
+
+/* Enhanced modal backdrop with better touch support */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  padding: 10px;
+  box-sizing: border-box;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.modal-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 8px 32px rgba(0, 0, 0, 0.1);
+  padding: 32px 24px 24px 24px;
+  min-width: 350px;
+  max-width: 1200px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  margin: auto;
+  animation: modalFadeIn 0.3s ease-out;
+  transform-origin: center;
+  touch-action: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Improved scrollbar styling for all browsers */
+.modal-card {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+.modal-card::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-card::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.modal-card::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.modal-card::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-card button {
+  background: #c91111;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(201, 17, 17, 0.2);
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.modal-card button:hover {
+  background: #a00e0e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(201, 17, 17, 0.3);
+}
+
+.modal-card button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(201, 17, 17, 0.2);
+}
+
+/* Focus management and accessibility for mobile */
+.modal-backdrop:focus-within {
+  outline: none;
+}
+
+.modal-card:focus {
+  outline: 2px solid #c91111;
+  outline-offset: 2px;
+}
+
+.modal-card button:focus {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .modal-backdrop {
+    background: rgba(0,0,0,0.8);
+  }
+  
+  .modal-card {
+    border: 2px solid #000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .modal-card {
+    animation: none;
+  }
+  
+  .modal-card button {
+    transition: none;
+  }
+  
+  .modal-card button:hover {
+    transform: none;
+  }
+}
+@media (max-width: 768px) and (min-width: 481px) {
+  .modal-backdrop {
+    padding: 15px;
+  }
+
+  .modal-card {
+    width: 95%;
+    max-width: 720px;
+    max-height: 95vh;
+    padding: 24px 20px 20px 20px;
+    border-radius: 10px;
+    margin: -350px auto 0 auto;
+  }
+
+  /* Enhance scrolling for tablet */
+  .modal-card {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .modal-card::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .modal-card::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  .modal-card::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+  }
+
+  .modal-card::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+}
+
+/* Mobile View - 390×844 */
+@media (max-width: 480px) {
+  .modal-backdrop {
+    padding: 8px;
+    align-items: flex-start;
+    padding-top: 20px;
+  }
+
+  .modal-card {
+    position: absolute;
+    left: 75px;
+    right: 16px;
+    width: auto;
+    max-width: calc(100vw - 116px);
+    min-width: auto;
+    max-height: calc(100vh - 40px);
+    padding: 20px 16px 16px 16px;
+    border-radius: 8px;
+    margin: 0;
+    font-size: 14px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.22), 0 10px 40px rgba(0,0,0,0.16);
+  }
+
+  /* Enhanced mobile scrolling */
+  .modal-card {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .modal-card::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Adjust button sizing for mobile */
+  .modal-card button {
+    font-size: 14px;
+    padding: 8px 12px;
+    min-height: 44px;
+    border-radius: 6px;
+  }
+}
+
+/* Very small mobile screens */
+@media (max-width: 360px) {
+  .modal-backdrop {
+    padding: 5px;
+    padding-top: 15px;
+  }
+
+  .modal-card {
+    width: calc(100% - 110px);
+    max-height: calc(100vh - 30px);
+    padding: 16px 12px 12px 12px;
+    border-radius: 6px;
+    margin-left: 100px;
+    margin-right: 10px;
+  }
+}
+
+/* Landscape mobile view */
+@media (max-width: 844px) and (max-height: 480px) and (orientation: landscape) {
+  .modal-backdrop {
+    padding: 5px;
+    align-items: center;
+  }
+
+  .modal-card {
+    position: absolute;
+    left: 100px;
+    right: 0;
+    width: auto;
+    max-width: 800px;
+    max-height: calc(100vh - 10px);
+    padding: 16px 20px 16px 20px;
+    margin: 0;
+  }
+}
+
+/* Responsive Design - Tablets and below */
+@media (max-width: 768px) {
+  .UserViewIncident-direction-bar {
+    padding-left: 15px;
+    font-size: 14px;
+    min-height: 35px;
+  }
+
+  .UserViewIncident-TitleBar {
+    flex-direction: column;
+    height: auto;
+    padding: 10px 0;
+  }
+
+  .UserViewIncident-TitleBar-NameAndIcon {
+    margin: 10px 0px 10px 15px;
+    font-size: 18px;
+  }
+
+  .UserViewIncident-TitleBar-buttons {
+    margin: -40px 15px 10px 0px;
+    justify-content: flex-end;
+  }
+
+  .UserViewIncident-showSearchBar {
+    flex-direction: column;
+    height: auto;
+    max-height: none;
+    padding: 15px 0;
+    gap: 15px;
+  }
+
+  .UserViewIncident-showSearchBar-Show {
+    margin: 0px 15px;
+    width: calc(100% - 30px);
+    justify-content: space-between;
+  }
+
+  .UserViewIncident-showSearchBar-Show-select {
+    margin-right: 0;
+    flex: 1;
+    max-width: 150px;
+  }
+
+  .UserViewIncident-showSearchBar-SearchBar {
+    margin: 0px 15px;
+    width: calc(100% - 30px);
+  }
+
+  .UserViewIncident-showSearchBar-SearchBar-input {
+    width: 100%;
+    max-width: none;
+  }
+
+  .UserViewIncident-table {
+    padding: 10px 15px 0px 15px;
+    overflow-x: auto;
+  }
+
+  .UserViewIncident-table-table {
+    min-width: 600px;
+  }
+
+  .UserViewIncident-content3 {
+    flex-direction: column;
+    padding: 20px 15px;
+    gap: 15px;
+    max-height: none;
+  }
+
+  .UserViewIncident-content3-team-entry-info {
+    order: 2;
+  }
+
+  .UserViewIncident-content3-team-pagination-buttons {
+    order: 1;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .modal-card {
+    max-width: 95vw;
+    width: 95%;
+    padding: 20px 15px;
+    max-height: 95vh;
+  }
+}
+
+/* Mobile devices */
+@media (max-width: 480px) {
+  .UserViewIncident-direction-bar {
+    padding-left: 10px;
+    font-size: 13px;
+    min-height: 40px;
+  }
+
+  .UserViewIncident-TitleBar-NameAndIcon {
+    margin: 10px 0px 10px 10px;
+    font-size: 16px;
+  }
+
+  .UserViewIncident-TitleBar-buttons {
+    margin: 10px 10px 10px 0px;
+  }
+
+  .UserViewIncident-TitleBar-buttons-ExportData {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .UserViewIncident-showSearchBar-Show {
+    margin: 0px 10px;
+    width: calc(100% - 20px);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .UserViewIncident-showSearchBar-Show-select {
+    width: 100%;
+    max-width: none;
+  }
+
+  .UserViewIncident-showSearchBar-SearchBar {
+    margin: 0px 10px;
+    width: calc(100% - 20px)
+  }
+
+  .UserViewIncident-table {
+    padding: 10px 10px 0px 10px;
+  }
+
+  .UserViewIncident-table-table {
+    min-width: 500px;
+  }
+
+  .UserViewIncident-table th,
+  .UserViewIncident-table td {
+    padding: 6px;
+    font-size: 11px;
+  }
+
+  .UserViewIncident-content3 {
+    padding: 15px 10px;
+    font-size: 11px;
+  }
+
+  .UserViewIncident-content3-team-pagination-buttons button {
+    padding: 1px 6px;
+    min-width: 25px;
+    font-size: 11px;
+  }
+
+  .modal-card {
+    max-width: 95vw;
+    width: 95%;
+    padding: 15px 10px;
+    margin: 10px;
+  }
+}
+
+/* Very small devices */
+@media (max-width: 320px) {
+  .UserViewIncident-TitleBar-NameAndIcon {
+    font-size: 14px;
+    gap: 8px;
+  }
+
+  .UserViewIncident-table-table {
+    min-width: 450px;
+  }
+
+  .UserViewIncident-content3-team-pagination-buttons {
+    gap: 3px;
+  }
+
+  .UserViewIncident-content3-team-pagination-buttons button {
+    padding: 1px 4px;
+    min-width: 20px;
+    font-size: 10px;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .UserViewIncident-main-content {
+    height: 100vh;
+  }
+
+  .UserViewIncident-direction-bar {
+    min-height: 25px;
+  }
+
+  .UserViewIncident-TitleBar {
+    height: 40px;
+  }
+
+  .UserViewIncident-TitleBar-NameAndIcon {
+    font-size: 16px;
+    margin: 5px 0px 5px 20px;
+  }
+
+  .UserViewIncident-TitleBar-buttons {
+    margin: 5px 20px 5px 0px;
+  }
+
+  .UserViewIncident-showSearchBar {
+    height: 35px;
+    max-height: 35px;
+  }
+
+  .UserViewIncident-content3 {
+    max-height: 40px;
+    padding: 15px 30px 8px 20px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .UserViewIncident-TitleBar-buttons,
+  .UserViewIncident-showSearchBar,
+  .UserViewIncident-content3,
+  .modal-backdrop {
+    display: none !important;
+  }
+
+  .UserViewIncident-main-content {
+    height: auto;
+  }
+
+  .UserViewIncident-table {
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+/* 1024x1366 (iPad/tablet portrait) popup modal-card size fix */
+@media (min-width: 1020px) and (max-width: 1050px) and (min-height: 1350px) and (max-height: 1370px) {
+  .modal-card {
+    min-width: 340px;
+    max-width: 820px;
+    width: 1000px;
+    font-size: 15px;
+    padding: 18px 14px 14px 14px;
+    border-radius: 12px;
+    box-shadow: 0 10px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
+    margin-top: -10px;
+  }
+}

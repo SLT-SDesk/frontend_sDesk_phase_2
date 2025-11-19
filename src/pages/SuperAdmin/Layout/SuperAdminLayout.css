@@ -1,0 +1,36 @@
+.SuperAdmin-layout-dashboard {
+    display: flex;
+    max-height: 100vh;
+    width: 100%;
+}
+
+.SuperAdmin-layout-dashboard-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.SuperAdmin-layout-dashboard-main > :last-child {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Overlay styles for mobile */
+@media (max-width: 768px) {
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+}
+
+@media (min-width: 769px) {
+    .overlay {
+        display: none;
+    }
+}

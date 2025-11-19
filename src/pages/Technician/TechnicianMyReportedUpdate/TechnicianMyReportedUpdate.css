@@ -1,0 +1,103 @@
+/* Popup card/modal: increase height for better visibility */
+.popup-content, .modal-card {
+  max-height: 95vh !important;
+  height: 90vh !important;
+  min-height: 400px;
+  overflow-y: auto;
+  margin-top: 32px !important;
+}
+.TechnicianMyReportedUpdate-main-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100vh;
+    background-color: #ffffff;
+  }
+  
+  .TechnicianMyReportedUpdate-direction-bar {
+    display: flex;
+    align-items: center;
+    background-color: antiquewhite;
+    min-height: 30px;
+    padding-left: 20px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  
+  .TechnicianMyReportedUpdate-direction-bar svg {
+    margin: 0 5px;
+  }
+  
+  .TechnicianMyReportedUpdate-content2 {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: auto;
+    padding: 10px;
+    background-color: #f8f9fa;
+  }
+  
+  .TechnicianMyReportedUpdate-details {
+    padding: 15px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin: 20px 68px 50px 68px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .TechnicianMyReportedUpdate-details h3 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  .TechnicianMyReportedUpdate-details-item {
+    display: flex;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  
+  .TechnicianMyReportedUpdate-details-label {
+    font-weight: 600;
+    width: 120px;
+    color: #333;
+  }
+  
+  .TechnicianMyReportedUpdate-button-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 0;
+  }
+  
+  .TechnicianMyReportedUpdate-details-back-btn {
+    padding: 6px 14px;
+    background-color: #b10e0e;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background-color 0.3s;
+  }
+  
+  .TechnicianMyReportedUpdate-details-back-btn:hover {
+    background-color: #900b0b;
+  }
+  .TechnicianMyReportedUpdate-tickets-creator {
+    display: flex;
+    align-items: center; 
+    background-color: #f0f0f0; 
+    padding: 10px; 
+    border-radius: 5px; 
+    width: 1290px;
+  
+   
+  }
+  
+  .TechnicianMyReportedUpdate-svr-desk {
+    font-weight: bold;
+    margin-right: 10px; 
+  }

@@ -1,0 +1,160 @@
+.AdminAddUser-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.AdminAddUser-content {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  width: 850px;
+  max-width: 95%;
+  min-height: 90vh;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.AdminAddUser-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.AdminAddUser-header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.AdminAddUser-header button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ef4444;
+}
+
+.AdminAddUser-header button:hover {
+  color: #b91c1c;
+}
+
+.AdminAddUser-form-grid {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.form-left,
+.form-right {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.AdminAddUser-content label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #374151;
+}
+
+.AdminAddUser-content input,
+.AdminAddUser-content select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #f9fafb;
+}
+
+.checkbox-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 57vh;
+  overflow-y: auto;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 10px;
+  background: #f9fafb;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.AdminAddUser-content input:focus,
+.AdminAddUser-content select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.AdminAddUser-content select:disabled {
+  background: #e5e7eb;
+  cursor: not-allowed;
+}
+
+.AdminAddUser-form-submit {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.AdminAddUser-form-submit button {
+  background: #b10e0e;
+  position: absolute;
+  bottom: 10vh;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.form-left-ActiveCheckBox {
+  display: flex;
+  flex-grow: 1;
+}
+.form-left-ActiveCheckBox input[type="checkbox"] {
+  margin-left: -150px;
+  transform: scale(0.65);
+}
+
+.AdminAddUser-form-submit button:hover {
+  background: #8b0b0b;
+}
+.checkbox-item input[type="checkbox"] {
+  width: auto;
+  margin-right: 8px;
+}
+
+.checkbox-item input[type="checkbox"]:disabled + span {
+  color: #9ca3af;
+}
+.error-message {
+  color: red;
+  font-size: 12px;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.success-message {
+  color: green;
+}
+
+.message-margin {
+  margin-left: 8px;
+}

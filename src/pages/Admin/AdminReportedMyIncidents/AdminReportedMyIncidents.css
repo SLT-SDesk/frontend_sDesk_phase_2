@@ -1,0 +1,508 @@
+.AdminReportedMyIncidents-main-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100vh;
+}
+
+.AdminReportedMyIncidents-direction-bar {
+    display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #3333ff 0%, #ccddff 100%);
+  color: white;
+  height: 40px;
+  padding-left: 20px;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0px -20px 20px -3px;
+  border-radius: 0 0 15px 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.AdminReportedMyIncidents-content2 {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+    padding-bottom: 20px;
+}
+
+.AdminReportedMyIncidents-TitleBar {
+    display: flex;
+    flex-direction: row;
+    height: 50px;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.AdminReportedMyIncidents-TitleBar-NameAndIcon {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 10px 0px 10px 20px;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.AdminReportedMyIncidents-TitleBar-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 10px 20px 10px 0px;
+    gap: 20px;
+    font-size: 13px;
+}
+
+.AdminReportedMyIncidents-TitleBar-buttons-ExportData {
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    border: 2px solid #ffffff;
+    gap: 5px;
+    font-weight: 600;
+    background-color: #b10e0e;
+    color: aliceblue;
+}
+
+.AdminReportedMyIncidents-showSearchBar {
+    display: flex;
+    flex-direction: row;
+    height: 40px;
+    max-height: 40px;
+    align-items: center;
+    width: 100%;
+    background-color: rgb(255, 255, 255);
+    justify-content: space-between;
+}
+
+.AdminReportedMyIncidents-showSearchBar-Show {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin: 0px 0px 0px 20px;
+    font-weight: 600;
+}
+
+.AdminReportedMyIncidents-showSearchBar-Show-select {
+    display: flex;
+    border: 1px solid #ccc;
+    width: 100px;
+    font-size: 14px;
+    height: 25px;
+    border-radius: 5px;
+    margin-right: 20px;
+}
+
+.AdminReportedMyIncidents-showSearchBar-Show-select2 {
+    display: flex;
+    border: 1px solid #ccc;
+    width: 180px;
+    font-size: 14px;
+    height: 25px;
+    border-radius: 5px;
+    margin-right: 20px;
+}
+
+.AdminReportedMyIncidents-showSearchBar-SearchBar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin: 0px 20px 0px 0px;
+}
+
+.AdminReportedMyIncidents-showSearchBar-SearchBar-input {
+    display: flex;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    width: 210px;
+    font-size: 13px;
+    height: 25px;
+    border-radius: 5px;
+}
+
+.AdminReportedMyIncidents-table {
+    flex: 1;
+    height: 100%;
+    padding: 10px 20px 0px 20px;
+    max-height: 80%;
+    overflow-y: auto;
+}
+
+.AdminReportedMyIncidents-table-table {
+    border-collapse: collapse;
+    background-color: #f8f9fa;
+    width: 100%;
+}
+
+.AdminReportedMyIncidents-table th,
+.AdminReportedMyIncidents-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 12px;
+}
+
+.AdminReportedMyIncidents-table th {
+    background-color: #e9ecef;
+    font-weight: bold;
+}
+
+.AdminReportedMyIncidents-table td {
+    white-space: nowrap;
+}
+.AdminReportedMyIncidents-no-data{
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    margin-left: 60%;
+}
+
+.AdminReportedMyIncidents-table td:nth-child(2),
+.AdminReportedMyIncidents-table td:nth-child(3),
+.AdminReportedMyIncidents-table td:nth-child(4) {
+    white-space: normal;
+    min-width: 100px;
+}
+
+.AdminReportedMyIncidents-content3 {
+    display: flex;
+    flex-grow: 1;
+    max-height: 53px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px 12px 20px;
+    font-size: 12px;
+    font-weight: bold;
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+}
+
+.AdminReportedMyIncidents-content3-team-pagination-buttons {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.AdminReportedMyIncidents-content3-team-pagination-buttons button {
+    padding: 2px 8px;
+    border: 1px solid #ddd;
+    background-color: white;
+    cursor: pointer;
+    border-radius: 3px;
+    min-width: 30px;
+}
+
+.AdminReportedMyIncidents-content3-team-pagination-buttons button.active {
+    background-color: #df5050;
+    color: white;
+    border-color: #000000;
+}
+
+.AdminReportedMyIncidents-content3-team-pagination-buttons button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.AdminReportedMyIncidents-content3-team-pagination-buttons span {
+    padding: 5px 10px;
+    color: #666;
+}
+.AdminReportedMyIncidents-tickets-creator {
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.AdminReportedMyIncidents-svr-desk {
+    font-weight: bold;
+    margin-right: 10px;
+}
+/* Large tablets and small desktops (1200px and below) */
+@media (max-width: 1200px) {
+    .AdminReportedMyIncidents-tickets-creator {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .AdminReportedMyIncidents-direction-bar {
+        padding-left: 15px;
+        font-size: 14px;
+    }
+    
+    .AdminReportedMyIncidents-TitleBar-NameAndIcon {
+        margin: 10px 0px 10px 15px;
+        font-size: 18px;
+    }
+    
+    .AdminReportedMyIncidents-TitleBar-buttons {
+        margin: 10px 15px 10px 0px;
+        gap: 15px;
+    }
+}
+
+/* Tablets (992px and below) */
+@media (max-width: 991.98px) {
+    .AdminReportedMyIncidents-main-content {
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .AdminReportedMyIncidents-TitleBar {
+        flex-direction: column;
+        height: auto;
+        padding: 10px 0;
+        gap: 10px;
+    }
+    
+    .AdminReportedMyIncidents-TitleBar-NameAndIcon {
+        margin: 5px 0px 5px 15px;
+        font-size: 16px;
+    }
+    
+    .AdminReportedMyIncidents-TitleBar-buttons {
+        margin: 5px 15px 5px 15px;
+        justify-content: flex-start;
+        gap: 10px;
+    }
+    
+    .AdminReportedMyIncidents-showSearchBar {
+        flex-direction: column;
+        height: auto !important;
+        max-height: none !important;
+        padding: 10px 0;
+    }
+
+    .AdminReportedMyIncidents-showSearchBar-Show,
+    .AdminReportedMyIncidents-showSearchBar-SearchBar {
+        margin: 5px 15px;
+        width: calc(100% - 30px);
+    }
+
+    .AdminReportedMyIncidents-showSearchBar-Show {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .AdminReportedMyIncidents-showSearchBar-Show-select,
+    .AdminReportedMyIncidents-showSearchBar-Show-select2 {
+        width: auto;
+        min-width: 120px;
+        margin-right: 10px;
+        margin-left: 0;
+    }
+
+    .AdminReportedMyIncidents-showSearchBar-SearchBar-input {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .AdminReportedMyIncidents-table {
+        padding: 10px 15px 0px 15px;
+        overflow-x: auto;
+    }
+    
+    .AdminReportedMyIncidents-content3 {
+        padding: 15px 15px 12px 15px;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .AdminReportedMyIncidents-content3-team-pagination-buttons {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+}
+
+/* Small tablets and large phones (768px and below) */
+@media (max-width: 767.98px) {
+    .AdminReportedMyIncidents-direction-bar {
+        padding-left: 10px;
+        font-size: 13px;
+        min-height: 35px;
+    }
+    
+    .AdminReportedMyIncidents-TitleBar-NameAndIcon {
+        margin: 5px 0px 5px 10px;
+        font-size: 15px;
+        gap: 8px;
+    }
+    
+    .AdminReportedMyIncidents-TitleBar-buttons {
+        margin: 5px 10px 5px 10px;
+        font-size: 12px;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .AdminReportedMyIncidents-TitleBar-buttons-ExportData {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    .AdminReportedMyIncidents-showSearchBar-Show {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .AdminReportedMyIncidents-showSearchBar-Show > div {
+        margin-bottom: 8px;
+        width: 100%;
+    }
+
+    .AdminReportedMyIncidents-showSearchBar-Show-select,
+    .AdminReportedMyIncidents-showSearchBar-Show-select2 {
+        width: 100%;
+        max-width: 200px;
+        margin-right: 0;
+    }
+    
+    .AdminReportedMyIncidents-showSearchBar-SearchBar-input {
+        width: 100%;
+        max-width: none;
+    }
+
+    .AdminReportedMyIncidents-table {
+        padding: 10px 10px 0px 10px;
+        overflow-x: auto;
+    }
+    
+    .AdminReportedMyIncidents-table-table {
+        min-width: 600px;
+    }
+    
+    .AdminReportedMyIncidents-table th,
+    .AdminReportedMyIncidents-table td {
+        padding: 6px 4px;
+        font-size: 11px;
+    }
+    
+    .AdminReportedMyIncidents-content3 {
+        padding: 10px;
+        font-size: 11px;
+    }
+    
+    .AdminReportedMyIncidents-content3-team-pagination-buttons button {
+        padding: 4px 6px;
+        min-width: 25px;
+        font-size: 11px;
+    }
+}
+
+/* Mobile phones (480px and below) */
+@media (max-width: 480px) {
+    .AdminReportedMyIncidents-direction-bar {
+        padding-left: 8px;
+        font-size: 12px;
+        min-height: 30px;
+    }
+    
+    .AdminReportedMyIncidents-TitleBar-NameAndIcon {
+        margin: 5px 0px 5px 8px;
+        font-size: 14px;
+        gap: 6px;
+    }
+    
+    .AdminReportedMyIncidents-TitleBar-buttons {
+        margin: 5px 8px 5px 8px;
+        font-size: 11px;
+        gap: 6px;
+    }
+    
+    .AdminReportedMyIncidents-TitleBar-buttons-ExportData {
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+    
+    .AdminReportedMyIncidents-showSearchBar-Show,
+    .AdminReportedMyIncidents-showSearchBar-SearchBar {
+        margin: 5px 8px;
+        width: calc(100% - 16px);
+    }
+    
+    .AdminReportedMyIncidents-showSearchBar-Show-select,
+    .AdminReportedMyIncidents-showSearchBar-Show-select2 {
+        width: 100%;
+        max-width: 150px;
+        font-size: 12px;
+        height: 30px;
+    }
+    
+    .AdminReportedMyIncidents-showSearchBar-SearchBar-input {
+        padding: 6px 8px;
+        font-size: 12px;
+        height: 30px;
+    }
+    
+    .AdminReportedMyIncidents-table {
+        padding: 8px;
+    }
+    
+    .AdminReportedMyIncidents-table-table {
+        min-width: 450px;
+    }
+    
+    .AdminReportedMyIncidents-table th,
+    .AdminReportedMyIncidents-table td {
+        padding: 4px 3px;
+        font-size: 10px;
+    }
+    
+    .AdminReportedMyIncidents-content3 {
+        padding: 8px;
+        font-size: 10px;
+        gap: 8px;
+    }
+    
+    .AdminReportedMyIncidents-content3-team-pagination-buttons {
+        gap: 3px;
+    }
+    
+    .AdminReportedMyIncidents-content3-team-pagination-buttons button {
+        padding: 3px 5px;
+        min-width: 20px;
+        font-size: 10px;
+    }
+}
+
+/* Extra small devices (360px and below) */
+@media (max-width: 360px) {
+    .AdminReportedMyIncidents-direction-bar {
+        padding-left: 5px;
+        font-size: 11px;
+    }
+    
+    .AdminReportedMyIncidents-TitleBar-NameAndIcon {
+        margin: 5px 0px 5px 5px;
+        font-size: 13px;
+    }
+    
+    .AdminReportedMyIncidents-TitleBar-buttons {
+        margin: 5px 5px 5px 5px;
+        font-size: 10px;
+    }
+    
+    .AdminReportedMyIncidents-showSearchBar-Show,
+    .AdminReportedMyIncidents-showSearchBar-SearchBar {
+        margin: 5px;
+        width: calc(100% - 10px);
+    }
+    
+    .AdminReportedMyIncidents-table {
+        padding: 5px;
+    }
+    
+    .AdminReportedMyIncidents-table-table {
+        min-width: 400px;
+    }
+    
+    .AdminReportedMyIncidents-content3 {
+        padding: 5px;
+    }
+}

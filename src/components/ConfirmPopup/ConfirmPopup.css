@@ -1,0 +1,129 @@
+.ConfirmPopup-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.ConfirmPopup-content {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    min-width: 60vw;
+    max-width: 90%;
+    min-height: 30vh;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.ConfirmPopup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.ConfirmPopup-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.ConfirmPopup-header button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ef4444;
+}
+
+.ConfirmPopup-header button:hover {
+    color: #b91c1c;
+}
+
+.ConfirmPopup-body {
+    margin-bottom: 20px;
+}
+
+.ConfirmPopup-body p {
+    font-size: 14px;
+    color: #374151;
+    margin: 0;
+}
+
+.ConfirmPopup-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.ConfirmPopup-cancel,
+.ConfirmPopup-confirm {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.ConfirmPopup-cancel {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.ConfirmPopup-cancel:hover {
+    background: #d1d5db;
+}
+
+.ConfirmPopup-confirm {
+    background: #b10e0e;
+    color: white;
+}
+
+.ConfirmPopup-confirm:hover {
+    background: #8b0b0b;
+}
+
+/* Mobile View (≤768px) */
+@media (max-width: 768px) {
+    .ConfirmPopup-content {
+        width: 300px;
+        padding: 16px;
+    }
+
+    .ConfirmPopup-header h2 {
+        font-size: 16px;
+    }
+
+    .ConfirmPopup-body p {
+        font-size: 12px;
+    }
+
+    .ConfirmPopup-cancel,
+    .ConfirmPopup-confirm {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
+
+/* Tablet View (769px–1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .ConfirmPopup-content {
+        width: 350px;
+        padding: 20px;
+    }
+
+    .ConfirmPopup-header h2 {
+        font-size: 17px;
+    }
+
+    .ConfirmPopup-body p {
+        font-size: 13px;
+    }
+}

@@ -1,0 +1,41 @@
+/* Additional responsive styles for CategorySelector */
+
+@media (max-width: 768px) {
+  .category-selector-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  
+  .category-selector-button {
+    width: 180px !important;
+    font-size: 12px !important;
+  }
+
+  .category-selector-menu {
+    width: 180px !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .category-selector-button {
+    width: 200px !important;
+    font-size: 13px !important;
+  }
+
+  .category-selector-menu {
+    width: 200px !important;
+  }
+}
+
+/* Style for option count badges */
+.option-count-badge {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  margin-left: 8px;
+  font-weight: bold;
+}

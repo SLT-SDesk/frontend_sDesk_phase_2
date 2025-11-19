@@ -1,0 +1,148 @@
+.AdminAddLocation-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.AdminAddLocation-content {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  width: 500px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  min-height: 80vh;
+}
+
+.AdminAddLocation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.AdminAddLocation-header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.AdminAddLocation-header button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ef4444;
+}
+
+.AdminAddLocation-header button:hover {
+  color: #b91c1c;
+}
+
+.AdminAddLocation-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.AdminAddLocation-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.AdminAddLocation-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.AdminAddLocation-field label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.AdminAddLocation-field input {
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #f9fafb;
+  width: 100%;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.AdminAddLocation-field select {
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #f9fafb;
+  width: 100%;
+}
+
+.AdminAddLocation-field input:focus,
+.AdminAddLocation-field select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.AdminAddLocation-field input:disabled {
+  background: #e5e7eb;
+  cursor: not-allowed;
+}
+
+.AdminAddLocation-field input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.AdminAddLocation-field input[style*="border-color: rgb(220, 53, 69)"] {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.AdminAddLocation-form-submit {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.AdminAddLocation-form-submit button {
+  background: #b10e0e;
+  color: white;
+  max-height: 40px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  position: absolute;
+  bottom: 14vh;
+}
+
+.AdminAddLocation-form-submit button:hover {
+  background: #8b0b0b;
+}
+.AdminAddLocation-form-error-text {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 2px;
+  display: block;
+  font-weight: 500;
+}
+/* Helper text styling */
+.AdminAddLocation-helper-text {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #6b7280;
+  font-style: italic;
+}

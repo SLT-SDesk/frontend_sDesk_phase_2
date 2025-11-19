@@ -1,0 +1,176 @@
+.AdminLocationTree-content {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    align-items: center;
+    z-index: 100000;
+  }
+  
+  .AdminLocationTree-content-TreePopup {
+    background: rgb(255, 255, 255);
+    border-radius: 8px;
+    width: 75vw;
+    max-width: 600px;
+    height: 82vh;
+    max-height: 600px;
+    overflow-y: auto;
+    padding: 20px;
+    flex-direction: column;
+    border: 1px solid #000000;
+  }
+  
+  .AdminLocationTree-content-TreePopup-Header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #8b8787;
+    margin-bottom: 5px;
+  }
+  
+  .AdminLocationTree-content-TreePopup-Header h3 {
+    font-size: 18px;
+  }
+  
+  .AdminLocationTree-content-TreePopup-Header-closeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ee3838;
+  }
+
+  .AdminLocationTree-content-TreePopup-SearchBox {
+    position: relative;
+    margin: 10px 0 15px;
+    padding: 0 5px;
+  }
+
+  .AdminLocationTree-content-TreePopup-SearchInput {
+    width: 100%;
+    padding: 8px 35px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .AdminLocationTree-content-TreePopup-SearchInput:focus {
+    border-color: #007bff;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 18px;
+  }
+
+  .AdminLocationTree-search-results {
+    padding: 5px;
+  }
+
+  .AdminLocationTree-search-result-item {
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-bottom: 5px;
+  }
+
+  .AdminLocationTree-search-result-item:hover {
+    background-color: #f0f0f0;
+  }
+
+  .AdminLocationTree-search-result-item .location-name {
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+
+  .AdminLocationTree-search-result-item .location-path {
+    font-size: 12px;
+    color: #666;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .AdminLocationTree-node {
+    margin-bottom: 8px;
+  }
+  
+  .AdminLocationTree-content-TreePopup-Body-Label {
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 5px 0;
+    display: flex;
+    align-items: center;
+    transition: transform 0.1s ease-in-out;
+  }
+  
+  .AdminLocationTree-content-TreePopup-Body-Label:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.02);
+    border-radius: 4px;
+  }
+  
+  .AdminLocationTree-content-TreePopup-Body-SubNodes {
+    margin-left: 30px;
+  }
+  
+  .AdminLocationTree-sublocation {
+    margin: 5px 0;
+  }
+  
+  .AdminLocationTree-content-TreePopup-Body-SubNodes-Label {
+    cursor: pointer;
+    padding: 5px 0;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    transition: transform 0.1s ease-in-out;
+  }
+  
+  .AdminLocationTree-content-TreePopup-Body-SubNodes-Label.AdminLocationTree-item:hover {
+    transform: scale(1.02);
+    background-color: #f0f0f0;
+    border-radius: 4px;
+  }
+  
+  .AdminLocationTree-item {
+    cursor: pointer;
+    padding: 5px 0 5px 20px;
+    font-size: 13px;
+    font-weight: 400;
+    transition: all 0.1s ease;
+  }
+  
+  .AdminLocationTree-item:hover {
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    transform: scale(1.01);
+  }
+  
+  .arrow-icon {
+    margin-right: 8px;
+    color: #555;
+  }

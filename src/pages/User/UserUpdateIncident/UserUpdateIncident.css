@@ -1,0 +1,515 @@
+@media (max-width: 780px) {
+  .modal-card {
+    width: 98vw !important;
+    min-width: 0 !important;
+    max-width: 100vw !important;
+    left: 1vw !important;
+    right: 1vw !important;
+    padding: 10px 2vw 10px 2vw !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+    overflow-x: auto;
+  }
+  .UserUpdateIncident-section,
+  .UserUpdateIncident-section-content,
+  .UserUpdateIncident-table {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+    overflow-x: auto;
+  }
+  .UserUpdateIncident-table th,
+  .UserUpdateIncident-table td {
+    font-size: 0.92rem;
+    padding: 0.5rem 0.3rem;
+    word-break: break-word;
+  }
+  .UserUpdateIncident-section-header {
+    font-size: 1rem;
+    padding: 0.7rem 0.7rem;
+  }
+  .btn-close-modal {
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+}
+:root {
+  --primary-bg-color: #f8f9fa;
+  --secondary-bg-color: #ffffff;
+  --font-color: #333;
+  --border-color: #dee2e6;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --danger-color: #dc3545;
+  --danger-hover-color: #c82333;
+}
+
+.container-fluid.vh-100 {
+  background-color: var(--primary-bg-color);
+}
+
+.direction-bar {
+  display: flex;
+  align-items: center;
+  background-color: #e9ecef;
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.direction-bar svg {
+  margin: 0 0.5rem;
+}
+
+.content-area {
+  padding: 1.5rem;
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  border-color: var(--danger-color);
+}
+
+.btn-danger:hover {
+  background-color: var(--danger-hover-color);
+  border-color: var(--danger-hover-color);
+}
+
+
+/* Enhanced modal specific styles with touch support */
+.UserUpdateIncident-modal-content {
+  background-color: transparent;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none !important;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.UserUpdateIncident-section {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
+  padding: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  touch-action: auto;
+}
+
+.UserUpdateIncident-section-header {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #222;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 1.25rem;
+  margin-bottom: 0;
+  position: relative;
+  touch-action: manipulation;
+}
+
+.UserUpdateIncident-section-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 1.25rem;
+  right: 1.25rem;
+  height: 2px;
+  background: linear-gradient(90deg, #c91111, transparent);
+}
+
+.UserUpdateIncident-section-content {
+  padding: 1.25rem;
+  touch-action: auto;
+}
+
+.UserUpdateIncident-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: 0.97rem;
+  margin-bottom: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  touch-action: auto;
+}
+
+.UserUpdateIncident-table th,
+.UserUpdateIncident-table td {
+  border: 1px solid var(--border-color);
+  padding: 0.875rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+  word-wrap: break-word;
+  -ms-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.UserUpdateIncident-table th {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.UserUpdateIncident-table td {
+  background: #fff;
+  transition: background-color 0.2s ease;
+}
+
+.UserUpdateIncident-table tr:hover td {
+  background: #f8f9fa;
+}
+
+.UserUpdateIncident-footer {
+  border-top: 1px solid var(--border-color);
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 1rem 1.25rem;
+  font-size: 0.95rem;
+  color: #555;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  border-radius: 0 0 8px 8px;
+  touch-action: manipulation;
+}
+
+.btn-close-modal {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #e0e0e0;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: #666;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 42px;
+  min-width: 42px;
+}
+
+.btn-close-modal:hover {
+  background: #fff;
+  color: #c91111;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-close-modal:active {
+  transform: scale(0.95);
+}
+
+/* Focus and accessibility improvements */
+.btn-close-modal:focus {
+  outline: 2px solid #c91111;
+  outline-offset: 2px;
+}
+
+.UserUpdateIncident-section:focus-within {
+  box-shadow: 0 2px 8px rgba(201, 17, 17, 0.1);
+}
+
+.UserUpdateIncident-table th:focus,
+.UserUpdateIncident-table td:focus {
+  outline: 2px solid #c91111;
+  outline-offset: -2px;
+}
+
+/* High contrast and accessibility modes */
+@media (prefers-contrast: high) {
+  .UserUpdateIncident-section {
+    border: 2px solid #000;
+  }
+  
+  .UserUpdateIncident-section-header {
+    background: #000;
+    color: #fff;
+  }
+  
+  .btn-close-modal {
+    border: 2px solid #000;
+    background: #fff;
+    color: #000;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .UserUpdateIncident-table td,
+  .btn-close-modal {
+    transition: none;
+  }
+  
+  .btn-close-modal:hover {
+    transform: none;
+  }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .UserUpdateIncident-modal-content {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .btn-close-modal {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+  }
+}
+
+/* Android Chrome specific fixes */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .UserUpdateIncident-table {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}
+
+/* Tablet View - 768×1024 */
+@media (max-width: 768px) and (min-width: 481px) {
+  .content-area {
+    padding: 1.25rem;
+  }
+  
+  .direction-bar {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+  }
+  
+  .UserUpdateIncident-modal-content {
+    padding: 0;
+  }
+  
+  .UserUpdateIncident-section {
+    margin-bottom: 1rem;
+    border-radius: 6px;
+  }
+  
+  .UserUpdateIncident-section-header {
+    font-size: 1.1rem;
+    padding: 0.875rem 1rem;
+  }
+  
+  .UserUpdateIncident-section-content {
+    padding: 1rem;
+  }
+  
+  .UserUpdateIncident-footer {
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+    gap: 1rem;
+  }
+  
+  .UserUpdateIncident-table {
+    font-size: 0.9rem;
+  }
+  
+  .UserUpdateIncident-table th,
+  .UserUpdateIncident-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .btn-close-modal {
+    width: 38px;
+    height: 38px;
+    top: 0.75rem;
+    right: 0.75rem;
+    font-size: 1.1rem;
+  }
+}
+
+/* Mobile View - 390×844 */
+@media (max-width: 480px) {
+  .content-area {
+    padding: 0.75rem;
+  }
+  
+  .direction-bar {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  .UserUpdateIncident-modal-content {
+    padding: 0;
+  }
+  
+  .UserUpdateIncident-section {
+    margin-bottom: 0.75rem;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+  
+  .UserUpdateIncident-section-header {
+    font-size: 1rem;
+    padding: 0.75rem 0.875rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  }
+  
+  .UserUpdateIncident-section-content {
+    padding: 0.875rem;
+  }
+  
+  .UserUpdateIncident-footer {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.85rem;
+    gap: 0.75rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .UserUpdateIncident-table {
+    font-size: 0.85rem;
+    border-radius: 4px;
+  }
+  
+  .UserUpdateIncident-table th,
+  .UserUpdateIncident-table td {
+    padding: 0.5rem 0.375rem;
+    font-size: 0.85rem;
+    word-break: break-word;
+  }
+
+  .UserUpdateIncident-table th {
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  /* Improve table readability on mobile */
+  .UserUpdateIncident-table td {
+    line-height: 1.4;
+  }
+
+  /* Make tables horizontally scrollable if needed */
+  .UserUpdateIncident-section-content {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .btn-close-modal {
+    width: 36px;
+    height: 36px;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 1rem;
+  }
+}
+
+/* Very small mobile screens */
+@media (max-width: 360px) {
+  .content-area {
+    padding: 0.5rem;
+  }
+  
+  .UserUpdateIncident-section-header {
+    font-size: 0.95rem;
+    padding: 0.625rem 0.75rem;
+  }
+  
+  .UserUpdateIncident-section-content {
+    padding: 0.75rem;
+  }
+  
+  .UserUpdateIncident-table th,
+  .UserUpdateIncident-table td {
+    padding: 0.375rem 0.25rem;
+    font-size: 0.8rem;
+  }
+
+  .UserUpdateIncident-footer {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .btn-close-modal {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Landscape mobile orientation */
+@media (max-width: 844px) and (max-height: 480px) and (orientation: landscape) {
+  .UserUpdateIncident-section-header {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.95rem;
+  }
+  
+  .UserUpdateIncident-section-content {
+    padding: 0.75rem;
+  }
+  
+  .UserUpdateIncident-table th,
+  .UserUpdateIncident-table td {
+    padding: 0.4rem 0.3rem;
+    font-size: 0.8rem;
+  }
+
+  .UserUpdateIncident-footer {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8rem;
+  }
+
+  .btn-close-modal {
+    width: 30px;
+    height: 30px;
+    font-size: 0.85rem;
+    top: 0.25rem;
+    right: 0.25rem;
+  }
+}
+
+/* Legacy tablet support */
+@media (max-width: 768px) {
+  .content-area {
+    padding: 1rem;
+  }
+  .direction-bar {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+  .UserUpdateIncident-modal-content {
+    padding: 0.5rem;
+    gap: 1rem;
+  }
+  .UserUpdateIncident-section-header {
+    font-size: 1rem;
+    padding: 0.5rem 0.5rem 0.4rem 0.5rem;
+  }
+  .UserUpdateIncident-section-content {
+    padding: 0 0.5rem 0.5rem 0.5rem;
+  }
+  .UserUpdateIncident-footer {
+    padding: 0.5rem 0.5rem;
+    font-size: 0.95rem;
+    gap: 0.75rem;
+  }
+  .UserUpdateIncident-table th,
+  .UserUpdateIncident-table td {
+    padding: 0.5rem 0.3rem;
+    font-size: 0.95rem;
+  }
+}

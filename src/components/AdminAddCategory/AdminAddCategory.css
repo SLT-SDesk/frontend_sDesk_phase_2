@@ -1,0 +1,639 @@
+.AdminAddCategory-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+    padding: 16px;
+}
+
+.AdminAddCategory-content1 {
+    background: #ffffff;
+    padding: 28px;
+    border-radius: 16px;
+    min-height: 90vh;
+    width: 55vw;
+    max-width: 100%;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.AdminAddCategory-content1-topcontainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.AdminAddCategory-content1-topcontainer-selectContainer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.AdminAddCategory-content1-topcontainer-label {
+    font-weight: 600;
+    font-size: 16px;
+    color: #1f2937;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 14px;
+}
+
+.AdminAddCategory-content1-topcontainer-select {
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #ffffff;
+    min-width: 180px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.AdminAddCategory-content1-topcontainer-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    transform: translateY(-1px);
+}
+
+.AdminAddCategory-content1 button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ef4444;
+    transition: color 0.2s;
+}
+
+.AdminAddCategory-content1 button:hover {
+    color: #b91c1c;
+}
+
+.AdminAddCategory-content1-formContainer {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 20px;
+    background: #fafbfc;
+    border-radius: 12px;
+    margin: 8px 0;
+    border: 1px solid #e2e8f0;
+}
+
+.AdminAddCategory-content1-formContainer-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    flex-grow: 1;
+}
+
+.AdminAddCategory-content1-formContainer-form label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #374151;
+    margin-bottom: 6px;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    font-size: 12px;
+}
+
+.AdminAddCategory-content1-formContainer-form input,
+.AdminAddCategory-content1-formContainer-form select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #ffffff;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.AdminAddCategory-content1-formContainer-form input:focus,
+.AdminAddCategory-content1-formContainer-form select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    transform: translateY(-1px);
+}
+
+.AdminAddCategory-content1-formContainer-form select:disabled {
+    background: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+    border-color: #d1d5db;
+    transform: none;
+    box-shadow: none;
+}
+
+.AdminAddCategory-content1-formContainer-form-submit {
+    margin-top: auto;
+    padding-top: 24px;
+    border-top: 2px solid #f1f5f9;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+}
+
+.AdminAddCategory-content1-formContainer-form-submit button {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 120px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.AdminAddCategory-content1-formContainer-form-submit button[type="submit"] {
+    background: #b10e0e;
+    color: white;
+}
+
+.AdminAddCategory-content1-formContainer-form-submit button[type="button"] {
+    background: #4b5563;
+    color: white;
+}
+
+.AdminAddCategory-content1-formContainer-form-submit button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.AdminAddCategory-content1-formContainer-form-submit button[type="submit"]:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+}
+
+.AdminAddCategory-content1-formContainer-form-submit button[type="button"]:hover {
+    background: linear-gradient(135deg, #4b5563, #374151);
+}
+
+.AdminAddCategory-content1-formContainer-form-submit button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.AdminAddCategory-content1-error-message {
+    color: #dc2626;
+    font-size: 13px;
+    margin-top: 6px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 20px;
+    font-weight: 500;
+    padding: 8px 12px;
+    background: #fef2f2;
+    border-left: 4px solid #dc2626;
+    border-radius: 4px;
+}
+
+/* Success message styling */
+.AdminAddCategory-success-message {
+    color: #059669;
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 16px;
+    text-align: center;
+    padding: 12px 16px;
+    background: #ecfdf5;
+    border-left: 4px solid #059669;
+    border-radius: 4px;
+    animation: fadeInSuccess 0.3s ease-in-out;
+}
+
+@keyframes fadeInSuccess {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Field group styling for better organization */
+.AdminAddCategory-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+}
+
+.AdminAddCategory-field-group:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.AdminAddCategory-field-group label {
+    margin-top: 0 !important;
+    margin-bottom: 8px !important;
+}
+
+/* Responsive Design */
+
+/* Large Desktop (1440px and above) */
+@media (min-width: 1440px) {
+    .AdminAddCategory-content1 {
+        width: 45vw;
+        max-width: 800px;
+    }
+}
+
+/* Desktop (1024px to 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+    .AdminAddCategory-content1 {
+        width: 55vw;
+        max-width: 700px;
+    }
+}
+
+/* Tablet (768px to 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .AdminAddCategory-modal {
+        padding: 12px;
+    }
+    
+    .AdminAddCategory-content1 {
+        width: 85vw;
+        max-width: 650px;
+        padding: 24px;
+        min-height: 88vh;
+    }
+    
+    .AdminAddCategory-content1-topcontainer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+    
+    .AdminAddCategory-content1-topcontainer-selectContainer {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .AdminAddCategory-content1-topcontainer-select {
+        min-width: 200px;
+    }
+    
+    .AdminAddCategory-content1-formContainer {
+        padding: 16px;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form {
+        gap: 20px;
+    }
+    
+    .AdminAddCategory-field-group {
+        padding: 14px;
+    }
+}
+
+/* Mobile Large (480px to 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+    .AdminAddCategory-modal {
+        padding: 8px;
+        align-items: stretch;
+        justify-content: stretch;
+    }
+    
+    .AdminAddCategory-content1 {
+        width: calc(100vw - 16px);
+        height: calc(100vh - 16px);
+        max-width: none;
+        max-height: none;
+        min-height: calc(100vh - 16px);
+        padding: 18px;
+        border-radius: 10px;
+    }
+    
+    .AdminAddCategory-content1-topcontainer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        margin-bottom: 18px;
+        padding-bottom: 12px;
+    }
+    
+    .AdminAddCategory-content1-topcontainer-selectContainer {
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .AdminAddCategory-content1-topcontainer-label {
+        font-size: 13px;
+    }
+    
+    .AdminAddCategory-content1-topcontainer-select {
+        min-width: 150px;
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    
+    .AdminAddCategory-content1-formContainer {
+        padding: 12px;
+        background: #f8fafc;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form {
+        gap: 18px;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form label {
+        font-size: 12px;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form input,
+    .AdminAddCategory-content1-formContainer-form select {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    
+    .AdminAddCategory-field-group {
+        padding: 12px;
+        gap: 8px;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form-submit {
+        margin-top: 20px;
+        padding-top: 20px;
+        align-self: stretch;
+        flex-direction: row;
+        justify-content: center;
+        gap: 12px;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form-submit button {
+        flex: 1;
+        max-width: 130px;
+        padding: 12px 18px;
+        font-size: 13px;
+    }
+    
+    .AdminAddCategory-success-message {
+        font-size: 13px;
+        margin-top: 12px;
+        padding: 10px 12px;
+    }
+    
+    .AdminAddCategory-content1-error-message {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}
+
+/* Mobile Small (320px to 479px) */
+@media (max-width: 479px) {
+    .AdminAddCategory-modal {
+        padding: 6px;
+        align-items: stretch;
+        justify-content: stretch;
+    }
+    
+    .AdminAddCategory-content1 {
+        width: calc(100vw - 12px);
+        height: calc(100vh - 12px);
+        max-width: none;
+        max-height: none;
+        min-height: calc(100vh - 12px);
+        padding: 14px;
+        border-radius: 8px;
+    }
+    
+    .AdminAddCategory-content1-topcontainer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+    }
+    
+    .AdminAddCategory-content1-topcontainer-selectContainer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    
+    .AdminAddCategory-content1-topcontainer-label {
+        font-size: 12px;
+        text-align: center;
+    }
+    
+    .AdminAddCategory-content1-topcontainer-select {
+        min-width: auto;
+        width: 100%;
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+    
+    .AdminAddCategory-content1-formContainer {
+        padding: 8px;
+        background: #f8fafc;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form {
+        gap: 14px;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form label {
+        font-size: 11px;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form input,
+    .AdminAddCategory-content1-formContainer-form select {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+    
+    .AdminAddCategory-field-group {
+        padding: 10px;
+        gap: 6px;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form-submit {
+        margin-top: 16px;
+        padding-top: 16px;
+        align-self: stretch;
+        flex-direction: row;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form-submit button {
+        flex: 1;
+        max-width: 110px;
+        padding: 10px 14px;
+        font-size: 11px;
+        letter-spacing: 0.3px;
+    }
+    
+    .AdminAddCategory-content1-error-message {
+        font-size: 10px;
+        padding: 4px 8px;
+        margin-top: 4px;
+    }
+    
+    .AdminAddCategory-success-message {
+        font-size: 11px;
+        margin-top: 8px;
+        padding: 8px 10px;
+    }
+}
+
+/* Landscape orientation adjustments for mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+    .AdminAddCategory-modal {
+        align-items: flex-start;
+        padding-top: 5px;
+    }
+    
+    .AdminAddCategory-content1 {
+        min-height: auto;
+        max-height: 95vh;
+        width: 90vw;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form {
+        gap: 8px;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form label {
+        margin-top: 6px;
+    }
+}
+
+/* Enhanced mobile form layout */
+@media (max-width: 767px) {
+    .AdminAddCategory-field-group {
+        margin-bottom: 8px;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form > div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form > div > label {
+        order: 1;
+        margin-bottom: 4px;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form > div > select,
+    .AdminAddCategory-content1-formContainer-form > div > input {
+        order: 2;
+        margin-bottom: 4px;
+    }
+    
+    .AdminAddCategory-content1-formContainer-form > div > .AdminAddCategory-content1-error-message {
+        order: 3;
+        margin-bottom: 8px;
+    }
+}
+
+/* Screen reader only content */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Focus management for better accessibility */
+.AdminAddCategory-content1 *:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Button loading state */
+.AdminAddCategory-content1-formContainer-form-submit button:disabled {
+    position: relative;
+    color: transparent;
+}
+
+.AdminAddCategory-content1-formContainer-form-submit button:disabled::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Smooth transitions for better UX */
+* {
+    box-sizing: border-box;
+}
+
+.AdminAddCategory-content1-formContainer-form input,
+.AdminAddCategory-content1-formContainer-form select {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.AdminAddCategory-content1-formContainer-form input:hover,
+.AdminAddCategory-content1-formContainer-form select:hover {
+    border-color: #94a3b8;
+}
+
+/* Enhanced error state styling */
+.AdminAddCategory-content1-formContainer-form input[aria-invalid="true"],
+.AdminAddCategory-content1-formContainer-form select[aria-invalid="true"] {
+    border-color: #dc2626;
+    background-color: #fef2f2;
+}
+
+.AdminAddCategory-content1-formContainer-form input[aria-invalid="true"]:focus,
+.AdminAddCategory-content1-formContainer-form select[aria-invalid="true"]:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
