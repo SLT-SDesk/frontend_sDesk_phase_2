@@ -1,0 +1,77 @@
+.total-incidents-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0e0;
+  height: 100%;
+}
+
+.incidents-content {
+  padding: 24px !important;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+}
+
+.info-icon {
+  color: #999;
+  font-size: 20px;
+}
+
+.incidents-count {
+  font-size: 48px;
+  font-weight: 700;
+  color: #333;
+  margin: 8px 0 16px 0;
+  line-height: 1;
+}
+
+.severity-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.severity-badge {
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 12px;
+  height: 24px;
+}
+
+.severity-badge.critical {
+  background-color: #ff4444;
+  color: white;
+}
+
+.severity-badge.critical .MuiChip-label {
+  padding: 0 10px;
+}
+
+.severity-badge.high {
+  background-color: #ff9800;
+  color: white;
+}
+
+.severity-badge.high .MuiChip-label {
+  padding: 0 10px;
+}
+
+.severity-badge.medium {
+  background-color: #ffc107;
+  color: white;
+}
+
+.severity-badge.medium .MuiChip-label {
+  padding: 0 10px;
+}

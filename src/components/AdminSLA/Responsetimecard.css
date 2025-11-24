@@ -1,0 +1,58 @@
+.response-time-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0e0;
+  height: 100%;
+}
+
+.response-content {
+  padding: 24px !important;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+}
+
+.time-icon {
+  color: #999;
+  font-size: 20px;
+}
+
+.percentage-value {
+  font-size: 48px;
+  font-weight: 700;
+  color: #333;
+  margin: 8px 0 16px 0;
+  line-height: 1;
+}
+
+.progress-container {
+  margin: 16px 0;
+}
+
+.progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  background-color: #e0e0e0;
+}
+
+.progress-bar .MuiLinearProgress-bar {
+  background-color: #333;
+  border-radius: 4px;
+}
+
+.avg-time {
+  font-size: 14px;
+  color: #666;
+  margin-top: 8px;
+}
