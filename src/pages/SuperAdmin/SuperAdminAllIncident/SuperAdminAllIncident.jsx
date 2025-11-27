@@ -1,17 +1,26 @@
 import React, { useState, useEffect } from "react";
 import TechnicianInsident from "../../Technician/TechnicianIncident/TechnicianInsident";
-import { FaHistory, FaSearch } from "react-icons/fa";
+import { FaHistory, FaSearch, FaRegClock } from "react-icons/fa"; 
 import { TiExportOutline } from "react-icons/ti";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAdminTeamDataRequest } from "../../../redux/incident/incidentSlice";
-import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import "./SuperAdminAllIncident.css";
+import IncidentTimelineDialog from "../../../components/IncidentTimelinePopup/IncidentTimelineDialog"; // ⭐ use popup
 
 const SuperAdminAllIncident = () => {
   const [showIncidentPopup, setShowIncidentPopup] = useState(false);
   const [selectedIncident, setSelectedIncident] = useState(null);
+
+  //  state for Incident Timeline popup (SLA inside component)
+  const [timelineOpen, setTimelineOpen] = useState(false);
+  const [timelineData, setTimelineData] = useState({
+    refNo: "",
+    status: "",
+    priority: "",
+  });
+
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -19,7 +28,6 @@ const SuperAdminAllIncident = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const {
     incidents,
@@ -38,7 +46,6 @@ const SuperAdminAllIncident = () => {
 
   if (!user) return <div>Error: User not found. Please login again.</div>;
 
-  // ✅ Helper functions
   const getMainCategoryNameFromDatabase = (categoryItemCode) => {
     const transformedCategories =
       categoryItems?.map((item) => ({
@@ -90,7 +97,6 @@ const SuperAdminAllIncident = () => {
     return location ? location.loc_name : locationCode;
   };
 
-  // ✅ Process incident data
   const tableData =
     incidents?.map((incident) => ({
       refNo: incident.incident_number,
@@ -101,10 +107,10 @@ const SuperAdminAllIncident = () => {
       mainCategory: getMainCategoryNameFromDatabase(incident.category),
       status: incident.status,
       location: getLocationName(incident.location),
+      priority: incident.priority || "", //  use priority for SLA
       rawCategory: incident.category,
     })) || [];
 
-  // ✅ Filtering logic
   const filteredData = tableData.filter((item) => {
     const matchesSearch = Object.values(item).some((val) =>
       String(val).toLowerCase().includes(searchTerm.toLowerCase())
@@ -117,8 +123,7 @@ const SuperAdminAllIncident = () => {
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
-  // ✅ Pagination logic
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
   const indexOfLast = currentPage * rowsPerPage;
   const indexOfFirst = indexOfLast - rowsPerPage;
   const currentRows = filteredData.slice(indexOfFirst, indexOfLast);
@@ -131,7 +136,16 @@ const SuperAdminAllIncident = () => {
     }
   };
 
-  // ✅ UPDATED Export to Excel with header details
+  //  open timeline popup – SLA logic inside IncidentTimelineDialog
+  const handleViewTimeline = (refNo, status, priority) => {
+    setTimelineData({
+      refNo,
+      status,
+      priority,
+    });
+    setTimelineOpen(true);
+  };
+
   const exportToExcel = () => {
     if (filteredData.length === 0) {
       alert("No data to export!");
@@ -141,7 +155,6 @@ const SuperAdminAllIncident = () => {
     const generatedDate = new Date().toLocaleString();
     const totalRecords = filteredData.length;
 
-    // Header info rows
     const headerInfo = [
       [`Report: All Incidents`],
       [`Name: ${user?.name || user?.user_name || "N/A"}`],
@@ -152,7 +165,6 @@ const SuperAdminAllIncident = () => {
       [],
     ];
 
-    // Table headers
     const tableHeaders = [
       [
         "Reference No",
@@ -163,10 +175,10 @@ const SuperAdminAllIncident = () => {
         "Main Category",
         "Location",
         "Status",
+        "Priority",
       ],
     ];
 
-    // Table rows
     const tableRows = filteredData.map((item) => [
       item.refNo,
       getUserName(item.assignedTo),
@@ -176,6 +188,7 @@ const SuperAdminAllIncident = () => {
       item.mainCategory,
       item.location,
       item.status,
+      item.priority,
     ]);
 
     const finalData = [...headerInfo, ...tableHeaders, ...tableRows];
@@ -191,22 +204,25 @@ const SuperAdminAllIncident = () => {
       { wch: 25 },
       { wch: 25 },
       { wch: 15 },
+      { wch: 15 },
     ];
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "All Incidents");
 
     const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    const blob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
     saveAs(blob, `All_Incidents_${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
-  // ✅ Render table rows
   const renderTableRows = () => {
     if (currentRows.length === 0) {
       return (
         <tr>
-          <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>
+          
+          <td colSpan="7" style={{ textAlign: "center", padding: "20px" }}>
             No incidents found.
           </td>
         </tr>
@@ -236,11 +252,23 @@ const SuperAdminAllIncident = () => {
         <td>{row.category}</td>
         <td>{row.location}</td>
         <td className="team-status-text">{row.status}</td>
+        
+        <td>
+          <button
+            className="incident-action-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewTimeline(row.refNo, row.status, row.priority);
+            }}
+          >
+            <FaRegClock size={12} />
+            &nbsp;View Timeline
+          </button>
+        </td>
       </tr>
     ));
   };
 
-  // ✅ Render pagination buttons
   const renderPaginationButtons = () => {
     const maxButtons = 7;
     const buttons = [];
@@ -324,7 +352,6 @@ const SuperAdminAllIncident = () => {
     );
   }
 
-  // ✅ Final UI
   return (
     <div className="SuperAdminincidentViewAll-main-content">
       <div className="SuperAdminincidentViewAll-direction-bar">
@@ -347,7 +374,6 @@ const SuperAdminAllIncident = () => {
           </div>
         </div>
 
-        {/* ✅ Search & Filter */}
         <div className="SuperAdminincidentViewAll-showSearchBar">
           <div className="SuperAdminincidentViewAll-showSearchBar-Show">
             Entries:
@@ -400,7 +426,6 @@ const SuperAdminAllIncident = () => {
           </div>
         </div>
 
-        {/* ✅ Table */}
         <div className="SuperAdminincidentViewAll-table">
           <table>
             <thead>
@@ -411,13 +436,13 @@ const SuperAdminAllIncident = () => {
                 <th>Category</th>
                 <th>Location</th>
                 <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>{renderTableRows()}</tbody>
           </table>
         </div>
 
-        {/* ✅ Pagination */}
         <div className="SuperAdminincidentViewAll-content3">
           <span>
             Showing {indexOfFirst + 1} to{" "}
@@ -443,7 +468,6 @@ const SuperAdminAllIncident = () => {
           </div>
         </div>
 
-        {/* ✅ Popup */}
         {showIncidentPopup && selectedIncident && (
           <div className="incident-popup-overlay">
             <div className="incident-popup-content">
@@ -483,6 +507,15 @@ const SuperAdminAllIncident = () => {
             </div>
           </div>
         )}
+
+        
+        <IncidentTimelineDialog
+          open={timelineOpen}
+          onClose={() => setTimelineOpen(false)}
+          incidentRef={timelineData.refNo}
+          status={timelineData.status}
+          priority={timelineData.priority}
+        />
       </div>
     </div>
   );
