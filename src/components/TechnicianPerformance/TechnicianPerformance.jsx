@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { dummyTechnicians } from "./dummyData";
+import { fetchTechnicianData } from "../../utils/slaDummyData";
+
+
 
 /* material ui*/
 import {
@@ -51,7 +53,7 @@ const StatusDot = styled.span`
 
 /*  main logic eka */
 /*state management */
-const TechnicianPerformance = () => {
+const TechnicianPerformance = ({ dateRange }) => {
   const [technicians, setTechnicians] = useState([]);
   const [filteredTechnicians, setFilteredTechnicians] = useState([]);
 
@@ -59,15 +61,26 @@ const TechnicianPerformance = () => {
   const [statusFilter, setStatusFilter] = useState("All");
 
   /* Load dummy data when date filter changes ( later----In backend integration, instead of this i have to use api call) */
-  useEffect(() => {
-    loadDummyData();
-  }, []);
+ useEffect(() => {
+    if (!dateRange?.start || !dateRange?.end) return;
 
-  const loadDummyData = () => {
-    // later----replace this with backend API call later
-    setTechnicians(dummyTechnicians);
-    setFilteredTechnicians(dummyTechnicians);
-  };
+    // NEW CODE — get teamId same as SLA page
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const teamId = user.teamId || user.team || undefined;
+
+    async function loadTechData() {
+      const result = await fetchTechnicianData({
+        start: dateRange.start,
+        end: dateRange.end,
+        teamId,   // NEW — pass teamId 
+      });
+
+      setTechnicians(result);
+      setFilteredTechnicians(result);
+    }
+
+    loadTechData();
+}, [dateRange]);
 
   /* search + status filtering */
   useEffect(() => {

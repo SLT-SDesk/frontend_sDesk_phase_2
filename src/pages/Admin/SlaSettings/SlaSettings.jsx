@@ -8,6 +8,8 @@ import TotalIncidentsCard from "../../../components/AdminSLA/Totalincidentscard"
 import fetchSlaData from "../../../utils/slaDummyData";
 // import "SLASettingsPage.css";
 import "./SlaSettings.css";
+// technician performance component
+import TechnicianPerformance from "../../../components/TechnicianPerformance/TechnicianPerformance";
 
 const SlaSettings = () => {
   const [range, setRange] = useState(() => {
@@ -109,8 +111,8 @@ const SlaSettings = () => {
               data?.response?.avgMinutes
                 ? `${data.response.avgMinutes} min`
                 : loading
-                ? "..."
-                : "—"
+                  ? "..."
+                  : "—"
             }
           />
           <ResolveRateCard
@@ -119,11 +121,14 @@ const SlaSettings = () => {
               data?.resolve?.avgHours
                 ? `${data.resolve.avgHours} hrs`
                 : loading
-                ? "..."
-                : "—"
+                  ? "..."
+                  : "—"
             }
           />
         </div>
+        {/* Technician Performance*/}
+        <TechnicianPerformance dateRange={range} />
+
       </div>
     </div>
   );
