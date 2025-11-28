@@ -1,1 +1,86 @@
 
+name: Frontend CD - Server-Side Build & Deploy
+
+# Triggers the workflow only on push events to the deployment branches
+on:
+  push:
+    branches:
+      - testing
+      - production
+
+jobs:
+  # STEP 1: Wait for CI to Pass
+  ci_check:
+    name: Wait for CI Success
+    # References the CI workflow file to ensure code quality and build integrity passed
+    uses: ./.github/workflows/frontend-ci.yml 
+
+  # STEP 2: Deployment
+  deployment:
+    needs: [ci_check] # Only run if CI check succeeds
+    runs-on: ubuntu-latest
+    
+    # Define environment variables using GitHub secrets for security
+    env:
+      TARGET_SERVER: ${{ secrets.SSH_HOST }}
+      TARGET_USER: ${{ secrets.SSH_USERNAME }}
+      # Directory on the server to store the cloned repository (for building)
+      GIT_REPO_PATH: '/home/${{ secrets.SSH_USERNAME }}/app_repo/frontend'
+      # Directory the web server serves files from (final destination)
+      HOSTING_PATH_TESTING: '/var/www/testing-app/html' 
+      HOSTING_PATH_PRODUCTION: '/var/www/production-app/html' 
+      
+    steps:
+      - name: 🚀 Deploy and Build on Linux Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.TARGET_SERVER }}
+          username: ${{ env.TARGET_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 3251 # <-- ADDED YOUR CUSTOM PORT HERE
+          script: |
+            # --- Setup Variables for Current Run ---
+            DEPLOY_BRANCH="${{ github.ref_name }}"
+            REPO_URL="https://github.com/${{ github.repository }}"
+            REPO_PATH="${{ env.GIT_REPO_PATH }}/$DEPLOY_BRANCH"
+            
+            # Set the final destination path based on the branch
+            if [ "$DEPLOY_BRANCH" == "testing" ]; then
+              HOSTING_PATH="${{ env.HOSTING_PATH_TESTING }}"
+            else
+              HOSTING_PATH="${{ env.HOSTING_PATH_PRODUCTION }}"
+            fi
+            
+            echo "Starting server-side build and deployment for branch $DEPLOY_BRANCH"
+            
+            # 1. Clone or Pull the Latest Code
+            # If the repo doesn't exist, clone it. Otherwise, hard-reset to the latest commit.
+            if [ ! -d "$REPO_PATH/.git" ]; then
+              echo "Cloning repository..."
+              mkdir -p "$REPO_PATH"
+              git clone $REPO_URL "$REPO_PATH"
+            fi
+            
+            cd "$REPO_PATH"
+            git fetch origin
+            git checkout "$DEPLOY_BRANCH"
+            git reset --hard origin/"$DEPLOY_BRANCH" 
+            
+            # 2. Install Dependencies and Build
+            echo "Installing dependencies and running build..."
+            # Assumes Node.js/NPM is correctly configured on the server
+            npm ci 
+            npm run build 
+            
+            # 3. Deploy the Build Artifact (Atomic Update)
+            echo "Deploying built files from $REPO_PATH/dist to $HOSTING_PATH"
+            BUILD_OUTPUT_DIR="$REPO_PATH/dist" # Assuming 'dist' is the output folder
+            
+            # rsync for robust, efficient, and atomic file transfer
+            # The --delete flag removes files from the destination that are no longer in the source
+            rsync -av --delete --exclude 'node_modules' "$BUILD_OUTPUT_DIR/" "$HOSTING_PATH/"
+            
+            echo "Deployment successful. Files updated in $HOSTING_PATH"
+            
+      - name: 🎉 Deployment Complete
+        run: echo "Deployment of ${{ github.ref_name }} branch to Linux server finished."
