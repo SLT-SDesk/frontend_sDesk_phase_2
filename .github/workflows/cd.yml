@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - testing
-      - production
+      #- production
 
 jobs:
   # STEP 1: Wait for CI to Pass
@@ -24,28 +24,28 @@ jobs:
       TARGET_SERVER: ${{ secrets.SSH_HOST }}
       TARGET_USER: ${{ secrets.SSH_USERNAME }}
       # Directory on the server to store the cloned repository (for building)
-      GIT_REPO_PATH: '/home/${{ secrets.SSH_USERNAME }}/app_repo/frontend'
+      GIT_REPO_PATH: '/home/${{ secrets.SSH_USERNAME }}/tmp/sdesk'
       # Directory the web server serves files from (final destination)
-      HOSTING_PATH_TESTING: '/var/www/testing-app/html' 
-      HOSTING_PATH_PRODUCTION: '/var/www/production-app/html' 
+      HOSTING_PATH_TESTING: '/var/www/sdesk_main/Sdesk'  #29/11
+      #HOSTING_PATH_PRODUCTION: '/var/www/production-app/html' 
       
     steps:
       - name: 🚀 Deploy and Build on Linux Server via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ env.TARGET_SERVER }}
-          username: ${{ env.TARGET_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.SSH_HOST }}   #29/11
+          username: ${{ secrets.SSH_USERNAME }} #29/11
+          key: ${{ secrets.SSH_PRIVATE_KEY }} #29/11
           port: 3251 # Using custom port
           script: |
             # --- Setup Variables for Current Run ---
             DEPLOY_BRANCH="${{ github.ref_name }}"
             REPO_URL="https://github.com/${{ github.repository }}"
-            REPO_PATH="${{ env.GIT_REPO_PATH }}/$DEPLOY_BRANCH"
+            REPO_PATH="/tmp/sdesk"
             
             # Set the final destination path based on the branch
             if [ "$DEPLOY_BRANCH" == "testing" ]; then
-              HOSTING_PATH="${{ env.HOSTING_PATH_TESTING }}"
+              HOSTING_PATH="/var/www/sdesk_main/Sdesk"
             else
               HOSTING_PATH="${{ env.HOSTING_PATH_PRODUCTION }}"
             fi
