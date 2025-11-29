@@ -1,7 +1,12 @@
 name: Frontend CI - Lint & Build Checks
 
-# FIXED: Using 'workflow_call' makes this workflow reusable for the CD pipeline.
+# NEW TRIGGER LOGIC:
+# 1. Runs automatically on push to the 'testing' branch.
+# 2. Remains callable by the 'frontend-cd.yml' for deployment gating.
 on:
+  push:
+    branches:
+      - testing      #29/11
   workflow_call:
     # No inputs or outputs needed for this simple gating check.
 
@@ -26,7 +31,6 @@ jobs:
       - name: 🧹 Run ESLint / Code Quality Checks
         run: npm run lint
         
-      # Unit test step remains commented out as requested.
       # - name: 🧪 Run Unit/Component Tests
       #   run: npm test
 
