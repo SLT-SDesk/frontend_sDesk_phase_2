@@ -12,7 +12,7 @@ jobs:
   ci_check:
     name: Wait for CI Success
     # This reference is now correct because frontend-ci.yml uses 'workflow_call'.
-    uses: ./.github/workflows/ci.yml 
+    uses: ./.github/workflows/ci.yml  #Change frontend-ci.yml --> ci.yml 29/11
 
   # STEP 2: Deployment
   deployment:
