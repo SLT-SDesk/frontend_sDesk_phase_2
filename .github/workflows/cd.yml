@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - testing
-      # - production
+      # - production  # ready for production deployment
 
 jobs:
   # STEP 1: Wait for CI to Pass
