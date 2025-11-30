@@ -1,0 +1,76 @@
+name: Frontend CD - Server-Side Build & Deploy (Testing Only)
+
+# Triggers the workflow only on push events to the deployment branches
+on:
+  push:
+    branches:
+      - testing
+      # - production
+
+jobs:
+  # STEP 1: Wait for CI to Pass
+  ci_check:
+    name: Wait for CI Success
+    # CRITICAL FIX: Use full repository/path@ref for reusable workflows
+    uses: ./.github/workflows/ci.yml
+
+  # STEP 2: Deployment
+  deployment:
+    needs: [ci_check] # Only run if CI check succeeds
+    runs-on: ubuntu-latest
+
+    # Define environment variables
+    env:
+      # NGINX ROOT PATH: Must match the path defined in your sdesk.conf file.
+      HOSTING_PATH_TESTING: "/var/www/sdesk_main/Sdesk/frontend/dist" # UPDATED to match Nginx config
+      # HOSTING_PATH_PRODUCTION: "/var/www/production-app/html"
+
+    steps:
+      - name: 🚀 Deploy and Build on Linux Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 3251 # Using custom port
+          script: |
+            # --- Setup Variables for Current Run ---
+            DEPLOY_BRANCH="${{ github.ref_name }}"
+            REPO_URL="https://github.com/${{ github.repository }}"
+            REPO_PATH="/tmp/sdesk" # Temporary build location
+
+            # Set the final destination path (matches Nginx root)
+            HOSTING_PATH="${{ env.HOSTING_PATH_TESTING }}"
+
+            echo "Starting server-side build and deployment for branch $DEPLOY_BRANCH"
+
+            # 1. Clone or Pull the Latest Code
+            # If the repo doesn't exist, clone it. Otherwise, hard-reset to the latest commit.
+            if [ ! -d "$REPO_PATH/.git" ]; then
+              echo "Cloning repository..."
+              mkdir -p "$REPO_PATH"
+              git clone "$REPO_URL" "$REPO_PATH"
+            fi
+
+            cd "$REPO_PATH"
+            git fetch origin
+            git checkout "$DEPLOY_BRANCH"
+            git reset --hard origin/"$DEPLOY_BRANCH"
+
+            # 2. Install Dependencies and Build
+            echo "Installing dependencies and running build..."
+            npm ci
+            npm run build
+
+            # 3. Deploy the Build Artifact (Atomic Update)
+            echo "Deploying built files from $REPO_PATH/dist to $HOSTING_PATH"
+            BUILD_OUTPUT_DIR="$REPO_PATH/dist" # Assuming 'dist' is the output folder
+
+            # rsync copies the contents of the $BUILD_OUTPUT_DIR (e.g., index.html, JS/CSS files)
+            # directly into the Nginx root folder defined above.
+            rsync -av --delete --exclude "node_modules" "$BUILD_OUTPUT_DIR/" "$HOSTING_PATH/"
+
+            echo "Deployment successful. Files updated in $HOSTING_PATH"
+
+      - name: 🎉 Deployment Complete
+        run: echo "Deployment of ${{ github.ref_name }} branch to Linux server finished."
