@@ -13,6 +13,7 @@ jobs:
     name: Wait for CI Success
     # FIX: Use the full, robust reference for the reusable workflow.
     uses: ./.github/workflows/ci.yml
+
   # STEP 2: Deployment
   deployment:
     needs: [ci_check] # Only run if CI check succeeds
@@ -44,12 +45,12 @@ jobs:
 
             echo "Starting server-side build and deployment for branch $DEPLOY_BRANCH"
 
-            # 1. CRITICAL FIX 1: Install rsync if not found (needed for deployment)
+            # 1. Check for rsync (must be installed manually on the server)
             if ! command -v rsync &> /dev/null
             then
-                echo "rsync not found. Installing now..."
-                # Tries yum (RHEL/CentOS/Fedora) then apt-get (Debian/Ubuntu)
-                sudo yum install rsync -y || sudo apt-get install rsync -y || { echo "ERROR: Could not install rsync. Deployment aborted."; exit 1; }
+                echo "ERROR: 'rsync' command not found on the server."
+                echo "Please install rsync manually on the SSH host (e.g., 'sudo apt-get install rsync' or 'sudo yum install rsync') and try again."
+                exit 1
             fi
 
             # 2. CRITICAL FIX 2: Clean and Clone the Latest Code
