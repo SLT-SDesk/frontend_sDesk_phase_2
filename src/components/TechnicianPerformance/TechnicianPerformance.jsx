@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { fetchTechnicianData } from "../../utils/slaDummyData";
 
-
-
 /* material ui*/
 import {
   Box,
@@ -12,7 +10,6 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel,
   Table as MuiTable,
   TableBody,
   TableCell,
@@ -20,13 +17,12 @@ import {
   TableRow,
   Paper,
   TableContainer,
-  IconButton,
 } from "@mui/material";
 
 import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
 
-/* style components tika*/
+/* style components */
 const Container = styled.div`
   padding: 20px;
   background: #ffffff;
@@ -41,6 +37,7 @@ const Title = styled.h3`
   margin-bottom: 5px;
 `;
 
+/* 🚨 FIXED: use $status instead of status to prevent DOM warnings */
 const StatusDot = styled.span`
   height: 12px;
   width: 12px;
@@ -48,23 +45,21 @@ const StatusDot = styled.span`
   margin-right: 8px;
   border-radius: 50%;
   background: ${(props) =>
-    props.status === "Active" ? "#2ECC71" : "#E74C3C"};
+    props.$status === "Active" ? "#2ECC71" : "#E74C3C"};
 `;
 
-/*  main logic eka */
-/*state management */
-const TechnicianPerformance = ({ dateRange }) => {
+/* Component */
+const TechnicianPerformance = ({ dateRange, onRowClick }) => {
   const [technicians, setTechnicians] = useState([]);
   const [filteredTechnicians, setFilteredTechnicians] = useState([]);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
-  /* Load dummy data when date filter changes ( later----In backend integration, instead of this i have to use api call) */
- useEffect(() => {
+  /* Load technician data when date range changes */
+  useEffect(() => {
     if (!dateRange?.start || !dateRange?.end) return;
 
-    // NEW CODE — get teamId same as SLA page
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const teamId = user.teamId || user.team || undefined;
 
@@ -72,7 +67,7 @@ const TechnicianPerformance = ({ dateRange }) => {
       const result = await fetchTechnicianData({
         start: dateRange.start,
         end: dateRange.end,
-        teamId,   // NEW — pass teamId 
+        teamId,
       });
 
       setTechnicians(result);
@@ -80,13 +75,12 @@ const TechnicianPerformance = ({ dateRange }) => {
     }
 
     loadTechData();
-}, [dateRange]);
+  }, [dateRange]);
 
-  /* search + status filtering */
+  /* Apply search + status filter */
   useEffect(() => {
     let result = technicians;
 
-    // search filter eka
     if (search.trim()) {
       result = result.filter(
         (t) =>
@@ -95,7 +89,6 @@ const TechnicianPerformance = ({ dateRange }) => {
       );
     }
 
-    // status filter eka
     if (statusFilter !== "All") {
       result = result.filter((t) => t.status === statusFilter);
     }
@@ -111,7 +104,6 @@ const TechnicianPerformance = ({ dateRange }) => {
         Individual Metric and Individual Statistics
       </h6>
 
-      {/* Technician count eka*/}
       <div
         style={{
           fontSize: "14px",
@@ -122,7 +114,8 @@ const TechnicianPerformance = ({ dateRange }) => {
       >
         {filteredTechnicians.length} of {technicians.length} technicians
       </div>
-      {/*  search + filters */}
+
+      {/* Search + Filters */}
       <Box
         sx={{
           display: "flex",
@@ -135,7 +128,7 @@ const TechnicianPerformance = ({ dateRange }) => {
           alignItems: "center",
         }}
       >
-        {/* Search */}
+        {/* Search box */}
         <TextField
           variant="filled"
           placeholder="Search by name or service number..."
@@ -146,9 +139,12 @@ const TechnicianPerformance = ({ dateRange }) => {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon sx={{
-                  color: "#9aa0a6", marginBottom: "16px"   
-                }} />
+                <SearchIcon
+                  sx={{
+                    color: "#9aa0a6",
+                    marginBottom: "16px",
+                  }}
+                />
               </InputAdornment>
             ),
             disableUnderline: true,
@@ -166,7 +162,6 @@ const TechnicianPerformance = ({ dateRange }) => {
             "& .MuiFilledInput-input": {
               paddingLeft: "4px",
               paddingTop: "4px",
-
             },
           }}
         />
@@ -183,10 +178,13 @@ const TechnicianPerformance = ({ dateRange }) => {
             height: "44px",
           }}
         >
-          <FilterListIcon sx={{
-            marginRight: "6px", opacity: 0.7, fontSize: "20px",
-            alignSelf: "center"
-          }} />
+          <FilterListIcon
+            sx={{
+              marginRight: "6px",
+              opacity: 0.7,
+              fontSize: "20px",
+            }}
+          />
 
           <FormControl
             variant="filled"
@@ -196,16 +194,6 @@ const TechnicianPerformance = ({ dateRange }) => {
               "& .MuiFilledInput-root": {
                 background: "transparent",
               },
-              "& .MuiSelect-select": {
-                paddingTop: "0 !important",
-                paddingBottom: "0 !important",
-                display: "flex",
-                alignItems: "center",    
-              },
-              "& .MuiSvgIcon-root": {
-                alignSelf: "center",      
-                marginTop: "0 !important"
-              }
             }}
           >
             <Select
@@ -216,9 +204,6 @@ const TechnicianPerformance = ({ dateRange }) => {
                 background: "transparent",
                 fontSize: "14px",
                 color: "#9aa0a6",
-                "& .MuiFilledInput-root": {
-                  background: "transparent",
-                },
               }}
             >
               <MenuItem value="All">All Status</MenuItem>
@@ -229,10 +214,7 @@ const TechnicianPerformance = ({ dateRange }) => {
         </Box>
       </Box>
 
-
-
-
-      {/* performance table*/}
+      {/* Technician Table */}
       <TableContainer
         component={Paper}
         elevation={0}
@@ -262,14 +244,18 @@ const TechnicianPerformance = ({ dateRange }) => {
                 <TableRow
                   key={tech.id}
                   hover
+                  onClick={() => onRowClick && onRowClick(tech)}   // ✅ POPUP TRIGGER
                   sx={{
-                    "&:hover": { background: "#fafafa" },
+                    "&:hover": {
+                      background: "#fafafa",
+                      cursor: "pointer",
+                    },
                   }}
                 >
                   <TableCell>{tech.name}</TableCell>
                   <TableCell>{tech.serviceNumber}</TableCell>
                   <TableCell>
-                    <StatusDot status={tech.status} />
+                    <StatusDot $status={tech.status} />
                     {tech.status}
                   </TableCell>
                 </TableRow>
