@@ -6,10 +6,13 @@ import ResponseTimeCard from "../../../components/AdminSLA/Responsetimecard";
 import TeamSizeCard from "../../../components/AdminSLA/Teamsizecard";
 import TotalIncidentsCard from "../../../components/AdminSLA/Totalincidentscard";
 import fetchSlaData from "../../../utils/slaDummyData";
-// import "SLASettingsPage.css";
 import "./SlaSettings.css";
+
 // technician performance component
 import TechnicianPerformance from "../../../components/TechnicianPerformance/TechnicianPerformance";
+
+// ✅ NEW IMPORT (popup)
+import TechnicianDetailsPopup from "../../../components/Technician_details_popup/TechnicianPopup";
 
 const SlaSettings = () => {
   const [range, setRange] = useState(() => {
@@ -18,19 +21,29 @@ const SlaSettings = () => {
     start.setDate(end.getDate() - 6);
     return { start, end };
   });
+
   const [datePopupOpen, setDatePopupOpen] = useState(false);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // ✅ NEW STATE FOR POPUP
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [selectedTechnician, setSelectedTechnician] = useState(null);
+
+  // ✅ FUNCTION TO OPEN POPUP
+  const handleRowClick = (tech) => {
+    console.log('Row clicked, technician:', tech);
+    setSelectedTechnician(tech);
+    setPopupOpen(true);
+  };
 
   const openDatePopup = () => setDatePopupOpen(true);
   const closeDatePopup = () => setDatePopupOpen(false);
 
   const handleApplyDateRange = ({ selection, startDate, endDate }) => {
-    // startDate and endDate are Date objects
     setRange({ start: startDate, end: endDate });
   };
 
-  // load SLA data when range changes
   useEffect(() => {
     let mounted = true;
     const load = async () => {
@@ -74,6 +87,7 @@ const SlaSettings = () => {
               Team Performance & Metrics
             </Typography>
           </div>
+
           <div className="sla-date-wrapper">
             <button
               type="button"
@@ -111,8 +125,8 @@ const SlaSettings = () => {
               data?.response?.avgMinutes
                 ? `${data.response.avgMinutes} min`
                 : loading
-                  ? "..."
-                  : "—"
+                ? "..."
+                : "—"
             }
           />
           <ResolveRateCard
@@ -121,14 +135,26 @@ const SlaSettings = () => {
               data?.resolve?.avgHours
                 ? `${data.resolve.avgHours} hrs`
                 : loading
-                  ? "..."
-                  : "—"
+                ? "..."
+                : "—"
             }
           />
         </div>
-        {/* Technician Performance*/}
-        <TechnicianPerformance dateRange={range} />
 
+        {/* Technician Performance */}
+        {/* ✅ NOW PASS THE CLICK HANDLER */}
+        <TechnicianPerformance dateRange={range} onRowClick={handleRowClick} />
+
+        {/* ✅ POPUP RENDER */}
+        <TechnicianDetailsPopup
+          isOpen={popupOpen}
+          onClose={() => {
+            console.log('Closing popup');
+            setPopupOpen(false);
+            setSelectedTechnician(null);
+          }}
+          technician={selectedTechnician}
+        />
       </div>
     </div>
   );

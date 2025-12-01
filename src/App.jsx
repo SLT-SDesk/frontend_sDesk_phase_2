@@ -1,4 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./styles/common.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LogIn from "./pages/LogIn/LogIn";
 import AdminLayout from "./pages/Admin/Layout/AdminLayout";

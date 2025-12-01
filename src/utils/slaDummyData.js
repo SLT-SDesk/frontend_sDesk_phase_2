@@ -121,13 +121,35 @@ export async function fetchTechnicianData({ start, end, teamId }) {
     const individualSeed = hashStringTo01(seedStr + i);
     const name = namePool[i % namePool.length];
     const serviceNumber = padSvc(i + 1);
+    
+    // Generate detailed metrics for the popup
+    const totalIncidents = Math.round(individualSeed * days * 2);
+    const critical = Math.round(totalIncidents * clamp(0.1 + individualSeed * 0.1, 0, 0.3));
+    const high = Math.round(totalIncidents * clamp(0.2 + individualSeed * 0.15, 0, 0.4));
+    const medium = Math.max(0, totalIncidents - critical - high);
+    
+    const responseOnTime = Math.round(totalIncidents * clamp(0.65 + individualSeed * 0.25, 0.5, 0.95));
+    const avgResponseTime = Number(clamp(5 + (1 - individualSeed) * 15, 2, 30).toFixed(1));
+    
+    const resolutionOnTime = Math.round(totalIncidents * clamp(0.6 + individualSeed * 0.3, 0.5, 0.9));
+    const avgResolutionTime = Number(clamp(1 + individualSeed * 8, 0.5, 12).toFixed(1));
 
     return {
       id: i + 1,
       name,
       serviceNumber,
       status: i < activeCount ? "Active" : "Inactive",
-      incidents: Math.round(individualSeed * days * 2),
+      incidents: totalIncidents,
+      // Detailed metrics for popup
+      totalIncidents,
+      critical,
+      high,
+      medium,
+      responseOnTime,
+      avgResponseTime,
+      resolutionOnTime,
+      avgResolutionTime,
+      date: `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`
     };
   });
 
