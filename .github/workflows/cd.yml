@@ -37,7 +37,7 @@ jobs:
       # ---------------------------------------------------------
       - name: ⚙️ Build SDesk Frontend (Phase 2)
         run: |
-          cd /var/www/sdesk_new/frontend_sDesk_phase_2      #update: 2/12/2025
+          # cd frontend_sDesk_phase_2      #update: 2/12/2025
           npm install
           npm run build
 
