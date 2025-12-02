@@ -54,7 +54,7 @@ jobs:
           target: "/home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_tmp/"
 
       - name: 📝 List dist files
-        run: ls -R /dist      #update 12/2/2025 - changed from ls -R frontend_sDesk_phase_2/dist to ls -R /dist
+        run: ls -R dist      #update 12/2/2025 - changed from ls -R frontend_sDesk_phase_2/dist to ls -R dist
 
      
       # SSH → Replace production dist safely
