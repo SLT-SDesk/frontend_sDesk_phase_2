@@ -834,3 +834,20 @@
         padding: 4px 5px;
     }
 }
+/* STEP A (ADMIN): NEW BUTTON STYLE FOR ACTIONS COLUMN */
+.incident-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.incident-action-btn:hover {
+  background-color: #f3f4f6;
+}
