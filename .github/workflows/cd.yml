@@ -24,7 +24,7 @@ jobs:
       
       - name: 🧪 Generate .env file from secrets
         run: |
-          cd frontend_sDesk_phase_2
+         
           echo "VITE_APP_URL=${{ secrets.VITE_APP_URL }}" >> .env
           echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env
           echo "VITE_SOCKET_URL=${{ secrets.VITE_SOCKET_URL }}" >> .env
