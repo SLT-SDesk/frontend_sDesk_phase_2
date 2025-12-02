@@ -52,6 +52,7 @@ jobs:
           port: 3251
           source: "dist/"       #update:2/12/2025 - changed from frontend_phase_2 to /dist/*
           target: "/home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_tmp/"
+          strip_components: 1   # Update: 2/12/2025 "strip off the dist part, Because it creates /var/www/sdesk_new/frontend_sDesk_phase_2/dist/dist 
 
       - name: 📝 List dist files
         run: ls -R dist      #update 12/2/2025 - changed from ls -R frontend_sDesk_phase_2/dist to ls -R dist
