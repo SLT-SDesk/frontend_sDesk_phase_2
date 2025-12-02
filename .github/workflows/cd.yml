@@ -50,8 +50,11 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}  # gayal
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 3251
-          source: "/dist/*"       #update:2/12/2025 - changed from frontend_phase_2 to /dist/*
+          source: "frontend_sDesk_phase_2/dist"       #update:2/12/2025 - changed from frontend_phase_2 to /dist/*
           target: "/home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_tmp/"
+
+      - name: 📝 List dist files
+        run: ls -R frontend_sDesk_phase_2/dist
 
      
       # SSH → Replace production dist safely
