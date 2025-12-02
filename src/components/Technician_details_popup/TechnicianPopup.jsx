@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   const [activeTab, setActiveTab] = useState(0);
+  const [selectedPriority, setSelectedPriority] = useState('all'); // 'all', 'critical', 'high', 'medium'
   
   console.log('TechnicianDetailsPopup render:', { isOpen, technician });
   
@@ -12,8 +13,45 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
     return null;
   }
 
-  const responseTimePercent = Math.round((technician.responseOnTime / technician.totalIncidents) * 100);
-  const resolutionTimePercent = Math.round((technician.resolutionOnTime / technician.totalIncidents) * 100);
+  // Calculate metrics based on selected priority
+  const getFilteredMetrics = () => {
+    if (selectedPriority === 'all') {
+      return {
+        responseOnTime: technician.responseOnTime || 0,
+        resolutionOnTime: technician.resolutionOnTime || 0,
+        totalIncidents: technician.totalIncidents || 0,
+        avgResponseTime: technician.avgResponseTime || 0,
+        avgResolutionTime: technician.avgResolutionTime || 0
+      };
+    }
+
+    // If priority-specific data exists, use it; otherwise calculate proportionally
+    const priorityData = technician[`${selectedPriority}Data`];
+    if (priorityData) {
+      return priorityData;
+    }
+
+    // Fallback: calculate proportionally based on priority count
+    const priorityCount = technician[selectedPriority] || 0;
+    const totalIncidents = technician.totalIncidents || 1;
+    const ratio = priorityCount / totalIncidents;
+
+    return {
+      responseOnTime: Math.round((technician.responseOnTime || 0) * ratio),
+      resolutionOnTime: Math.round((technician.resolutionOnTime || 0) * ratio),
+      totalIncidents: priorityCount,
+      avgResponseTime: technician.avgResponseTime || 0,
+      avgResolutionTime: technician.avgResolutionTime || 0
+    };
+  };
+
+  const filteredMetrics = getFilteredMetrics();
+  const responseTimePercent = filteredMetrics.totalIncidents > 0 
+    ? Math.round((filteredMetrics.responseOnTime / filteredMetrics.totalIncidents) * 100) 
+    : 0;
+  const resolutionTimePercent = filteredMetrics.totalIncidents > 0 
+    ? Math.round((filteredMetrics.resolutionOnTime / filteredMetrics.totalIncidents) * 100) 
+    : 0;
 
   // Mock session data
   const sessions = [
@@ -113,7 +151,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-2 mb-6 border-b">
+          <div className="flex justify-center gap-2 mb-6 border-b">
             <button 
               onClick={() => setActiveTab(0)}
               className={`flex items-center gap-2 px-6 py-3 font-medium text-sm transition-all border-b-2 ${
@@ -158,19 +196,34 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                 </div>
                 
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="bg-red-100 rounded-lg p-4 text-center">
+                  <div 
+                    onClick={() => setSelectedPriority(selectedPriority === 'critical' ? 'all' : 'critical')}
+                    className={`bg-red-100 rounded-lg p-4 text-center cursor-pointer transition-all transform hover:scale-105 ${
+                      selectedPriority === 'critical' ? 'ring-2 ring-red-500 shadow-lg' : 'hover:shadow-md'
+                    }`}
+                  >
                     <p className="text-gray-700 font-semibold mb-3 text-sm">Critical</p>
                     <div className="bg-red-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
                       {technician.critical || 0}
                     </div>
                   </div>
-                  <div className="bg-orange-200 rounded-lg p-4 text-center">
+                  <div 
+                    onClick={() => setSelectedPriority(selectedPriority === 'high' ? 'all' : 'high')}
+                    className={`bg-orange-200 rounded-lg p-4 text-center cursor-pointer transition-all transform hover:scale-105 ${
+                      selectedPriority === 'high' ? 'ring-2 ring-orange-500 shadow-lg' : 'hover:shadow-md'
+                    }`}
+                  >
                     <p className="text-gray-700 font-semibold mb-3 text-sm">High</p>
                     <div className="bg-orange-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
                       {technician.high || 0}
                     </div>
                   </div>
-                  <div className="bg-yellow-100 rounded-lg p-4 text-center">
+                  <div 
+                    onClick={() => setSelectedPriority(selectedPriority === 'medium' ? 'all' : 'medium')}
+                    className={`bg-yellow-100 rounded-lg p-4 text-center cursor-pointer transition-all transform hover:scale-105 ${
+                      selectedPriority === 'medium' ? 'ring-2 ring-yellow-500 shadow-lg' : 'hover:shadow-md'
+                    }`}
+                  >
                     <p className="text-gray-700 font-semibold mb-3 text-sm">Medium</p>
                     <div className="bg-yellow-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
                       {technician.medium || 0}
@@ -181,11 +234,18 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
 
               {/* Performance Metrics */}
               <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                  </svg>
-                  <span className="font-semibold text-gray-700 text-sm">Performance Metrics</span>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    <span className="font-semibold text-gray-700 text-sm">Performance Metrics</span>
+                  </div>
+                  {selectedPriority !== 'all' && (
+                    <span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium">
+                      Filtered: {selectedPriority.charAt(0).toUpperCase() + selectedPriority.slice(1)}
+                    </span>
+                  )}
                 </div>
 
                 {/* Response Time */}
@@ -206,8 +266,8 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                     ></div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-600 px-1">
-                    <span>{technician.responseOnTime || 0}/{technician.totalIncidents || 0} on time</span>
-                    <span>Avg: {technician.avgResponseTime || 0} min</span>
+                    <span>{filteredMetrics.responseOnTime}/{filteredMetrics.totalIncidents} on time</span>
+                    <span>Avg: {filteredMetrics.avgResponseTime} min</span>
                   </div>
                 </div>
 
@@ -229,8 +289,8 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                     ></div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-600 px-1">
-                    <span>{technician.resolutionOnTime || 0}/{technician.totalIncidents || 0} on time</span>
-                    <span>Avg: {technician.avgResolutionTime || 0} hrs</span>
+                    <span>{filteredMetrics.resolutionOnTime}/{filteredMetrics.totalIncidents} on time</span>
+                    <span>Avg: {filteredMetrics.avgResolutionTime} hrs</span>
                   </div>
                 </div>
               </div>
