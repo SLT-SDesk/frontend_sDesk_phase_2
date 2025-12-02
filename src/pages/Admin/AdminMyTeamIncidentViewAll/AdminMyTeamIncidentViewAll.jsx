@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TechnicianInsident from "../../Technician/TechnicianIncident/TechnicianInsident";
-import { FaHistory, FaSearch } from "react-icons/fa";
+import { FaHistory, FaSearch,FaRegClock } from "react-icons/fa";
 import { TiExportOutline } from "react-icons/ti";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import "./AdminMyTeamIncidentViewAll.css";
+import IncidentTimelineDialog from "../../../components/IncidentTimelinePopup/IncidentTimelineDialog"; // ⭐ use new popup
 
 const AdminMyTeamIncidentViewAll = () => {
   const [showIncidentPopup, setShowIncidentPopup] = useState(false);
@@ -21,6 +22,14 @@ const AdminMyTeamIncidentViewAll = () => {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  //  state for Incident Timeline popup (uses SLA inside component)
+  const [timelineOpen, setTimelineOpen] = useState(false);
+  const [timelineData, setTimelineData] = useState({
+    refNo: "",
+    status: "",
+    priority: "",
+  });
 
   const {
     incidents,
@@ -127,11 +136,11 @@ const AdminMyTeamIncidentViewAll = () => {
     "Reference No": incident.incident_number,
     "Assigned To": getUserName(incident.handler),
     "Affected User": getUserName(incident.informant),
-    "Category": incident.category,
+    Category: incident.category,
     "Main Category": getMainCategoryNameFromDatabase(incident.category),
-    "Location": getLocationName(incident.location),
-    "Status": incident.status,
-    "Priority": incident.priority,
+    Location: getLocationName(incident.location),
+    Status: incident.status,
+    Priority: incident.priority || "", // ⭐ used for SLA 
   }));
 
   const filteredData = tableData.filter((item) => {
@@ -145,7 +154,7 @@ const AdminMyTeamIncidentViewAll = () => {
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
   const indexOfLast = currentPage * rowsPerPage;
   const indexOfFirst = indexOfLast - rowsPerPage;
   const currentRows = filteredData.slice(indexOfFirst, indexOfLast);
@@ -158,6 +167,16 @@ const AdminMyTeamIncidentViewAll = () => {
       setSelectedIncident(incident);
       setShowIncidentPopup(true);
     }
+  };
+
+  // open timeline popup – SLA handled inside IncidentTimelineDialog
+  const handleViewTimeline = (refNo, status, priority) => {
+    setTimelineData({
+      refNo,
+      status,
+      priority,
+    });
+    setTimelineOpen(true);
   };
 
   // 🟢 UPDATED Excel Export Function with Header Info
@@ -225,16 +244,24 @@ const AdminMyTeamIncidentViewAll = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "My Team Incidents");
 
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(blob, `My_Team_Incidents_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+    saveAs(
+      blob,
+      `My_Team_Incidents_${new Date().toISOString().slice(0, 10)}.xlsx`
+    );
   };
 
   const renderTableRows = () => {
     if (currentRows.length === 0) {
       return (
         <tr>
-          <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>
+          <td colSpan="7" style={{ textAlign: "center", padding: "20px" }}>
             No incidents found.
           </td>
         </tr>
@@ -252,6 +279,22 @@ const AdminMyTeamIncidentViewAll = () => {
         <td>{row["Category"]}</td>
         <td>{row["Location"]}</td>
         <td>{row["Status"]}</td>
+        <td>
+          <button
+            className="incident-action-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewTimeline(
+                row["Reference No"],
+                row["Status"],
+                row["Priority"]
+              );
+            }}
+          >
+            <FaRegClock size={12} />
+            &nbsp;View Timeline
+          </button>
+        </td>
       </tr>
     ));
   };
@@ -272,10 +315,18 @@ const AdminMyTeamIncidentViewAll = () => {
     }
 
     buttons.push(
-      <button key={1} onClick={() => setCurrentPage(1)} className={currentPage === 1 ? "active" : ""}>
+      <button
+        key={1}
+        onClick={() => setCurrentPage(1)}
+        className={currentPage === 1 ? "active" : ""}
+        >
         1
       </button>,
-      <button key={2} onClick={() => setCurrentPage(2)} className={currentPage === 2 ? "active" : ""}>
+      <button
+        key={2}
+        onClick={() => setCurrentPage(2)}
+        className={currentPage === 2 ? "active" : ""}
+        >
         2
       </button>
     );
@@ -283,12 +334,17 @@ const AdminMyTeamIncidentViewAll = () => {
     if (currentPage > 3) buttons.push(<span key="ellipsis1">...</span>);
     if (currentPage > 3 && currentPage < totalPages - 2) {
       buttons.push(
-        <button key={currentPage} onClick={() => setCurrentPage(currentPage)} className="active">
+        <button
+          key={currentPage}
+          onClick={() => setCurrentPage(currentPage)}
+          className="active"
+        >
           {currentPage}
         </button>
       );
     }
-    if (currentPage < totalPages - 2) buttons.push(<span key="ellipsis2">...</span>);
+    if (currentPage < totalPages - 2)
+      buttons.push(<span key="ellipsis2">...</span>);
     buttons.push(
       <button
         key={totalPages - 1}
@@ -413,6 +469,7 @@ const AdminMyTeamIncidentViewAll = () => {
                   <th>Category</th>
                   <th>Location</th>
                   <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>{renderTableRows()}</tbody>
@@ -464,6 +521,13 @@ const AdminMyTeamIncidentViewAll = () => {
             </div>
           </div>
         )}
+        <IncidentTimelineDialog
+          open={timelineOpen}
+          onClose={() => setTimelineOpen(false)}
+          incidentRef={timelineData.refNo}
+          status={timelineData.status}
+          priority={timelineData.priority}
+        />
       </div>
     </div>
   );
