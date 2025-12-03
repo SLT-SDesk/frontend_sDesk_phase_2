@@ -4,10 +4,10 @@ import { Provider } from 'react-redux';
 import { store } from './redux/configStore.js';
 import App from './App.jsx';
 
-// Testing comment to verify CICD pipeline
+// TESTING PURPOSES ONLY- CD.Yml
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <App />
-  </Provider>
+</Provider>
 );
