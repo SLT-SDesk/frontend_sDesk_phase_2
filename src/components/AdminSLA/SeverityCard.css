@@ -1,0 +1,158 @@
+/* Severity Card Container */
+.severity-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0e0;
+  height: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+}
+
+.severity-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Card Content */
+.severity-content {
+  padding: 24px !important;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Severity Header Section */
+.severity-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-left: 12px;
+  border-left: 4px solid;
+  border-radius: 2px;
+}
+
+.severity-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.severity-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Metrics Container */
+.severity-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+/* Individual Metric Item */
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.metric-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.metric-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1.2;
+  margin: 4px 0;
+}
+
+.metric-subtext {
+  font-size: 13px;
+  color: #888;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+/* Divider between metrics */
+.metric-divider {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 4px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .severity-content {
+    padding: 20px !important;
+  }
+
+  .metric-value {
+    font-size: 28px;
+  }
+
+  .severity-label {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .severity-content {
+    padding: 18px !important;
+  }
+
+  .severity-header {
+    margin-bottom: 16px;
+    padding-left: 10px;
+  }
+
+  .severity-icon {
+    font-size: 20px;
+  }
+
+  .severity-label {
+    font-size: 16px;
+  }
+
+  .metric-value {
+    font-size: 26px;
+  }
+
+  .metric-label {
+    font-size: 11px;
+  }
+
+  .metric-subtext {
+    font-size: 12px;
+  }
+
+  .severity-metrics {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .severity-content {
+    padding: 16px !important;
+  }
+
+  .metric-value {
+    font-size: 24px;
+  }
+
+  .severity-header {
+    gap: 8px;
+  }
+}
