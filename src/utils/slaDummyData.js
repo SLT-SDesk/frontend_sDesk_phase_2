@@ -46,7 +46,49 @@ export async function fetchSlaData({ start, end, teamId } = {}) {
   const high = Math.round(total * clamp(0.18 + (1 - rand) * 0.15, 0, 0.6));
   const medium = Math.max(0, total - critical - high);
 
-  // Response
+  // Generate severity-specific metrics for Critical incidents
+  const criticalResponsePercent = Math.round(
+    clamp(75 + rand * 20 + (7 - days) * 0.8, 50, 99)
+  );
+  const criticalAvgMinutes = Number(
+    clamp(3 + (1 - rand) * 7 - days * 0.15, 1, 15).toFixed(1)
+  );
+  const criticalResolvePercent = Math.round(
+    clamp(65 + rand * 25 - days * 0.3, 40, 99)
+  );
+  const criticalAvgHours = Number(
+    clamp(1 + (1 - rand) * 4 + days * 0.1, 0.5, 8).toFixed(1)
+  );
+
+  // Generate severity-specific metrics for High incidents
+  const highResponsePercent = Math.round(
+    clamp(70 + rand * 20 + (7 - days) * 0.6, 45, 99)
+  );
+  const highAvgMinutes = Number(
+    clamp(5 + (1 - rand) * 10 - days * 0.1, 2, 25).toFixed(1)
+  );
+  const highResolvePercent = Math.round(
+    clamp(60 + rand * 25 - days * 0.35, 35, 99)
+  );
+  const highAvgHours = Number(
+    clamp(2 + (1 - rand) * 6 + days * 0.15, 1, 12).toFixed(1)
+  );
+
+  // Generate severity-specific metrics for Medium incidents
+  const mediumResponsePercent = Math.round(
+    clamp(65 + rand * 25 + (7 - days) * 0.5, 40, 99)
+  );
+  const mediumAvgMinutes = Number(
+    clamp(8 + (1 - rand) * 15 - days * 0.08, 3, 40).toFixed(1)
+  );
+  const mediumResolvePercent = Math.round(
+    clamp(55 + rand * 30 - days * 0.4, 30, 99)
+  );
+  const mediumAvgHours = Number(
+    clamp(4 + (1 - rand) * 12 + days * 0.2, 2, 24).toFixed(1)
+  );
+
+  // Overall response and resolve (weighted average or kept for backward compatibility)
   const responsePercent = Math.round(
     clamp(60 + (1 - rand) * 30 + (7 - days) * 0.6, 20, 99)
   );
@@ -54,7 +96,6 @@ export async function fetchSlaData({ start, end, teamId } = {}) {
     clamp(5 + (1 - rand) * 12 - days * 0.1, 1, 180).toFixed(1)
   );
 
-  // Resolve
   const resolvePercent = Math.round(
     clamp(50 + rand * 35 - days * 0.4, 10, 99)
   );
@@ -64,14 +105,51 @@ export async function fetchSlaData({ start, end, teamId } = {}) {
 
   return {
     teamInfo: { size: baseTeamSize, active },
-    incidents: { total, critical, high, medium },
-    response: { percent: responsePercent, avgMinutes },
-    resolve: { percent: resolvePercent, avgHours },
+    incidents: { 
+      total, 
+      critical, 
+      high, 
+      medium 
+    },
+    response: { 
+      percent: responsePercent, 
+      avgMinutes,
+      // Severity-specific response data
+      critical: {
+        percent: criticalResponsePercent,
+        avgMinutes: criticalAvgMinutes
+      },
+      high: {
+        percent: highResponsePercent,
+        avgMinutes: highAvgMinutes
+      },
+      medium: {
+        percent: mediumResponsePercent,
+        avgMinutes: mediumAvgMinutes
+      }
+    },
+    resolve: { 
+      percent: resolvePercent, 
+      avgHours,
+      // Severity-specific resolve data
+      critical: {
+        percent: criticalResolvePercent,
+        avgHours: criticalAvgHours
+      },
+      high: {
+        percent: highResolvePercent,
+        avgHours: highAvgHours
+      },
+      medium: {
+        percent: mediumResolvePercent,
+        avgHours: mediumAvgHours
+      }
+    },
   };
 }
 
 
-// newly added part eka - sasini
+// Technician data generator
 
 const namePool = [
   "Nilupul Tharanga",
@@ -103,7 +181,7 @@ function padSvc(n) {
 export async function fetchTechnicianData({ start, end, teamId }) {
   await new Promise((r) => setTimeout(r, 120));
 
-  // Same seed logic as SLA data — ensures SAME team size
+  // Same seed logic as SLA data – ensures SAME team size
   const days = daysBetween(start, end);
   const seedStr = `${start}-${end}-${teamId || "all"}`;
   const rand = hashStringTo01(seedStr);
@@ -155,4 +233,5 @@ export async function fetchTechnicianData({ start, end, teamId }) {
 
   return technicians;
 }
+
 export default fetchSlaData;

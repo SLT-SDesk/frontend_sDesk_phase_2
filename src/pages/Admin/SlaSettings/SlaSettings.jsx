@@ -1,17 +1,16 @@
 import { Box, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import AdminDateRangePopup from "../../../components/AdminDateRangePopup/DateRangePopup";
-import ResolveRateCard from "../../../components/AdminSLA/Resolveratecard";
-import ResponseTimeCard from "../../../components/AdminSLA/Responsetimecard";
 import TeamSizeCard from "../../../components/AdminSLA/Teamsizecard";
 import TotalIncidentsCard from "../../../components/AdminSLA/Totalincidentscard";
+import SeverityCard from "../../../components/AdminSLA/SeverityCard";
 import fetchSlaData from "../../../utils/slaDummyData";
 import "./SlaSettings.css";
 
 // technician performance component
 import TechnicianPerformance from "../../../components/TechnicianPerformance/TechnicianPerformance";
 
-// ✅ NEW IMPORT (popup)
+// popup
 import TechnicianDetailsPopup from "../../../components/Technician_details_popup/TechnicianPopup";
 
 const SlaSettings = () => {
@@ -26,11 +25,9 @@ const SlaSettings = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // ✅ NEW STATE FOR POPUP
   const [popupOpen, setPopupOpen] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState(null);
 
-  // ✅ FUNCTION TO OPEN POPUP
   const handleRowClick = (tech) => {
     console.log('Row clicked, technician:', tech);
     setSelectedTechnician(tech);
@@ -68,6 +65,26 @@ const SlaSettings = () => {
       mounted = false;
     };
   }, [range]);
+
+  // Helper function to get severity-specific data
+  const getSeverityData = (severity) => {
+    const severityKey = severity.toLowerCase();
+    return {
+      totalIncidents: data?.incidents?.[severityKey] ?? (loading ? "..." : 0),
+      responseTime: {
+        percentage: data?.response?.[severityKey]?.percent ?? (loading ? "..." : 0),
+        avg: data?.response?.[severityKey]?.avgMinutes 
+          ? `${data.response[severityKey].avgMinutes} min`
+          : loading ? "..." : "—"
+      },
+      resolveRate: {
+        percentage: data?.resolve?.[severityKey]?.percent ?? (loading ? "..." : 0),
+        avg: data?.resolve?.[severityKey]?.avgHours
+          ? `${data.resolve[severityKey].avgHours} hrs`
+          : loading ? "..." : "—"
+      }
+    };
+  };
 
   return (
     <div className="sla-settings-page">
@@ -109,43 +126,39 @@ const SlaSettings = () => {
         </div>
 
         <div className="metrics-grid">
-          <TeamSizeCard
-            teamSize={data?.teamInfo?.size ?? (loading ? "..." : 3)}
-            activeMembers={data?.teamInfo?.active ?? (loading ? "..." : 3)}
+          <div className="team-section">
+            <TeamSizeCard
+              teamSize={data?.teamInfo?.size ?? (loading ? "..." : 3)}
+              activeMembers={data?.teamInfo?.active ?? (loading ? "..." : 3)}
+            />
+            <TotalIncidentsCard
+              total={data?.incidents?.total ?? (loading ? "..." : 0)}
+              critical={data?.incidents?.critical ?? 0}
+              high={data?.incidents?.high ?? 0}
+              medium={data?.incidents?.medium ?? 0}
+            />
+          </div>
+          
+          <SeverityCard
+            severity="critical"
+            {...getSeverityData("critical")}
           />
-          <TotalIncidentsCard
-            total={data?.incidents?.total ?? (loading ? "..." : 0)}
-            critical={data?.incidents?.critical ?? 0}
-            high={data?.incidents?.high ?? 0}
-            medium={data?.incidents?.medium ?? 0}
+          
+          <SeverityCard
+            severity="high"
+            {...getSeverityData("high")}
           />
-          <ResponseTimeCard
-            percentage={data?.response?.percent ?? (loading ? "..." : 0)}
-            avgTime={
-              data?.response?.avgMinutes
-                ? `${data.response.avgMinutes} min`
-                : loading
-                ? "..."
-                : "—"
-            }
-          />
-          <ResolveRateCard
-            percentage={data?.resolve?.percent ?? (loading ? "..." : 0)}
-            avgTime={
-              data?.resolve?.avgHours
-                ? `${data.resolve.avgHours} hrs`
-                : loading
-                ? "..."
-                : "—"
-            }
+          
+          <SeverityCard
+            severity="medium"
+            {...getSeverityData("medium")}
           />
         </div>
 
         {/* Technician Performance */}
-        {/* ✅ NOW PASS THE CLICK HANDLER */}
         <TechnicianPerformance dateRange={range} onRowClick={handleRowClick} />
 
-        {/* ✅ POPUP RENDER */}
+        {/* Popup */}
         <TechnicianDetailsPopup
           isOpen={popupOpen}
           onClose={() => {

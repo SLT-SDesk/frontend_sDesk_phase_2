@@ -58,6 +58,20 @@
   max-width: 1400px;
 }
 
+/* NEW: Team Section Styling */
+.team-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+}
+
+/* Ensure both cards in team section have equal height */
+.team-section > * {
+  flex: 1;
+  min-height: 0;
+}
+
 @media (max-width: 768px) {
   .sla-top-bar {
     flex-direction: column;
@@ -71,6 +85,11 @@
 
   .sla-content {
     padding: 16px;
+  }
+
+  /* Stack team section normally on mobile */
+  .team-section {
+    gap: 16px;
   }
 }
 
