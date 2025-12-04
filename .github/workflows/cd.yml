@@ -44,6 +44,8 @@ jobs:
             echo "Building frontend on server..."
             npm run build
 
+            sudo chown -R nginx:nginx /home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_src/dist     # 04/12/2025 8.54 update the file permisssion before copying
+ 
             echo "Cleaning old production build..."
             sudo rm -rf /var/www/sdesk_new/frontend_sDesk_phase_2/dist/*
 
