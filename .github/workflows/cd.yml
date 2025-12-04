@@ -20,17 +20,17 @@ jobs:
           node-version: '20'
 
      
-      # # Create frontend .env from GitHub Secrets
+      # Create frontend .env from GitHub Secrets
       
-      # - name: 🧪 Generate .env file from secrets
-      #   run: |
+      - name: 🧪 Generate .env file from secrets
+        run: |
          
-      #     echo "VITE_APP_URL=${{ secrets.VITE_APP_URL }}" >> .env
-      #     echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env
-      #     echo "VITE_SOCKET_URL=${{ secrets.VITE_SOCKET_URL }}" >> .env
-      #     echo "VITE_MICROSOFT_CLIENT_ID=${{ secrets.VITE_MICROSOFT_CLIENT_ID }}" >> .env
-      #     echo "VITE_MICROSOFT_TENANT_ID=${{ secrets.VITE_MICROSOFT_TENANT_ID }}" >> .env
-      #     echo "AZURE_REDIRECT_URI=${{ secrets.AZURE_REDIRECT_URI }}" >> .env
+          echo "VITE_APP_URL=${{ secrets.VITE_APP_URL }}" >> .env
+          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env
+          echo "VITE_SOCKET_URL=${{ secrets.VITE_SOCKET_URL }}" >> .env
+          echo "VITE_MICROSOFT_CLIENT_ID=${{ secrets.VITE_MICROSOFT_CLIENT_ID }}" >> .env
+          echo "VITE_MICROSOFT_TENANT_ID=${{ secrets.VITE_MICROSOFT_TENANT_ID }}" >> .env
+          echo "AZURE_REDIRECT_URI=${{ secrets.AZURE_REDIRECT_URI }}" >> .env
 
       # ---------------------------------------------------------
       # Build the frontend
