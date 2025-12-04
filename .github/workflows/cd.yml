@@ -24,7 +24,7 @@ jobs:
       
       - name: 🧪 Generate .env file from secrets
         run: |
-          cd frontend_sDesk_phase_2
+         
           echo "VITE_APP_URL=${{ secrets.VITE_APP_URL }}" >> .env
           echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env
           echo "VITE_SOCKET_URL=${{ secrets.VITE_SOCKET_URL }}" >> .env
@@ -37,7 +37,6 @@ jobs:
       # ---------------------------------------------------------
       - name: ⚙️ Build SDesk Frontend (Phase 2)
         run: |
-          cd /var/www/sdesk_new/frontend_sDesk_phase_2      #update: 2/12/2025
           npm install
           npm run build
 
@@ -51,8 +50,12 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}  # gayal
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 3251
-          source: "frontend_sDesk_phase_2/dist/*"
+          source: "dist/"       #update:2/12/2025 - changed from frontend_phase_2 to /dist/*
           target: "/home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_tmp/"
+          strip_components: 1   # Update: 2/12/2025 "strip off the dist part, Because it creates /var/www/sdesk_new/frontend_sDesk_phase_2/dist/dist 
+
+      - name: 📝 List dist files
+        run: ls -R dist      #update 12/2/2025 - changed from ls -R frontend_sDesk_phase_2/dist to ls -R dist
 
      
       # SSH → Replace production dist safely
