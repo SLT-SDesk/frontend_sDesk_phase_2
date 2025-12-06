@@ -1,9 +1,23 @@
 name: Deploy SDesk Frontend Phase 2 (Testing)
 
 on:
+  # Step 1.1: 
+  # Trigger on push to testing branch
+  
   push:
     branches:
       - testing
+
+  # Step 1.2: 
+  # Trigger workflow when a PR targets testing branch
+
+  pull_request:
+    branches:
+      - testing
+
+  # Step 1.3: 
+  # Allow manual trigger
+ 
   workflow_dispatch:
 
 jobs:
@@ -11,56 +25,52 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      
+      # STEP 1 — Checkout repository
+     
       - name: ⬇️ Checkout code
         uses: actions/checkout@v4
 
-      - name: 🛠️ Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
+      
+      # STEP 2 — Create .env file using GitHub secrets
+      
+      # This .env file is added to the uploaded source and then
+      # copied into the project folder on the server before build.
      
-      # # Create frontend .env from GitHub Secrets
-      
-      # - name: 🧪 Generate .env file from secrets
-      #   run: |
-         
-      #     echo "VITE_APP_URL=${{ secrets.VITE_APP_URL }}" >> .env
-      #     echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env
-      #     echo "VITE_SOCKET_URL=${{ secrets.VITE_SOCKET_URL }}" >> .env
-      #     echo "VITE_MICROSOFT_CLIENT_ID=${{ secrets.VITE_MICROSOFT_CLIENT_ID }}" >> .env
-      #     echo "VITE_MICROSOFT_TENANT_ID=${{ secrets.VITE_MICROSOFT_TENANT_ID }}" >> .env
-      #     echo "AZURE_REDIRECT_URI=${{ secrets.AZURE_REDIRECT_URI }}" >> .env
-
-      # ---------------------------------------------------------
-      # Build the frontend
-      # ---------------------------------------------------------
-      - name: ⚙️ Build SDesk Frontend (Phase 2)
+      - name: 🔐 Generate .env file
         run: |
-          npm install
-          npm run build
-
+          echo "VITE_APP_URL=${{ secrets.VITE_APP_URL }}" >> .env
+          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env
+          echo "VITE_SOCKET_URL=${{ secrets.VITE_SOCKET_URL }}" >> .env
+          echo "VITE_MICROSOFT_CLIENT_ID=${{ secrets.VITE_MICROSOFT_CLIENT_ID }}" >> .env
+          echo "VITE_MICROSOFT_TENANT_ID=${{ secrets.VITE_MICROSOFT_TENANT_ID }}" >> .env
+          echo "AZURE_REDIRECT_URI=${{ secrets.AZURE_REDIRECT_URI }}" >> .env
+     
+      # STEP 3 — Upload SOURCE CODE to server
       
-      # Upload only frontend dist folder
       
-      - name: 🚀 Upload Dist to Server
+      # The server will run npm install + npm run build.
+      
+      # Uploaded source is stored temporarily at: ~/sdesk_frontend_src_tmp/
+      
+      # Later on, SSH script replaces the project directory, then performs a fresh build.
+     
+      - name: 📤 Upload source code to server
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.SSH_HOST }}          # 124.43.216.136
-          username: ${{ secrets.SSH_USERNAME }}  # gayal
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 3251
-          source: "dist/"           #update:2/12/2025 - changed from frontend_phase_2 to /dist/*
-          target: "/home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_tmp/"
-          strip_components: 1       # Update: 2/12/2025 "strip off the dist part, Because it creates /var/www/sdesk_new/frontend_sDesk_phase_2/dist/dist 
+          source: "./"
+          target: "/home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_src_tmp/"
+          overwrite: true
 
-      - name: 📝 List dist files
-        run: ls -R dist             #update 12/2/2025 - changed from ls -R frontend_sDesk_phase_2/dist to ls -R dist
-
-     
-      # SSH → Replace production dist safely
       
-      - name: 🔄 Deploy & Restart Nginx
+      # STEP 4 — SSH: Clone repo only one and then check the existing code, pull latest changes
+      # Replace the source code with the uploaded version, then build on server.
+
+      - name: 🔄 Build & Deploy on Server
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -68,31 +78,76 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 3251
           script: |
-            echo "Starting SDesk Frontend Deployment..."
+            FRONTEND_PATH="/var/www/sdesk_new/frontend_sDesk_phase_2"
+            TMP_SRC="/home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_src_tmp"
 
-            echo "Listing files in temporary upload directory:"     # update 4/12/2025 to verify the contents before and after the copy operation of ssh and scp
-            ls -al ~/sdesk_frontend_tmp/
-  
-            echo "Listing files in final target directory BEFORE copy:"
-            ls -al /var/www/sdesk_new/frontend_sDesk_phase_2/dist/        # update 4/12/2025 to verify the contents before and after the copy operation of ssh and scp
+            # STEP 4.1 — Clone repo if not exists, else pull latest changes
+            echo "Checking if the frontend project directory exists..."
+            
 
-            echo "Removing old frontend build..."
-            sudo rm -rf /var/www/sdesk_new/frontend_sDesk_phase_2/dist/*
+            if [ ! -d "$FRONTEND_PATH" ]; then
+              echo "Project directory NOT found. Creating & cloning..."
+              sudo mkdir -p $FRONTEND_PATH
+              sudo git clone https://github.com/SLT-SDesk/frontend_sDesk_phase_2 $FRONTEND_PATH
+            else
+              echo "Project directory exists — pulling latest Git updates..."
+              cd $FRONTEND_PATH
+              git config --global --add safe.directory $FRONTEND_PATH
+              sudo git pull || true
+            fi
+            
+            
+            
+            # STEP 4.2 — Replace source code with uploaded version, install dependencies, build
 
-            echo "Copying new build..."
-            sudo cp -r ~/sdesk_frontend_tmp/* /var/www/sdesk_new/frontend_sDesk_phase_2/dist/   
+            echo "--------------------------------------------------"
+            echo "Fixing permissions for BUILD (give to gayal)..."
+            echo "--------------------------------------------------"
+            sudo chown -R $USER:$USER /var/www/sdesk_new
 
-            echo "Removing outdated nested 'dist' directory from final path..."
-            # update 4/12/2025 8.03 Clean up the old, nested dist folder that was copied along with the rest
-            sudo rm -rf /var/www/sdesk_new/frontend_sDesk_phase_2/dist/dist
 
-            echo "Listing files in final target directory AFTER copy:"
-            ls -al /var/www/sdesk_new/frontend_sDesk_phase_2/dist/          # update 4/12/2025 to verify the contents before and after the copy operation of ssh and scp
+            # STEP 4.3 — Replace source code with uploaded version
+            echo "--------------------------------------------------"
+            echo "Replacing server-side source code with uploaded version..."
+            echo "--------------------------------------------------"
+            rm -rf $FRONTEND_PATH/*
+            cp -r $TMP_SRC/* $FRONTEND_PATH/
 
-            echo "Fixing permissions..."
-            sudo chown -R nginx:nginx /var/www/sdesk_new/frontend_sDesk_phase_2/dist
+            # STEP 4.4 — Copy .env file into project
+            echo "--------------------------------------------------"
+            echo "Copying .env file into project..."
+            echo "--------------------------------------------------"
+            cp $TMP_SRC/.env $FRONTEND_PATH/.env
 
+            # STEP 4.5 — Install dependencies & build
+            echo "--------------------------------------------------"
+            echo "Installing npm dependencies..."
+            echo "--------------------------------------------------"
+            cd $FRONTEND_PATH
+            npm install
+
+            # STEP 4.6 — Build the project
+            echo "--------------------------------------------------"
+            echo "Building frontend (Vite) on server..."
+            echo "--------------------------------------------------"
+            npm run build
+
+
+            # STEP 4.7 — Move built files to NGINX directory
+            echo "--------------------------------------------------"
+            echo "Fixing permissions for NGINX (give to nginx)..."
+            echo "--------------------------------------------------"
+            sudo chown -R nginx:nginx /var/www/sdesk_new
+
+
+            # STEP 4.8 — Copy built files to NGINX directory
+            echo "--------------------------------------------------"
             echo "Restarting Nginx..."
+            echo "--------------------------------------------------"
             sudo systemctl restart nginx
 
-            echo "Frontend Deployment Completed Successfully."
+
+            # Final Step — Deployment completed message
+            echo "--------------------------------------------------"
+            echo "Frontend Deployment Completed Successfully! 🎉"
+            echo "--------------------------------------------------"
