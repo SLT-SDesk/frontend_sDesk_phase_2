@@ -53,7 +53,10 @@ const SlaSettings = () => {
           end: range.end,
           teamId,
         });
-        if (mounted) setData(resp);
+        if (mounted) {
+          console.log('Fetched SLA Data:', resp);
+          setData(resp);
+        }
       } catch (e) {
         console.error("Failed to load SLA data", e);
       } finally {
@@ -69,19 +72,32 @@ const SlaSettings = () => {
   // Helper function to get severity-specific data
   const getSeverityData = (severity) => {
     const severityKey = severity.toLowerCase();
+    
+    const totalIncidents = data?.incidents?.[severityKey] ?? (loading ? "..." : 0);
+    const responseData = data?.response?.[severityKey];
+    const resolveData = data?.resolve?.[severityKey];
+    
+    console.log(`${severity} Severity Data:`, {
+      totalIncidents,
+      responseData,
+      resolveData
+    });
+    
     return {
-      totalIncidents: data?.incidents?.[severityKey] ?? (loading ? "..." : 0),
+      totalIncidents,
       responseTime: {
-        percentage: data?.response?.[severityKey]?.percent ?? (loading ? "..." : 0),
-        avg: data?.response?.[severityKey]?.avgMinutes 
-          ? `${data.response[severityKey].avgMinutes} min`
-          : loading ? "..." : "—"
+        percentage: responseData?.percent ?? (loading ? "..." : 0),
+        avg: responseData?.avgMinutes 
+          ? `${responseData.avgMinutes} min`
+          : loading ? "..." : "—",
+        onTimeCount: responseData?.onTimeCount ?? (loading ? "..." : 0)
       },
       resolveRate: {
-        percentage: data?.resolve?.[severityKey]?.percent ?? (loading ? "..." : 0),
-        avg: data?.resolve?.[severityKey]?.avgHours
-          ? `${data.resolve[severityKey].avgHours} hrs`
-          : loading ? "..." : "—"
+        percentage: resolveData?.percent ?? (loading ? "..." : 0),
+        avg: resolveData?.avgHours
+          ? `${resolveData.avgHours} hrs`
+          : loading ? "..." : "—",
+        onTimeCount: resolveData?.onTimeCount ?? (loading ? "..." : 0)
       }
     };
   };
