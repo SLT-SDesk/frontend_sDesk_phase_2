@@ -101,6 +101,7 @@ jobs:
             else
               echo "Project directory exists — pulling latest Git updates..."
               cd $FRONTEND_PATH
+              git config --global --add safe.directory /var/www/sdesk_new/frontend_sDesk_phase_2  #6/12/2025 Added this line to fix git safe directory issue.
               sudo git pull || true   # Prevent pipeline crash if repo not initialized
             fi
 
