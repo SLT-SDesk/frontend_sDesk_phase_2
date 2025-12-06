@@ -81,44 +81,39 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 3251
           script: |
-            FRONTEND_PATH="/var/www/sdesk_new/frontend_sDesk_phase_2"   #update 6/12/2025 13.35 Fix syntax error("), 13.43 Changed from /var/www/sdesk_new/frontend_sDesk_phase_2/ to /var/www/sdesk_new/frontend_sDesk_phase_2
+            FRONTEND_PATH="/var/www/sdesk_new/frontend_sDesk_phase_2"
             TMP_SRC="/home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_src_tmp"
 
             echo "--------------------------------------------------"
             echo "Checking if the frontend project directory exists..."
             echo "--------------------------------------------------"
 
-            # -----------------------------------------------------
-            # ONE-TIME SETUP:
-            # If the folder does not exist, clone the full Git repo.
-            # After the first deployment, this block does not run.
-            # -----------------------------------------------------
             if [ ! -d "$FRONTEND_PATH" ]; then
               echo "Project directory NOT found. Creating & cloning..."
-              sudo mkdir -p /var/www/sdesk_new/frontend_sDesk_phase_2
-              sudo git clone https://github.com/${{ github.repository }} $FRONTEND_PATH
-              sudo chown -R nginx:nginx /var/www/sdesk_new
+              sudo mkdir -p $FRONTEND_PATH
+              sudo git clone https://github.com/SLT-SDesk/frontend_sDesk_phase_2 $FRONTEND_PATH
             else
               echo "Project directory exists — pulling latest Git updates..."
               cd $FRONTEND_PATH
-              git config --global --add safe.directory /var/www/sdesk_new/frontend_sDesk_phase_2  #6/12/2025 Added this line to fix git safe directory issue.
-              sudo git pull || true   # Prevent pipeline crash if repo not initialized
+              git config --global --add safe.directory $FRONTEND_PATH
+              sudo git pull || true
             fi
+
+            echo "--------------------------------------------------"
+            echo "Fixing permissions for BUILD (give to gayal)..."
+            echo "--------------------------------------------------"
+            sudo chown -R $USER:$USER /var/www/sdesk_new
 
             echo "--------------------------------------------------"
             echo "Replacing server-side source code with uploaded version..."
             echo "--------------------------------------------------"
-
-            # Clean existing source
-            sudo rm -rf $FRONTEND_PATH/*
-
-            # Copy uploaded files into project folder
-            sudo cp -r $TMP_SRC/* $FRONTEND_PATH/
+            rm -rf $FRONTEND_PATH/*
+            cp -r $TMP_SRC/* $FRONTEND_PATH/
 
             echo "--------------------------------------------------"
             echo "Copying .env file into project..."
             echo "--------------------------------------------------"
-            sudo cp $TMP_SRC/.env $FRONTEND_PATH/.env       # 6/12/2025 Copy the generated .env file and changed it to sudo permission.
+            cp $TMP_SRC/.env $FRONTEND_PATH/.env
 
             echo "--------------------------------------------------"
             echo "Installing npm dependencies..."
@@ -132,7 +127,7 @@ jobs:
             npm run build
 
             echo "--------------------------------------------------"
-            echo "Fixing file permissions..."   #6/12/2025 Added this block to fix permission issue.
+            echo "Fixing permissions for NGINX (give to nginx)..."
             echo "--------------------------------------------------"
             sudo chown -R nginx:nginx /var/www/sdesk_new
 
