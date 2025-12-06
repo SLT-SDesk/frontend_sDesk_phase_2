@@ -226,8 +226,8 @@ const TechnicianPerformance = ({ dateRange, onRowClick }) => {
         <MuiTable>
           <TableHead>
             <TableRow sx={{ backgroundColor: "#f5f6f8" }}>
-              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Service Number</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Name</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
             </TableRow>
           </TableHead>
@@ -252,8 +252,8 @@ const TechnicianPerformance = ({ dateRange, onRowClick }) => {
                     },
                   }}
                 >
-                  <TableCell>{tech.name}</TableCell>
                   <TableCell>{tech.serviceNumber}</TableCell>
+                  <TableCell>{tech.name}</TableCell>
                   <TableCell>
                     <StatusDot $status={tech.status} />
                     {tech.status}
