@@ -7,17 +7,23 @@ const SeverityCard = ({ severity, totalIncidents, responseTime, resolveRate }) =
     critical: {
       color: '#ff4444',
       label: 'Critical',
-      icon: '🔴'
+      icon: '🔴',
+      responseTarget: '15 min',
+      resolutionTarget: '2 hrs'
     },
     high: {
       color: '#ff9800',
       label: 'High',
-      icon: '🟠'
+      icon: '🟠',
+      responseTarget: '30 min',
+      resolutionTarget: '12 hrs'
     },
     medium: {
       color: '#ffc107',
       label: 'Medium',
-      icon: '🟡'
+      icon: '🟡',
+      responseTarget: '4 hrs',
+      resolutionTarget: '16 hrs'
     }
   };
 
@@ -34,9 +40,10 @@ const SeverityCard = ({ severity, totalIncidents, responseTime, resolveRate }) =
         </div>
 
         <div className="severity-metrics">
+          {/* Total Incidents */}
           <div className="metric-item">
             <Typography variant="caption" className="metric-label">
-              Total Incidents
+              TOTAL INCIDENTS
             </Typography>
             <Typography variant="h4" className="metric-value">
               {totalIncidents}
@@ -45,30 +52,52 @@ const SeverityCard = ({ severity, totalIncidents, responseTime, resolveRate }) =
 
           <div className="metric-divider" />
 
-          <div className="metric-item">
-            <Typography variant="caption" className="metric-label">
-              Response Time
-            </Typography>
-            <Typography variant="h4" className="metric-value">
-              {responseTime.percentage}%
-            </Typography>
-            <Typography variant="caption" className="metric-subtext">
-              Avg: {responseTime.avg}
-            </Typography>
+          {/* Response Time */}
+          <div className="metric-item-split">
+            <div className="metric-left">
+              <Typography variant="caption" className="metric-label">
+                RESPONSE TIME
+              </Typography>
+              <Typography variant="h4" className="metric-value-large">
+                {responseTime.percentage}%
+              </Typography>
+              <Typography variant="caption" className="metric-subtext">
+                Avg: {responseTime.avg}
+              </Typography>
+            </div>
+            <div className="metric-right">
+              <Typography variant="caption" className="metric-label-right">
+                ON TIME
+              </Typography>
+              <Typography variant="h4" className="metric-value-ontime">
+                {responseTime.onTimeCount}
+              </Typography>
+            </div>
           </div>
 
           <div className="metric-divider" />
 
-          <div className="metric-item">
-            <Typography variant="caption" className="metric-label">
-              Resolve Rate
-            </Typography>
-            <Typography variant="h4" className="metric-value">
-              {resolveRate.percentage}%
-            </Typography>
-            <Typography variant="caption" className="metric-subtext">
-              Avg: {resolveRate.avg}
-            </Typography>
+          {/* Resolve Rate */}
+          <div className="metric-item-split">
+            <div className="metric-left">
+              <Typography variant="caption" className="metric-label">
+                RESOLVE RATE
+              </Typography>
+              <Typography variant="h4" className="metric-value-large">
+                {resolveRate.percentage}%
+              </Typography>
+              <Typography variant="caption" className="metric-subtext">
+                Avg: {resolveRate.avg}
+              </Typography>
+            </div>
+            <div className="metric-right">
+              <Typography variant="caption" className="metric-label-right">
+                ON TIME
+              </Typography>
+              <Typography variant="h4" className="metric-value-ontime">
+                {resolveRate.onTimeCount}
+              </Typography>
+            </div>
           </div>
         </div>
       </CardContent>
