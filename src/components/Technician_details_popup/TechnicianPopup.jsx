@@ -1,47 +1,93 @@
 // TechnicianPopup.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import DateRangePopup from '../AdminDateRangePopup/DateRangePopup';
+import { fetchTechnicianData } from '../../utils/slaDummyData';
 
 const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   const [activeTab, setActiveTab] = useState(0);
   const [selectedPriority, setSelectedPriority] = useState('all'); // 'all', 'critical', 'high', 'medium'
+  const [dateRangePopupOpen, setDateRangePopupOpen] = useState(false);
+  const [dateRange, setDateRange] = useState({
+    selection: 'Today',
+    startDate: new Date(),
+    endDate: new Date()
+  });
+  const [filteredTechnicianData, setFilteredTechnicianData] = useState(null);
   
   console.log('TechnicianDetailsPopup render:', { isOpen, technician });
   
+  // Fetch filtered technician data based on date range
+  useEffect(() => {
+    if (isOpen && technician) {
+      const loadData = async () => {
+        const techData = await fetchTechnicianData({
+          start: dateRange.startDate,
+          end: dateRange.endDate,
+          teamId: technician.teamId || null
+        });
+        
+        // Find the matching technician from the fetched data
+        const matchedTech = techData.find(t => t.serviceNumber === technician.serviceNumber);
+        setFilteredTechnicianData(matchedTech || technician);
+      };
+      
+      loadData();
+    }
+  }, [isOpen, technician, dateRange]);
+
   if (!isOpen) return null;
   if (!technician) {
     console.warn('Popup is open but no technician data provided');
     return null;
   }
 
+  // Use filtered data if available, otherwise use original technician data
+  const displayData = filteredTechnicianData || technician;
+
+  // Handle date range change
+  const handleDateRangeApply = (newRange) => {
+    setDateRange(newRange);
+    setDateRangePopupOpen(false);
+  };
+
+  // Format date range display
+  const formatDateRange = () => {
+    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    if (dateRange.selection === 'Today' || dateRange.selection === 'Yesterday') {
+      return dateRange.startDate.toLocaleDateString('en-US', options);
+    }
+    return `${dateRange.startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${dateRange.endDate.toLocaleDateString('en-US', options)}`;
+  };
+
   // Calculate metrics based on selected priority
   const getFilteredMetrics = () => {
     if (selectedPriority === 'all') {
       return {
-        responseOnTime: technician.responseOnTime || 0,
-        resolutionOnTime: technician.resolutionOnTime || 0,
-        totalIncidents: technician.totalIncidents || 0,
-        avgResponseTime: technician.avgResponseTime || 0,
-        avgResolutionTime: technician.avgResolutionTime || 0
+        responseOnTime: displayData.responseOnTime || 0,
+        resolutionOnTime: displayData.resolutionOnTime || 0,
+        totalIncidents: displayData.totalIncidents || 0,
+        avgResponseTime: displayData.avgResponseTime || 0,
+        avgResolutionTime: displayData.avgResolutionTime || 0
       };
     }
 
     // If priority-specific data exists, use it; otherwise calculate proportionally
-    const priorityData = technician[`${selectedPriority}Data`];
+    const priorityData = displayData[`${selectedPriority}Data`];
     if (priorityData) {
       return priorityData;
     }
 
     // Fallback: calculate proportionally based on priority count
-    const priorityCount = technician[selectedPriority] || 0;
-    const totalIncidents = technician.totalIncidents || 1;
+    const priorityCount = displayData[selectedPriority] || 0;
+    const totalIncidents = displayData.totalIncidents || 1;
     const ratio = priorityCount / totalIncidents;
 
     return {
-      responseOnTime: Math.round((technician.responseOnTime || 0) * ratio),
-      resolutionOnTime: Math.round((technician.resolutionOnTime || 0) * ratio),
+      responseOnTime: Math.round((displayData.responseOnTime || 0) * ratio),
+      resolutionOnTime: Math.round((displayData.resolutionOnTime || 0) * ratio),
       totalIncidents: priorityCount,
-      avgResponseTime: technician.avgResponseTime || 0,
-      avgResolutionTime: technician.avgResolutionTime || 0
+      avgResponseTime: displayData.avgResponseTime || 0,
+      avgResolutionTime: displayData.avgResolutionTime || 0
     };
   };
 
@@ -115,9 +161,21 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
         <div className="flex items-start justify-between p-6 border-b">
           <div>
             <h2 className="text-lg font-bold text-gray-900 mb-1">Technician Details</h2>
-            <p className="text-xs text-gray-500">
-              {technician.date || new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-            </p>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setDateRangePopupOpen(true);
+              }}
+              className="flex items-center gap-2 text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span>{formatDateRange()}</span>
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
           </div>
           <button 
             onClick={onClose}
@@ -129,9 +187,8 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
           </button>
         </div>
 
-        {/* Scrollable Content */}
-        <div className="overflow-y-auto flex-1 p-6">
-          {/* Technician Info Card */}
+        {/* Fixed Section - Technician Info Card */}
+        <div className="p-6 pb-0">
           <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl p-6 flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center">
@@ -140,18 +197,18 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                 </span>
               </div>
               <div>
-                <h3 className="text-white text-lg font-bold">{technician.name}</h3>
-                <p className="text-blue-100 text-sm">{technician.serviceNumber || technician.id}</p>
+                <h3 className="text-white text-lg font-bold">{displayData.name}</h3>
+                <p className="text-blue-100 text-sm">{displayData.serviceNumber || displayData.id}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 bg-green-500 px-4 py-2 rounded-lg">
               <div className="w-2 h-2 bg-white rounded-full"></div>
-              <span className="text-white font-semibold text-sm">{technician.status || 'Active'}</span>
+              <span className="text-white font-semibold text-sm">{displayData.status || 'Active'}</span>
             </div>
           </div>
 
           {/* Tabs */}
-          <div className="flex justify-center gap-2 mb-6 border-b">
+          <div className="flex justify-center gap-2 border-b">
             <button 
               onClick={() => setActiveTab(0)}
               className={`flex items-center gap-2 px-6 py-3 font-medium text-sm transition-all border-b-2 ${
@@ -179,7 +236,10 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
               <span>Sessions</span>
             </button>
           </div>
+        </div>
 
+        {/* Scrollable Content */}
+        <div className="overflow-y-auto flex-1 p-6">
           {/* Tab Content */}
           {activeTab === 0 && (
             <div>
@@ -192,7 +252,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                     </svg>
                     <span className="font-semibold text-gray-700 text-sm">Assigned Incidents</span>
                   </div>
-                  <span className="text-3xl font-bold text-gray-900">{technician.totalIncidents || 0}</span>
+                  <span className="text-3xl font-bold text-gray-900">{displayData.totalIncidents || 0}</span>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-4">
@@ -204,7 +264,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                   >
                     <p className="text-gray-700 font-semibold mb-3 text-sm">Critical</p>
                     <div className="bg-red-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
-                      {technician.critical || 0}
+                      {displayData.critical || 0}
                     </div>
                   </div>
                   <div 
@@ -215,7 +275,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                   >
                     <p className="text-gray-700 font-semibold mb-3 text-sm">High</p>
                     <div className="bg-orange-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
-                      {technician.high || 0}
+                      {displayData.high || 0}
                     </div>
                   </div>
                   <div 
@@ -226,7 +286,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                   >
                     <p className="text-gray-700 font-semibold mb-3 text-sm">Medium</p>
                     <div className="bg-yellow-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
-                      {technician.medium || 0}
+                      {displayData.medium || 0}
                     </div>
                   </div>
                 </div>
@@ -300,7 +360,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
           {activeTab === 1 && (
             <div>
               <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                Active Sessions for {technician.name}
+                Active Sessions for {displayData.name}
               </h3>
               <p className="text-sm text-gray-500 mb-6">Total Duration: Still Active</p>
 
@@ -354,6 +414,14 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
           )}
         </div>
       </div>
+
+      {/* Date Range Popup with higher z-index than technician popup */}
+      <DateRangePopup
+        open={dateRangePopupOpen}
+        onClose={() => setDateRangePopupOpen(false)}
+        onApply={handleDateRangeApply}
+        selectedRange={dateRange.selection}
+      />
     </div>
   );
 };
