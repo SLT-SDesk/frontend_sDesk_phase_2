@@ -137,6 +137,9 @@ function DateRangePopup({ open, onClose, onApply, selectedRange }) {
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      sx={{
+        zIndex: 10000
+      }}
       PaperProps={{
         style: {
           borderRadius: '12px',
