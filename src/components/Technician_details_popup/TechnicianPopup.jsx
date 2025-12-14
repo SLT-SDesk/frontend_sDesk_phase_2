@@ -1,7 +1,7 @@
 // TechnicianPopup.jsx
 import { useState, useEffect } from 'react';
 import DateRangePopup from '../AdminDateRangePopup/DateRangePopup';
-import { fetchTechnicianData } from '../../utils/slaDummyData';
+import { apiClient } from '../../api/axiosInstance';
 
 const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   const [activeTab, setActiveTab] = useState(0);
@@ -12,23 +12,47 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
     startDate: new Date(),
     endDate: new Date()
   });
-  const [filteredTechnicianData, setFilteredTechnicianData] = useState(null);
+  const [technicianStats, setTechnicianStats] = useState(null);
+  const [performanceData, setPerformanceData] = useState(null);
+  const [loading, setLoading] = useState(false);
   
   console.log('TechnicianDetailsPopup render:', { isOpen, technician });
   
-  // Fetch filtered technician data based on date range
+  // Fetch real technician data from backend
   useEffect(() => {
     if (isOpen && technician) {
       const loadData = async () => {
-        const techData = await fetchTechnicianData({
-          start: dateRange.startDate,
-          end: dateRange.endDate,
-          teamId: technician.teamId || null
-        });
-        
-        // Find the matching technician from the fetched data
-        const matchedTech = techData.find(t => t.serviceNumber === technician.serviceNumber);
-        setFilteredTechnicianData(matchedTech || technician);
+        setLoading(true);
+        try {
+          const serviceNum = technician.serviceNum || technician.serviceNumber;
+         
+          // Fetch assigned incidents stats
+          const statsResponse = await apiClient.get(`/incident/technician/${serviceNum}/stats`);
+          setTechnicianStats(statsResponse.data);
+          console.log(statsResponse);
+          // Fetch performance metrics
+          const performanceResponse = await apiClient.get(`/incident/technician/${serviceNum}/performance`);
+          setPerformanceData(performanceResponse.data);
+        } catch (error) {
+          console.error('Failed to fetch technician data:', error);
+          // Set default values on error
+          setTechnicianStats({
+            totalIncidents: 0,
+            byPriority: { critical: 0, high: 0, medium: 0, low: 0 },
+            byStatus: { open: 0, inProgress: 0, hold: 0, closed: 0 }
+          });
+          setPerformanceData({
+            totalIncidents: 0,
+            responseOnTime: 0,
+            resolutionOnTime: 0,
+            responseOnTimePercent: 0,
+            resolutionOnTimePercent: 0,
+            avgResponseTime: 0,
+            avgResolutionTime: 0
+          });
+        } finally {
+          setLoading(false);
+        }
       };
       
       loadData();
@@ -40,9 +64,6 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
     console.warn('Popup is open but no technician data provided');
     return null;
   }
-
-  // Use filtered data if available, otherwise use original technician data
-  const displayData = filteredTechnicianData || technician;
 
   // Handle date range change
   const handleDateRangeApply = (newRange) => {
@@ -61,33 +82,37 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
 
   // Calculate metrics based on selected priority
   const getFilteredMetrics = () => {
-    if (selectedPriority === 'all') {
+    if (!performanceData) {
       return {
-        responseOnTime: displayData.responseOnTime || 0,
-        resolutionOnTime: displayData.resolutionOnTime || 0,
-        totalIncidents: displayData.totalIncidents || 0,
-        avgResponseTime: displayData.avgResponseTime || 0,
-        avgResolutionTime: displayData.avgResolutionTime || 0
+        responseOnTime: 0,
+        resolutionOnTime: 0,
+        totalIncidents: 0,
+        avgResponseTime: 0,
+        avgResolutionTime: 0
       };
     }
 
-    // If priority-specific data exists, use it; otherwise calculate proportionally
-    const priorityData = displayData[`${selectedPriority}Data`];
-    if (priorityData) {
-      return priorityData;
+    if (selectedPriority === 'all') {
+      return {
+        responseOnTime: performanceData.responseOnTime || 0,
+        resolutionOnTime: performanceData.resolutionOnTime || 0,
+        totalIncidents: performanceData.totalIncidents || 0,
+        avgResponseTime: performanceData.avgResponseTime || 0,
+        avgResolutionTime: performanceData.avgResolutionTime || 0
+      };
     }
 
-    // Fallback: calculate proportionally based on priority count
-    const priorityCount = displayData[selectedPriority] || 0;
-    const totalIncidents = displayData.totalIncidents || 1;
+    // For priority filtering, calculate proportionally
+    const priorityCount = technicianStats?.byPriority?.[selectedPriority] || 0;
+    const totalIncidents = technicianStats?.totalIncidents || 1;
     const ratio = priorityCount / totalIncidents;
 
     return {
-      responseOnTime: Math.round((displayData.responseOnTime || 0) * ratio),
-      resolutionOnTime: Math.round((displayData.resolutionOnTime || 0) * ratio),
+      responseOnTime: Math.round((performanceData.responseOnTime || 0) * ratio),
+      resolutionOnTime: Math.round((performanceData.resolutionOnTime || 0) * ratio),
       totalIncidents: priorityCount,
-      avgResponseTime: displayData.avgResponseTime || 0,
-      avgResolutionTime: displayData.avgResolutionTime || 0
+      avgResponseTime: performanceData.avgResponseTime || 0,
+      avgResolutionTime: performanceData.avgResolutionTime || 0
     };
   };
 
@@ -197,13 +222,13 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                 </span>
               </div>
               <div>
-                <h3 className="text-white text-lg font-bold">{displayData.name}</h3>
-                <p className="text-blue-100 text-sm">{displayData.serviceNumber || displayData.id}</p>
+                <h3 className="text-white text-lg font-bold">{technician.name}</h3>
+                <p className="text-blue-100 text-sm">{technician.serviceNum || technician.serviceNumber || technician.id}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 bg-green-500 px-4 py-2 rounded-lg">
               <div className="w-2 h-2 bg-white rounded-full"></div>
-              <span className="text-white font-semibold text-sm">{displayData.status || 'Active'}</span>
+              <span className="text-white font-semibold text-sm">{technician.status || 'Active'}</span>
             </div>
           </div>
 
@@ -252,7 +277,11 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                     </svg>
                     <span className="font-semibold text-gray-700 text-sm">Assigned Incidents</span>
                   </div>
-                  <span className="text-3xl font-bold text-gray-900">{displayData.totalIncidents || 0}</span>
+                  {loading ? (
+                    <div className="text-2xl font-bold text-gray-400">...</div>
+                  ) : (
+                    <span className="text-3xl font-bold text-gray-900">{technicianStats?.totalIncidents || 0}</span>
+                  )}
                 </div>
                 
                 <div className="grid grid-cols-3 gap-4">
@@ -264,7 +293,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                   >
                     <p className="text-gray-700 font-semibold mb-3 text-sm">Critical</p>
                     <div className="bg-red-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
-                      {displayData.critical || 0}
+                      {loading ? '...' : technicianStats?.byPriority?.critical || 0}
                     </div>
                   </div>
                   <div 
@@ -275,7 +304,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                   >
                     <p className="text-gray-700 font-semibold mb-3 text-sm">High</p>
                     <div className="bg-orange-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
-                      {displayData.high || 0}
+                      {loading ? '...' : technicianStats?.byPriority?.high || 0}
                     </div>
                   </div>
                   <div 
@@ -286,7 +315,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                   >
                     <p className="text-gray-700 font-semibold mb-3 text-sm">Medium</p>
                     <div className="bg-yellow-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
-                      {displayData.medium || 0}
+                      {loading ? '...' : technicianStats?.byPriority?.medium || 0}
                     </div>
                   </div>
                 </div>
@@ -360,7 +389,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
           {activeTab === 1 && (
             <div>
               <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                Active Sessions for {displayData.name}
+                Active Sessions for {technician.name}
               </h3>
               <p className="text-sm text-gray-500 mb-6">Total Duration: Still Active</p>
 
