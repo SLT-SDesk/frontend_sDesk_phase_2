@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TechnicianInsident from "../../Technician/TechnicianIncident/TechnicianInsident";
-import { FaHistory, FaSearch } from "react-icons/fa";
+import { FaHistory, FaSearch,FaRegClock } from "react-icons/fa";
 import { TiExportOutline } from "react-icons/ti";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAdminTeamDataRequest } from "../../../redux/incident/incidentSlice";
@@ -8,10 +8,20 @@ import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import "./SuperAdminAllIncident.css";
+import IncidentTimelineDialog from "../../../components/IncidentTimelinePopup/IncidentTimelineDialog"; // ⭐ use popup
 
 const SuperAdminAllIncident = () => {
   const [showIncidentPopup, setShowIncidentPopup] = useState(false);
   const [selectedIncident, setSelectedIncident] = useState(null);
+
+  //  state for Incident Timeline popup (SLA inside component)
+  const [timelineOpen, setTimelineOpen] = useState(false);
+  const [timelineData, setTimelineData] = useState({
+    refNo: "",
+    status: "",
+    priority: "",
+  });
+
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -101,6 +111,7 @@ const SuperAdminAllIncident = () => {
       mainCategory: getMainCategoryNameFromDatabase(incident.category),
       status: incident.status,
       location: getLocationName(incident.location),
+      priority: incident.priority || "", //  use priority for SLA
       rawCategory: incident.category,
     })) || [];
 
@@ -118,7 +129,7 @@ const SuperAdminAllIncident = () => {
   });
 
   // ✅ Pagination logic
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
   const indexOfLast = currentPage * rowsPerPage;
   const indexOfFirst = indexOfLast - rowsPerPage;
   const currentRows = filteredData.slice(indexOfFirst, indexOfLast);
@@ -129,6 +140,16 @@ const SuperAdminAllIncident = () => {
       setSelectedIncident(incident);
       setShowIncidentPopup(true);
     }
+  };
+
+  //  open timeline popup – SLA logic inside IncidentTimelineDialog
+  const handleViewTimeline = (refNo, status, priority) => {
+    setTimelineData({
+      refNo,
+      status,
+      priority,
+    });
+    setTimelineOpen(true);
   };
 
   // ✅ UPDATED Export to Excel with header details
@@ -163,6 +184,7 @@ const SuperAdminAllIncident = () => {
         "Main Category",
         "Location",
         "Status",
+        "Priority",
       ],
     ];
 
@@ -176,6 +198,7 @@ const SuperAdminAllIncident = () => {
       item.mainCategory,
       item.location,
       item.status,
+      item.priority, 
     ]);
 
     const finalData = [...headerInfo, ...tableHeaders, ...tableRows];
@@ -191,13 +214,17 @@ const SuperAdminAllIncident = () => {
       { wch: 25 },
       { wch: 25 },
       { wch: 15 },
+      { wch: 15 },
     ];
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "All Incidents");
 
     const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+
+    const blob = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
     saveAs(blob, `All_Incidents_${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
@@ -206,7 +233,7 @@ const SuperAdminAllIncident = () => {
     if (currentRows.length === 0) {
       return (
         <tr>
-          <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>
+          <td colSpan="7" style={{ textAlign: "center", padding: "20px" }}>
             No incidents found.
           </td>
         </tr>
@@ -236,6 +263,18 @@ const SuperAdminAllIncident = () => {
         <td>{row.category}</td>
         <td>{row.location}</td>
         <td className="team-status-text">{row.status}</td>
+        <td>
+          <button
+            className="incident-action-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewTimeline(row.refNo, row.status, row.priority);
+            }}
+          >
+            <FaRegClock size={12} />
+            &nbsp;View Timeline
+          </button>
+        </td>
       </tr>
     ));
   };
@@ -411,6 +450,7 @@ const SuperAdminAllIncident = () => {
                 <th>Category</th>
                 <th>Location</th>
                 <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>{renderTableRows()}</tbody>
@@ -483,6 +523,13 @@ const SuperAdminAllIncident = () => {
             </div>
           </div>
         )}
+        <IncidentTimelineDialog
+          open={timelineOpen}
+          onClose={() => setTimelineOpen(false)}
+          incidentRef={timelineData.refNo}
+          status={timelineData.status}
+          priority={timelineData.priority}
+        />
       </div>
     </div>
   );

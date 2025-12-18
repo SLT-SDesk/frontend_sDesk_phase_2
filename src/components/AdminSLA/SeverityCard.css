@@ -1,0 +1,259 @@
+/* Severity Card Container */
+.severity-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0e0;
+  height: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+}
+
+.severity-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Card Content */
+.severity-content {
+  padding: 24px !important;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Severity Header Section */
+.severity-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-left: 12px;
+  border-left: 4px solid;
+  border-radius: 2px;
+}
+
+.severity-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.severity-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Metrics Container */
+.severity-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+/* Individual Metric Item */
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+/* Split layout for Response Time and Resolve Rate */
+.metric-item-split {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px 0;
+  gap: 16px;
+}
+
+.metric-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.metric-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 80px;
+}
+
+.metric-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
+}
+
+.metric-label-right {
+  font-size: 11px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
+  text-align: right;
+}
+
+.metric-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1.2;
+  margin: 4px 0;
+}
+
+.metric-value-large {
+  font-size: 36px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1.1;
+  margin: 4px 0;
+}
+
+.metric-value-ontime {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1.2;
+  margin: 4px 0;
+  text-align: right;
+}
+
+.metric-subtext {
+  font-size: 12px;
+  color: #888;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+/* Metric detail container */
+.metric-detail {
+  margin-top: 4px;
+}
+
+/* Divider between metrics */
+.metric-divider {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 4px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .severity-content {
+    padding: 20px !important;
+  }
+
+  .metric-value-large {
+    font-size: 32px;
+  }
+
+  .metric-value-ontime {
+    font-size: 24px;
+  }
+
+  .severity-label {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .severity-content {
+    padding: 18px !important;
+  }
+
+  .severity-header {
+    margin-bottom: 16px;
+    padding-left: 10px;
+  }
+
+  .severity-icon {
+    font-size: 20px;
+  }
+
+  .severity-label {
+    font-size: 16px;
+  }
+
+  .metric-value {
+    font-size: 28px;
+  }
+
+  .metric-value-large {
+    font-size: 30px;
+  }
+
+  .metric-value-ontime {
+    font-size: 22px;
+  }
+
+  .metric-label {
+    font-size: 10px;
+  }
+
+  .metric-label-right {
+    font-size: 10px;
+  }
+
+  .metric-subtext {
+    font-size: 11px;
+  }
+
+  .severity-metrics {
+    gap: 12px;
+  }
+
+  .metric-item-split {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .severity-content {
+    padding: 16px !important;
+  }
+
+  .metric-value {
+    font-size: 24px;
+  }
+
+  .metric-value-large {
+    font-size: 28px;
+  }
+
+  .metric-value-ontime {
+    font-size: 20px;
+  }
+
+  .severity-header {
+    gap: 8px;
+  }
+
+  .metric-item-split {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .metric-right {
+    align-items: flex-start;
+  }
+
+  .metric-value-ontime {
+    text-align: left;
+  }
+
+  .metric-label-right {
+    text-align: left;
+  }
+}

@@ -324,3 +324,14 @@ export const fetchIncidentsByMainCategoryCode = async (mainCategoryCode: string)
     throw error;
   }
 };
+
+//====== Get incident performance (response & resolution time)
+export const getIncidentPerformance = async (incidentNumber: string) => {
+  try {
+    return await apiClient.get(
+      buildUrl(API_BASE, `/incident/${incidentNumber}/performance`)
+    );
+  } catch (error) {
+    throw error;
+  }
+};
