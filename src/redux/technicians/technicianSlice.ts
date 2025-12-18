@@ -204,9 +204,9 @@ fetchTeamSessionsFailure,
 } = technicianSlice.actions;
 
 //Selectors
-export const selectTechnicians = (state: any) => state.technician.technicians;
-export const selectTechniciansLoading = (state: any) => state.technician.loading;
-export const selectTechniciansError = (state: any) => state.technician.error;
+// export const selectTechnicians = (state: any) => state.technician.technicians;
+// export const selectTechniciansLoading = (state: any) => state.technician.loading;
+// export const selectTechniciansError = (state: any) => state.technician.error;
 export const selectTechnicianSessions = (state: any) =>
   state.technician.technicianSessions;
 
