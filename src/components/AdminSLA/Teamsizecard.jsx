@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, Typography } from '@mui/material';
 import GroupIcon from '@mui/icons-material/Group';
-import './TeamSizeCard.css';
+import "./TeamSizeCard.css";
 
 const TeamSizeCard = ({ teamSize, activeMembers }) => {
   return (
