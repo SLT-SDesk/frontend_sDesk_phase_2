@@ -157,8 +157,15 @@ export const {
 } = technicianSlice.actions;
 
 //Selectors
-export const selectTechnicians = (state: any) => state.technician.technicians;
-export const selectTechniciansLoading = (state: any) => state.technician.loading;
-export const selectTechniciansError = (state: any) => state.technician.error;
+// FIXED selectors (MATCH reducer key)
+export const selectTechnicians = (state: any) =>
+  state.technicians.technicians;
+
+export const selectTechniciansLoading = (state: any) =>
+  state.technicians.loading;
+
+export const selectTechniciansError = (state: any) =>
+  state.technicians.error;
+
 
 export default technicianSlice.reducer;
