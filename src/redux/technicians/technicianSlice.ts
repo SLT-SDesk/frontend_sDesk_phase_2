@@ -212,6 +212,15 @@ export const selectTechnicianSessions = (state: any) =>
 
 export const selectTeamSessions = (state: any) =>
   state.technician.teamTechnicianSessions;
+// FIXED selectors (MATCH reducer key)
+export const selectTechnicians = (state: any) =>
+  state.technicians.technicians;
+
+export const selectTechniciansLoading = (state: any) =>
+  state.technicians.loading;
+
+export const selectTechniciansError = (state: any) =>
+  state.technicians.error;
 
 
 export default technicianSlice.reducer;
