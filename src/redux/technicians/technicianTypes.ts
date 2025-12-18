@@ -17,3 +17,30 @@ export interface Technician {
   permanentMember?: boolean;
   subrootUser?: boolean;
 }
+
+export interface Session {
+  id: number;
+  technician_service_number: string;
+  login_time: string;
+  logout_time: string | null;
+}
+
+export interface TechnicianSession {
+  id: string;
+  serviceNum: string;
+  name: string;
+  team: string;
+  position: string;
+  active: boolean;
+  tier: string;
+  teamId: string;
+  email: string;
+  contactNumber: string;
+  sessions: Session[];
+}
+
+export interface TeamTechnicianSessions {
+  serviceNum: string;
+  name: string;
+  sessions: Session[];
+}
