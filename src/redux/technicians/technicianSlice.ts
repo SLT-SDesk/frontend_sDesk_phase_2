@@ -1,10 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { Technician } from "./technicianTypes";
+import { Technician, TechnicianSession, TeamTechnicianSessions } from "./technicianTypes";
 
 
 const initialState = {
   technicians: [] as Technician[],
-   activeTechnicians: [] as Technician[],
+  activeTechnicians: [] as Technician[],
+  technicianSessions: null as TechnicianSession | null,
+  teamTechnicianSessions: [] as TeamTechnicianSessions[],
    
   loading: false,
   error: null as string | null,
@@ -14,6 +16,45 @@ const technicianSlice = createSlice({
   name: "technicians",
   initialState,
   reducers: {
+
+    // =====================
+// Technician Sessions
+// =====================
+
+fetchTechnicianSessionsRequest(state, action) {
+  state.loading = true;
+  state.error = null;
+},
+
+fetchTechnicianSessionsSuccess(state, action) {
+  state.loading = false;
+  state.technicianSessions = action.payload;
+},
+
+fetchTechnicianSessionsFailure(state, action) {
+  state.loading = false;
+  state.error = action.payload;
+},
+
+// =====================
+// Team Sessions
+// =====================
+
+fetchTeamSessionsRequest(state, action) {
+  state.loading = true;
+  state.error = null;
+},
+
+fetchTeamSessionsSuccess(state, action) {
+  state.loading = false;
+  state.teamTechnicianSessions = action.payload;
+},
+
+fetchTeamSessionsFailure(state, action) {
+  state.loading = false;
+  state.error = action.payload;
+},
+
     fetchTechniciansRequest(state, action) {
       state.loading = true;
       state.error = null;
@@ -132,6 +173,12 @@ const technicianSlice = createSlice({
 });
 
 export const {
+  fetchTechnicianSessionsRequest,
+fetchTechnicianSessionsSuccess,
+fetchTechnicianSessionsFailure,
+fetchTeamSessionsRequest,
+fetchTeamSessionsSuccess,
+fetchTeamSessionsFailure,
   fetchTechniciansRequest,
   fetchTechniciansSuccess,
   fetchTechniciansFailure,
@@ -157,6 +204,14 @@ export const {
 } = technicianSlice.actions;
 
 //Selectors
+// export const selectTechnicians = (state: any) => state.technician.technicians;
+// export const selectTechniciansLoading = (state: any) => state.technician.loading;
+// export const selectTechniciansError = (state: any) => state.technician.error;
+export const selectTechnicianSessions = (state: any) =>
+  state.technician.technicianSessions;
+
+export const selectTeamSessions = (state: any) =>
+  state.technician.teamTechnicianSessions;
 // FIXED selectors (MATCH reducer key)
 export const selectTechnicians = (state: any) =>
   state.technicians.technicians;
