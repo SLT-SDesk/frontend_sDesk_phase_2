@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, Typography, Chip, Box } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import './TotalIncidentsCard.css';
+import './Totalincidentscard.css';
 
 const TotalIncidentsCard = ({ total, critical, high, medium }) => {
   return (
