@@ -43,15 +43,21 @@ export function aggregateSeverityData(incidents, performances) {
       bucket.response.late += 1;
     }
 
-    // ===== RESOLVE =====
-    const resolveMinutes = Number(perf.resolveTimeMinutes ?? 0);
-    bucket.resolve.totalMinutes += resolveMinutes;
+    // ===== resolve rate changed =====
+    if (perf.resolutionTimeMinutes > 0) {
+      const resolveMinutes = Number(perf.resolutionTimeMinutes);
+      bucket.resolve.totalMinutes += resolveMinutes;
 
-    if (resolveMinutes <= sla.resolve) {
-      bucket.resolve.onTime += 1;
+      if (resolveMinutes <= sla.resolve) {
+        bucket.resolve.onTime += 1;
+      } else {
+        bucket.resolve.late += 1;
+      }
     } else {
+      // unresolved ticket
       bucket.resolve.late += 1;
     }
+
   });
 
   // ---------- Calculate totals across all severities ----------
@@ -65,7 +71,7 @@ export function aggregateSeverityData(incidents, performances) {
       avgMinutes: totals.response.avg,
       onTimeCount: totals.response.onTime,
       lateCount: totals.response.late,
-      
+
       // Severity-specific response data
       critical: formatSeverityData(result.critical, 'response', '15 min'),
       high: formatSeverityData(result.high, 'response', '30 min'),
@@ -77,7 +83,7 @@ export function aggregateSeverityData(incidents, performances) {
       avgHours: totals.resolve.avg,
       onTimeCount: totals.resolve.onTime,
       lateCount: totals.resolve.late,
-      
+
       // Severity-specific resolve data
       critical: formatSeverityData(result.critical, 'resolve', '2 hrs'),
       high: formatSeverityData(result.high, 'resolve', '12 hrs'),
