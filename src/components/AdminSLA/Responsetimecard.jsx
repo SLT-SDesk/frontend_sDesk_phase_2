@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, Typography, LinearProgress, Box } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import './ResponseTimeCard.css';
+import './Responsetimecard.css';
 
 const ResponseTimeCard = ({ percentage, avgTime }) => {
   return (

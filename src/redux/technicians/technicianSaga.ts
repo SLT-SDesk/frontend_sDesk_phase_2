@@ -1,5 +1,11 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
 import {
+  fetchTechnicianSessionsRequest,
+  fetchTechnicianSessionsSuccess,
+  fetchTechnicianSessionsFailure,
+  fetchTeamSessionsRequest,
+  fetchTeamSessionsSuccess,
+  fetchTeamSessionsFailure,
   fetchTechniciansRequest,
   fetchTechniciansSuccess,
   fetchTechniciansFailure,
@@ -23,6 +29,30 @@ forceLogoutTechnicianSuccess,
 forceLogoutTechnicianFailure
 } from './technicianSlice';
 import * as technicianService from './technicianService';
+
+function* fetchTechnicianSessionsSaga(action: any): Generator<any, any, any> {
+  try {
+    const res = yield call(
+      technicianService.fetchTechnicianSessionsByServiceNum,
+      action.payload
+    );
+    yield put(fetchTechnicianSessionsSuccess(res.data));
+  } catch (err: any) {
+    yield put(fetchTechnicianSessionsFailure(err.message));
+  }
+}
+
+function* fetchTeamSessionsSaga(action: any): Generator<any, any, any> {
+  try {
+    const res = yield call(
+      technicianService.fetchTechnicianSessionsByTeamId,
+      action.payload
+    );
+    yield put(fetchTeamSessionsSuccess(res.data));
+  } catch (err: any) {
+    yield put(fetchTeamSessionsFailure(err.message));
+  }
+}
 
 function* handleFetchTechnicians(action) {
   try {
@@ -104,4 +134,6 @@ export default function* technicianSaga() {
   yield takeLatest(checkTechnicianStatusRequest.type, handleCheckTechnicianStatus); 
   yield takeLatest(fetchActiveTechniciansRequest.type, handleFetchActiveTechnicians);
   yield takeLatest(forceLogoutTechnicianRequest.type, handleForceLogoutTechnician);
+  yield takeLatest(fetchTechnicianSessionsRequest.type, fetchTechnicianSessionsSaga);
+  yield takeLatest(fetchTeamSessionsRequest.type, fetchTeamSessionsSaga);
 }

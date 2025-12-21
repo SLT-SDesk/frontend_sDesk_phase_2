@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, Typography, LinearProgress, Box } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import './ResolveRateCard.css';
+import './Resolveratecard.css';
 
 const ResolveRateCard = ({ percentage, avgTime }) => {
   return (

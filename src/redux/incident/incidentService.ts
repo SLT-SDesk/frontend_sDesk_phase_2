@@ -335,3 +335,14 @@ export const getIncidentPerformance = async (incidentNumber: string) => {
     throw error;
   }
 };
+
+//getAllTechnicianPerformance
+export const getAllTechnicianPerformance = async () => {
+  try {
+    return await apiClient.get(
+      buildUrl(API_BASE, `/incident/all-technician-performance`)
+    );
+  } catch (error) {
+    throw error;
+  }
+}
