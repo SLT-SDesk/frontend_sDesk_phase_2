@@ -75,12 +75,19 @@
   display: flex;
   align-items: center;
   border-right: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.employee-column:hover {
+  background-color: #e3f2fd;
 }
 
 .employee-name {
   font-size: 14px;
   color: #333;
   font-weight: 400;
+  user-select: none;
 }
 
 .timeline-grid {
