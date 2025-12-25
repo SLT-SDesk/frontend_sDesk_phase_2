@@ -8,15 +8,15 @@ const generateRandomColor = (seed) => {
   const hash = seed.split('').reduce((acc, char) => {
     return char.charCodeAt(0) + ((acc << 5) - acc);
   }, 0);
-
+  
   const hue = Math.abs(hash % 360);
   const saturation = 65 + (Math.abs(hash) % 20); // 65-85%
   const lightness = 50 + (Math.abs(hash >> 8) % 15); // 50-65%
-
+  
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
 
-const EmployeeTimeline = ({ data, selectedDate }) => {
+const EmployeeTimeline = ({ data, selectedDate, onEmployeeClick }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   // Update current time every minute for active sessions
@@ -50,7 +50,7 @@ const EmployeeTimeline = ({ data, selectedDate }) => {
     // Check if session is on the selected date
     const loginDate = loginTime.toDateString();
     const compareDate = new Date(selectedDate).toDateString();
-
+    
     if (loginDate !== compareDate) {
       return null; // Don't show sessions from other dates
     }
@@ -60,6 +60,9 @@ const EmployeeTimeline = ({ data, selectedDate }) => {
     const logoutHour = logoutTime.getHours() + logoutTime.getMinutes() / 60;
 
     // Calculate position (percentage from start of day 0:00)
+    // const startPercent = (loginHour / 24) * 100;
+    // const endPercent = (logoutHour / 24) * 100;
+    // const widthPercent = endPercent - startPercent;
     const GRID_START = 8;   // 8 AM
     const GRID_END = 21;   // 9 PM
     const GRID_HOURS = GRID_END - GRID_START;
@@ -74,7 +77,6 @@ const EmployeeTimeline = ({ data, selectedDate }) => {
 
     const startPercent = (sessionStart / GRID_HOURS) * 100;
     const widthPercent = ((sessionEnd - sessionStart) / GRID_HOURS) * 100;
-
 
     return {
       left: `${startPercent}%`,
@@ -140,7 +142,7 @@ const EmployeeTimeline = ({ data, selectedDate }) => {
                 <div className="session-bars-container">
                   {employee.sessions.map((session) => {
                     const barStyle = calculateSessionBar(session, selectedDate);
-
+                    
                     if (!barStyle) return null;
 
                     const employeeColor = generateRandomColor(employee.serviceNum);
