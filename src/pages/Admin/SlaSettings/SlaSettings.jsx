@@ -62,7 +62,7 @@ const SlaSettings = () => {
     );
     setTeamTechnicians(teamTechs);
     setTeamIncidents(incidentCounts);
-  }, [dispatch, currentAdmin.teamId, range.start, range.end]);
+  }, [dispatch, currentAdmin.teamId, range.start, range.end, technicians]);
 
   const dataSla = aggregateSeverityData(filteredIncidents, performances);
 

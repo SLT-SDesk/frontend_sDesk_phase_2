@@ -1,8 +1,8 @@
-
-// TimelinePage.jsx
+// LoggingTimeLine.jsx
 import React, { useState, useEffect } from 'react';
 import EmployeeTimeline from '../../../components/EmployeeTimeline/EmployeeTimeline';
 import AdminDateRangePopup from '../../../components/AdminDateRangePopup/DateRangePopup';
+import SessionDetailsPopup from '../../../components/SessionDetailsPopup/SessionDetailsPopup';
 import './LoggingTimeLine.css';
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTeamSessionsRequest } from "../../../redux/technicians/technicianSlice";
@@ -11,7 +11,11 @@ function LoggingTimeLine() {
   const [employeeData, setEmployeeData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [dateRangePopupOpen, setDateRangePopupOpen] = useState(false);
+  const [sessionDetailsPopupOpen, setSessionDetailsPopupOpen] = useState(false);
+  const [selectedSessions, setSelectedSessions] = useState([]);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [dateRangeText, setDateRangeText] = useState('Today');
+  const [currentDateRange, setCurrentDateRange] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const { user } = useSelector((state) => state.auth);
@@ -21,87 +25,29 @@ function LoggingTimeLine() {
   const { teamTechnicianSessions } = useSelector((state) => state.technicians);
 
   useEffect(() => {
-    
-    try {
-        setLoading(true);
-        dispatch(fetchTeamSessionsRequest(currentAdmin.teamId));
-        setEmployeeData(teamTechnicianSessions)
-    } catch (error) {
-        setLoading(false);
-        console.error('Error fetching team sessions:', error);
-    }finally {
-        setLoading(false);
-    }
-    
-    // fetchEmployeeSessions();
+    fetchSessions();
   }, [selectedDate, dispatch]);
 
+  const fetchSessions = async () => {
+    try {
+      setLoading(true);
+      dispatch(fetchTeamSessionsRequest(currentAdmin.teamId));
+      setEmployeeData(teamTechnicianSessions);
+    } catch (error) {
+      console.error('Error fetching team sessions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update employeeData when Redux state changes
+  useEffect(() => {
+    if (teamTechnicianSessions && teamTechnicianSessions.length > 0) {
+      setEmployeeData(teamTechnicianSessions);
+    }
+  }, [teamTechnicianSessions, dispatch]);
+
   console.log('Team Sessions:', teamTechnicianSessions);
-
-//   const fetchEmployeeSessions = async () => {
-//     setLoading(true);
-//     try {
-//       // Replace with your actual API endpoint
-//       const response = await fetch('/api/employee-sessions', {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({
-//           date: selectedDate.toISOString()
-//         })
-//       });
-      
-//       const data = await response.json();
-//       setEmployeeData(data);
-//     } catch (error) {
-//       console.error('Error fetching employee sessions:', error);
-//       // Use sample data for demonstration
-//       setEmployeeData(getSampleData());
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-  // Sample data for demonstration
-//   const getSampleData = () => [
-//     {
-//       serviceNum: "299202",
-//       name: "New User672",
-//       sessions: [
-//         {
-//           id: 1,
-//           technician_service_number: "299202",
-//           login_time: "2025-12-23T08:00:00.000Z",
-//           logout_time: "2025-12-23T11:00:00.000Z"
-//         },
-//         {
-//           id: 2,
-//           technician_service_number: "299202",
-//           login_time: "2025-12-23T13:00:00.000Z",
-//           logout_time: "2025-12-23T17:00:00.000Z"
-//         }
-//       ]
-//     },
-//     {
-//       serviceNum: "352105",
-//       name: "New User983",
-//       sessions: [
-//         {
-//           id: 4,
-//           technician_service_number: "352105",
-//           login_time: "2025-12-23T10:00:00.000Z",
-//           logout_time: "2025-12-23T13:00:00.000Z"
-//         },
-//         {
-//           id: 5,
-//           technician_service_number: "352105",
-//           login_time: "2025-12-23T14:00:00.000Z",
-//           logout_time: null // Active session
-//         }
-//       ]
-//     }
-//   ];
 
   const formatDate = (date) => {
     return date.toLocaleDateString('en-US', { 
@@ -147,7 +93,104 @@ function LoggingTimeLine() {
   const handleDateRangeApply = (range) => {
     setDateRangeText(range.selection);
     setSelectedDate(range.startDate);
+    setCurrentDateRange(range);
     setDateRangePopupOpen(false);
+    
+    // Show session details popup with filtered sessions
+    showSessionDetailsForDateRange(range);
+  };
+
+  const showSessionDetailsForDateRange = (range) => {
+    // Filter sessions based on date range
+    const filteredSessions = [];
+    
+    employeeData.forEach(employee => {
+      employee.sessions.forEach(session => {
+        const sessionDate = new Date(session.login_time);
+        const startDate = new Date(range.startDate);
+        const endDate = new Date(range.endDate);
+        
+        // Set times to start and end of day for comparison
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+        sessionDate.setHours(0, 0, 0, 0);
+        
+        if (sessionDate >= startDate && sessionDate <= endDate) {
+          filteredSessions.push({
+            ...session,
+            employeeName: employee.name,
+            serviceNum: employee.serviceNum
+          });
+        }
+      });
+    });
+    
+    setSelectedSessions(filteredSessions);
+    setSelectedEmployee(null); // Show all employees
+    setSessionDetailsPopupOpen(true);
+  };
+
+  const handleViewOptionClick = (option) => {
+    const today = new Date();
+    let startDate, endDate;
+    
+    switch (option.value) {
+      case 'day':
+        startDate = new Date(selectedDate);
+        endDate = new Date(selectedDate);
+        break;
+      case '3days':
+        startDate = new Date(selectedDate);
+        startDate.setDate(selectedDate.getDate() - 2);
+        endDate = new Date(selectedDate);
+        break;
+      case 'week':
+        startDate = new Date(selectedDate);
+        startDate.setDate(selectedDate.getDate() - 6);
+        endDate = new Date(selectedDate);
+        break;
+      case 'month':
+        startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+        endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
+        break;
+      default:
+        startDate = endDate = selectedDate;
+    }
+    
+    const range = {
+      selection: option.label,
+      startDate,
+      endDate
+    };
+    
+    setCurrentDateRange(range);
+    setDateRangeText(option.label);
+    showSessionDetailsForDateRange(range);
+  };
+
+  const handleEmployeeClick = (employee) => {
+    // Filter sessions for selected date range
+    const range = currentDateRange || {
+      selection: 'Today',
+      startDate: selectedDate,
+      endDate: selectedDate
+    };
+    
+    const filteredSessions = employee.sessions.filter(session => {
+      const sessionDate = new Date(session.login_time);
+      const startDate = new Date(range.startDate);
+      const endDate = new Date(range.endDate);
+      
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+      sessionDate.setHours(0, 0, 0, 0);
+      
+      return sessionDate >= startDate && sessionDate <= endDate;
+    });
+    
+    setSelectedSessions(filteredSessions);
+    setSelectedEmployee(employee.name);
+    setSessionDetailsPopupOpen(true);
   };
 
   const viewOptions = [
@@ -198,7 +241,11 @@ function LoggingTimeLine() {
           </button>
           
           {viewOptions.map((option) => (
-            <button key={option.value} className="view-option">
+            <button 
+              key={option.value} 
+              className="view-option"
+              onClick={() => handleViewOptionClick(option)}
+            >
               {option.label}
             </button>
           ))}
@@ -218,6 +265,7 @@ function LoggingTimeLine() {
         <EmployeeTimeline 
           data={employeeData} 
           selectedDate={selectedDate}
+          onEmployeeClick={handleEmployeeClick}
         />
       )}
 
@@ -227,6 +275,15 @@ function LoggingTimeLine() {
         onClose={() => setDateRangePopupOpen(false)}
         onApply={handleDateRangeApply}
         selectedRange={dateRangeText}
+      />
+
+      {/* Session Details Popup */}
+      <SessionDetailsPopup
+        open={sessionDetailsPopupOpen}
+        onClose={() => setSessionDetailsPopupOpen(false)}
+        sessions={selectedSessions}
+        dateRange={currentDateRange}
+        employeeName={selectedEmployee}
       />
     </div>
   );
