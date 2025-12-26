@@ -20,6 +20,7 @@ import {
   fetchDashboardStats,
   uploadAttachment,
   fetchIncidentsByMainCategoryCode,
+  getAllTechnicianPerformance
 
 } from "./incidentService";
 import {
@@ -83,8 +84,25 @@ import {
   fetchIncidentsByMainCategoryCodeRequest,
   fetchIncidentsByMainCategoryCodeSuccess,
   fetchIncidentsByMainCategoryCodeFailure,
+  fetchTechnicianPerformanceRequest,
+  fetchTechnicianPerformanceSuccess,
+  fetchTechnicianPerformanceFailure
 
 } from "./incidentSlice";
+
+function* handleFetchTechnicianPerformance() {
+  try {
+    const response = yield call(getAllTechnicianPerformance);
+    yield put(fetchTechnicianPerformanceSuccess(response.data));
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to fetch technician performance";
+
+    yield put(fetchTechnicianPerformanceFailure(errorMessage));
+  }
+}
 
 function* handleFetchAllIncidents() {
   try {
@@ -356,6 +374,7 @@ export default function* incidentSaga() {
   yield takeLatest(fetchDashboardStatsRequest.type, handleFetchDashboardStats);
   yield takeLatest(uploadAttachmentRequest.type, handleUploadAttachment);
   yield takeLatest(fetchIncidentsByMainCategoryCodeRequest.type, handleFetchIncidentsByMainCategoryCode);
+  yield takeLatest(fetchTechnicianPerformanceRequest.type, handleFetchTechnicianPerformance);
 
 }
 

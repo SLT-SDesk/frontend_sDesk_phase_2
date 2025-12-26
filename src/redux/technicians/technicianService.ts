@@ -2,6 +2,24 @@ import apiClient from "../../api/axiosInstance";
 import { Technician } from "./technicianTypes";
 import { buildUrl, API_BASE } from "../../utils/apiUtils";
 
+//Fetch Technician Sessions By ServiceNum
+export const fetchTechnicianSessionsByServiceNum = async (serviceNum: string) => {
+  try {
+    return await apiClient.get(buildUrl(API_BASE, `/technician/sessions/${serviceNum}`));
+  } catch (error) {
+    throw error;
+  }
+}
+
+//Fetch Technician Sessions By TeamId
+export const fetchTechnicianSessionsByTeamId = async (teamId: string) => {
+  try {
+    return await apiClient.get(buildUrl(API_BASE, `/technician/sessions-teamId/${teamId}`));
+  } catch (error) {
+    throw error;
+  }
+};
+
 //Fetch a technician by service number
 export const fetchTechnicianByServiceNum = async (serviceNum: string) => {
   try {

@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { fetchTechnicianData } from "../../utils/slaDummyData";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchTechniciansRequest,
+  selectTechnicians,
+  selectTechniciansLoading,
+} from "../../redux/technicians/technicianSlice";
+
 
 /* material ui*/
 import {
@@ -50,51 +56,50 @@ const StatusDot = styled.span`
 
 /* Component */
 const TechnicianPerformance = ({ dateRange, onRowClick }) => {
-  const [technicians, setTechnicians] = useState([]);
+  const dispatch = useDispatch();// Redux dispatch eka
   const [filteredTechnicians, setFilteredTechnicians] = useState([]);
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
 
-  /* Load technician data when date range changes */
+  // Technicians from Redux store
+  const techniciansFromStore = useSelector(selectTechnicians);
+  const loading = useSelector(selectTechniciansLoading);
+
+  // technician mapping according to ui data(redux data structure to component structure)
+  const technicians = (techniciansFromStore || []).map((tech) => ({
+  id: tech.id,
+  serviceNumber: tech.serviceNum,
+  name: tech.name,
+  status: tech.active ? "Active" : "Inactive",
+}));
+
+
+  // Saga ,technicianService ,axios ,backend , Redux store
   useEffect(() => {
-    if (!dateRange?.start || !dateRange?.end) return;
+    dispatch(fetchTechniciansRequest());
+  }, [dispatch]);
 
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    const teamId = user.teamId || user.team || undefined;
-
-    async function loadTechData() {
-      const result = await fetchTechnicianData({
-        start: dateRange.start,
-        end: dateRange.end,
-        teamId,
-      });
-
-      setTechnicians(result);
-      setFilteredTechnicians(result);
-    }
-
-    loadTechData();
-  }, [dateRange]);
 
   /* Apply search + status filter */
-  useEffect(() => {
-    let result = technicians;
+ useEffect(() => {
+  let result = technicians;
 
-    if (search.trim()) {
-      result = result.filter(
-        (t) =>
-          t.name.toLowerCase().includes(search.toLowerCase()) ||
-          t.serviceNumber.toLowerCase().includes(search.toLowerCase())
-      );
-    }
+  if (search.trim()) {
+    result = result.filter(
+      (t) =>
+        t.name.toLowerCase().includes(search.toLowerCase()) ||
+        t.serviceNumber.toLowerCase().includes(search.toLowerCase())
+    );
+  }
 
-    if (statusFilter !== "All") {
-      result = result.filter((t) => t.status === statusFilter);
-    }
+  if (statusFilter !== "All") {
+    result = result.filter((t) => t.status === statusFilter);
+  }
 
-    setFilteredTechnicians(result);
-  }, [search, statusFilter, technicians]);
+  setFilteredTechnicians(result);
+}, [techniciansFromStore, search, statusFilter]);
+
 
   return (
     <Container>

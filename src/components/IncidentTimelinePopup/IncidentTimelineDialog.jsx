@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -11,7 +11,9 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import styled from "styled-components"; 
+import styled from "styled-components";
+import { getIncidentPerformance } from "../../redux/incident/incidentService"; //
+
 
 //  SLA logic (Critical / High / Medium) 
 
@@ -40,6 +42,15 @@ const getSlaForPriority = (priority) => {
         resolutionLabel: "--",
       };
   }
+};
+
+// ==== Convert backend time labels (2m, 1h 5m) into readable text====
+const humanizeTime = (value) => {
+  if (!value) return "--";
+
+  return value
+    .replace(/(\d+)\s*h/g, "$1 hours")
+    .replace(/(\d+)\s*m/g, "$1 minutes");
 };
 
 
@@ -313,7 +324,44 @@ const IncidentTimelineDialog = ({
   priority,
 }) => {
   const normalizedStatus = (status || "").toLowerCase();
-  const { responseLabel, resolutionLabel } = getSlaForPriority(priority);
+
+  // ===== backend performance state ===== 
+  const [performance, setPerformance] = useState({
+    responseTimeLabel: null,
+    resolutionTimeLabel: null,
+  });
+
+  // ===== fetching performance data===
+  useEffect(() => {
+    if (!open || !incidentRef) return;
+
+    console.log("INCIDENT REF USED:", incidentRef);
+
+    const fetchPerformance = async () => {
+      try {
+        const res = await getIncidentPerformance(incidentRef);
+        setPerformance(res.data);
+
+
+
+        console.log("RAW API RESPONSE:", res.data);
+        setPerformance(res.data);
+      } catch (error) {
+        console.error("API ERROR:", error?.response?.data || error.message);
+      }
+    };
+
+    fetchPerformance();
+  }, [open, incidentRef]);
+
+  // ===== displaying priority ===
+  const sla = getSlaForPriority(priority);
+
+  const responseTimeDisplay =
+    performance.responseTimeLabel || sla.responseLabel || "--";
+
+  const resolutionTimeDisplay =
+    performance.resolutionTimeLabel || sla.resolutionLabel || "--";
 
   const headerSubtitle =
     "View the response and resolution times for the selected incident.";
@@ -330,8 +378,9 @@ const IncidentTimelineDialog = ({
             <CardText>
               <CardTitle>Response Time</CardTitle>
               <CardMainValue $variant="primary">
-                {responseLabel}
+                {humanizeTime(responseTimeDisplay)}
               </CardMainValue>
+
               <CardSubText>
                 Time taken to respond to the incident.
               </CardSubText>
@@ -345,8 +394,9 @@ const IncidentTimelineDialog = ({
             <CardText>
               <CardTitle>Resolution Time</CardTitle>
               <CardMainValue $variant="success">
-                {resolutionLabel}
+                {humanizeTime(resolutionTimeDisplay)}
               </CardMainValue>
+
               <CardSubText>
                 Total time taken to resolve the incident.
               </CardSubText>
@@ -367,8 +417,9 @@ const IncidentTimelineDialog = ({
             <CardText>
               <CardTitle>Response Time</CardTitle>
               <CardMainValue $variant="primary">
-                {responseLabel}
+                {humanizeTime(responseTimeDisplay)}
               </CardMainValue>
+
               <CardSubText>
                 Expected time to respond based on priority.
               </CardSubText>
@@ -402,8 +453,9 @@ const IncidentTimelineDialog = ({
             <CardText>
               <CardTitle>Response Time</CardTitle>
               <CardMainValue $variant="primary">
-                {responseLabel}
+                {humanizeTime(responseTimeDisplay)}
               </CardMainValue>
+
               <CardSubText>
                 Expected time to respond based on priority.
               </CardSubText>
@@ -436,8 +488,9 @@ const IncidentTimelineDialog = ({
             <CardText>
               <CardTitle>Response Time</CardTitle>
               <CardMainValue $variant="primary">
-                {responseLabel}
+                {humanizeTime(responseTimeDisplay)}
               </CardMainValue>
+
               <CardSubText>
                 Expected time to respond based on priority.
               </CardSubText>

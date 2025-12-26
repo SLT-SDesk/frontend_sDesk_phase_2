@@ -77,6 +77,17 @@ export interface DashboardStats {
   todayIncidents?: any[];
 }
 
+export interface TechnicianPerformance {
+  id: number;
+  incidentNumber: string;
+  responseTime: string;
+  resolveTime: string;
+  responseTimeMinutes: number;
+  responseTimeLabel: string;
+  resolutionTimeMinutes: number;
+  resolutionTimeLabel: string;
+}
+
 
 export interface IncidentState {
   incidents: Incident[];
@@ -94,6 +105,8 @@ export interface IncidentState {
   locations: any[];
   uploadedAttachment: UploadedAttachment | null; // Add uploaded attachment state
   incidentsByMainCategory: Incident[]; // Add incidents by main category
+  performances: TechnicianPerformance[];
+  
   loading: boolean;
   error: string | null;
 }

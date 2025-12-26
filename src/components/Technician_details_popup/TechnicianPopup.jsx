@@ -1,19 +1,128 @@
 // TechnicianPopup.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import DateRangePopup from '../AdminDateRangePopup/DateRangePopup';
+import { apiClient } from '../../api/axiosInstance';
 
 const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   const [activeTab, setActiveTab] = useState(0);
+  const [selectedPriority, setSelectedPriority] = useState('all'); // 'all', 'critical', 'high', 'medium'
+  const [dateRangePopupOpen, setDateRangePopupOpen] = useState(false);
+  const [dateRange, setDateRange] = useState({
+    selection: 'Today',
+    startDate: new Date(),
+    endDate: new Date()
+  });
+  const [technicianStats, setTechnicianStats] = useState(null);
+  const [performanceData, setPerformanceData] = useState(null);
+  const [loading, setLoading] = useState(false);
   
   console.log('TechnicianDetailsPopup render:', { isOpen, technician });
   
+  // Fetch real technician data from backend
+  useEffect(() => {
+    if (isOpen && technician) {
+      const loadData = async () => {
+        setLoading(true);
+        try {
+          const serviceNum = technician.serviceNum || technician.serviceNumber;
+         
+          // Fetch assigned incidents stats
+          const statsResponse = await apiClient.get(`/incident/technician/${serviceNum}/stats`);
+          setTechnicianStats(statsResponse.data);
+          console.log(statsResponse);
+          // Fetch performance metrics
+          const performanceResponse = await apiClient.get(`/incident/technician/${serviceNum}/performance`);
+          setPerformanceData(performanceResponse.data);
+        } catch (error) {
+          console.error('Failed to fetch technician data:', error);
+          // Set default values on error
+          setTechnicianStats({
+            totalIncidents: 0,
+            byPriority: { critical: 0, high: 0, medium: 0, low: 0 },
+            byStatus: { open: 0, inProgress: 0, hold: 0, closed: 0 }
+          });
+          setPerformanceData({
+            totalIncidents: 0,
+            responseOnTime: 0,
+            resolutionOnTime: 0,
+            responseOnTimePercent: 0,
+            resolutionOnTimePercent: 0,
+            avgResponseTime: 0,
+            avgResolutionTime: 0
+          });
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      loadData();
+    }
+  }, [isOpen, technician, dateRange]);
+
   if (!isOpen) return null;
   if (!technician) {
     console.warn('Popup is open but no technician data provided');
     return null;
   }
 
-  const responseTimePercent = Math.round((technician.responseOnTime / technician.totalIncidents) * 100);
-  const resolutionTimePercent = Math.round((technician.resolutionOnTime / technician.totalIncidents) * 100);
+  // Handle date range change
+  const handleDateRangeApply = (newRange) => {
+    setDateRange(newRange);
+    setDateRangePopupOpen(false);
+  };
+
+  // Format date range display
+  const formatDateRange = () => {
+    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    if (dateRange.selection === 'Today' || dateRange.selection === 'Yesterday') {
+      return dateRange.startDate.toLocaleDateString('en-US', options);
+    }
+    return `${dateRange.startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${dateRange.endDate.toLocaleDateString('en-US', options)}`;
+  };
+
+  // Calculate metrics based on selected priority
+  const getFilteredMetrics = () => {
+    if (!performanceData) {
+      return {
+        responseOnTime: 0,
+        resolutionOnTime: 0,
+        totalIncidents: 0,
+        avgResponseTime: 0,
+        avgResolutionTime: 0
+      };
+    }
+
+    if (selectedPriority === 'all') {
+      return {
+        responseOnTime: performanceData.responseOnTime || 0,
+        resolutionOnTime: performanceData.resolutionOnTime || 0,
+        totalIncidents: performanceData.totalIncidents || 0,
+        avgResponseTime: performanceData.avgResponseTime || 0,
+        avgResolutionTime: performanceData.avgResolutionTime || 0
+      };
+    }
+
+    // For priority filtering, calculate proportionally
+    const priorityCount = technicianStats?.byPriority?.[selectedPriority] || 0;
+    const totalIncidents = technicianStats?.totalIncidents || 1;
+    const ratio = priorityCount / totalIncidents;
+
+    return {
+      responseOnTime: Math.round((performanceData.responseOnTime || 0) * ratio),
+      resolutionOnTime: Math.round((performanceData.resolutionOnTime || 0) * ratio),
+      totalIncidents: priorityCount,
+      avgResponseTime: performanceData.avgResponseTime || 0,
+      avgResolutionTime: performanceData.avgResolutionTime || 0
+    };
+  };
+
+  const filteredMetrics = getFilteredMetrics();
+  const responseTimePercent = filteredMetrics.totalIncidents > 0 
+    ? Math.round((filteredMetrics.responseOnTime / filteredMetrics.totalIncidents) * 100) 
+    : 0;
+  const resolutionTimePercent = filteredMetrics.totalIncidents > 0 
+    ? Math.round((filteredMetrics.resolutionOnTime / filteredMetrics.totalIncidents) * 100) 
+    : 0;
 
   // Mock session data
   const sessions = [
@@ -77,9 +186,21 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
         <div className="flex items-start justify-between p-6 border-b">
           <div>
             <h2 className="text-lg font-bold text-gray-900 mb-1">Technician Details</h2>
-            <p className="text-xs text-gray-500">
-              {technician.date || new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-            </p>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setDateRangePopupOpen(true);
+              }}
+              className="flex items-center gap-2 text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span>{formatDateRange()}</span>
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
           </div>
           <button 
             onClick={onClose}
@@ -91,9 +212,8 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
           </button>
         </div>
 
-        {/* Scrollable Content */}
-        <div className="overflow-y-auto flex-1 p-6">
-          {/* Technician Info Card */}
+        {/* Fixed Section - Technician Info Card */}
+        <div className="p-6 pb-0">
           <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl p-6 flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center">
@@ -103,7 +223,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
               </div>
               <div>
                 <h3 className="text-white text-lg font-bold">{technician.name}</h3>
-                <p className="text-blue-100 text-sm">{technician.serviceNumber || technician.id}</p>
+                <p className="text-blue-100 text-sm">{technician.serviceNum || technician.serviceNumber || technician.id}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 bg-green-500 px-4 py-2 rounded-lg">
@@ -113,7 +233,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-2 mb-6 border-b">
+          <div className="flex justify-center gap-2 border-b">
             <button 
               onClick={() => setActiveTab(0)}
               className={`flex items-center gap-2 px-6 py-3 font-medium text-sm transition-all border-b-2 ${
@@ -141,7 +261,10 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
               <span>Sessions</span>
             </button>
           </div>
+        </div>
 
+        {/* Scrollable Content */}
+        <div className="overflow-y-auto flex-1 p-6">
           {/* Tab Content */}
           {activeTab === 0 && (
             <div>
@@ -154,26 +277,45 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                     </svg>
                     <span className="font-semibold text-gray-700 text-sm">Assigned Incidents</span>
                   </div>
-                  <span className="text-3xl font-bold text-gray-900">{technician.totalIncidents || 0}</span>
+                  {loading ? (
+                    <div className="text-2xl font-bold text-gray-400">...</div>
+                  ) : (
+                    <span className="text-3xl font-bold text-gray-900">{technicianStats?.totalIncidents || 0}</span>
+                  )}
                 </div>
                 
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="bg-red-100 rounded-lg p-4 text-center">
+                  <div 
+                    onClick={() => setSelectedPriority(selectedPriority === 'critical' ? 'all' : 'critical')}
+                    className={`bg-red-100 rounded-lg p-4 text-center cursor-pointer transition-all transform hover:scale-105 ${
+                      selectedPriority === 'critical' ? 'ring-2 ring-red-500 shadow-lg' : 'hover:shadow-md'
+                    }`}
+                  >
                     <p className="text-gray-700 font-semibold mb-3 text-sm">Critical</p>
                     <div className="bg-red-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
-                      {technician.critical || 0}
+                      {loading ? '...' : technicianStats?.byPriority?.critical || 0}
                     </div>
                   </div>
-                  <div className="bg-orange-200 rounded-lg p-4 text-center">
+                  <div 
+                    onClick={() => setSelectedPriority(selectedPriority === 'high' ? 'all' : 'high')}
+                    className={`bg-orange-200 rounded-lg p-4 text-center cursor-pointer transition-all transform hover:scale-105 ${
+                      selectedPriority === 'high' ? 'ring-2 ring-orange-500 shadow-lg' : 'hover:shadow-md'
+                    }`}
+                  >
                     <p className="text-gray-700 font-semibold mb-3 text-sm">High</p>
                     <div className="bg-orange-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
-                      {technician.high || 0}
+                      {loading ? '...' : technicianStats?.byPriority?.high || 0}
                     </div>
                   </div>
-                  <div className="bg-yellow-100 rounded-lg p-4 text-center">
+                  <div 
+                    onClick={() => setSelectedPriority(selectedPriority === 'medium' ? 'all' : 'medium')}
+                    className={`bg-yellow-100 rounded-lg p-4 text-center cursor-pointer transition-all transform hover:scale-105 ${
+                      selectedPriority === 'medium' ? 'ring-2 ring-yellow-500 shadow-lg' : 'hover:shadow-md'
+                    }`}
+                  >
                     <p className="text-gray-700 font-semibold mb-3 text-sm">Medium</p>
                     <div className="bg-yellow-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
-                      {technician.medium || 0}
+                      {loading ? '...' : technicianStats?.byPriority?.medium || 0}
                     </div>
                   </div>
                 </div>
@@ -181,11 +323,18 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
 
               {/* Performance Metrics */}
               <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                  </svg>
-                  <span className="font-semibold text-gray-700 text-sm">Performance Metrics</span>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    <span className="font-semibold text-gray-700 text-sm">Performance Metrics</span>
+                  </div>
+                  {selectedPriority !== 'all' && (
+                    <span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium">
+                      Filtered: {selectedPriority.charAt(0).toUpperCase() + selectedPriority.slice(1)}
+                    </span>
+                  )}
                 </div>
 
                 {/* Response Time */}
@@ -206,8 +355,8 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                     ></div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-600 px-1">
-                    <span>{technician.responseOnTime || 0}/{technician.totalIncidents || 0} on time</span>
-                    <span>Avg: {technician.avgResponseTime || 0} min</span>
+                    <span>{filteredMetrics.responseOnTime}/{filteredMetrics.totalIncidents} on time</span>
+                    <span>Avg: {filteredMetrics.avgResponseTime} min</span>
                   </div>
                 </div>
 
@@ -229,8 +378,8 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                     ></div>
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-600 px-1">
-                    <span>{technician.resolutionOnTime || 0}/{technician.totalIncidents || 0} on time</span>
-                    <span>Avg: {technician.avgResolutionTime || 0} hrs</span>
+                    <span>{filteredMetrics.resolutionOnTime}/{filteredMetrics.totalIncidents} on time</span>
+                    <span>Avg: {filteredMetrics.avgResolutionTime} hrs</span>
                   </div>
                 </div>
               </div>
@@ -294,6 +443,14 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
           )}
         </div>
       </div>
+
+      {/* Date Range Popup with higher z-index than technician popup */}
+      <DateRangePopup
+        open={dateRangePopupOpen}
+        onClose={() => setDateRangePopupOpen(false)}
+        onApply={handleDateRangeApply}
+        selectedRange={dateRange.selection}
+      />
     </div>
   );
 };
