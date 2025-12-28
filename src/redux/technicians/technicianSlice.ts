@@ -9,7 +9,8 @@ const initialState = {
   teamTechnicianSessions: [] as TeamTechnicianSessions[],
   technicianStats: null as any,
   technicianPerformance: null as any,
-   
+  statsLoading: false,
+  performanceLoading: false,
   loading: false,
   error: null as string | null,
 };
@@ -173,28 +174,28 @@ fetchTeamSessionsFailure(state, action) {
     },
     // Technician Stats
     fetchTechnicianStatsRequest(state, action) {
-      state.loading = true;
+      state.statsLoading = true;
       state.error = null;
     },
     fetchTechnicianStatsSuccess(state, action) {
-      state.loading = false;
+      state.statsLoading = false;
       state.technicianStats = action.payload;
     },
     fetchTechnicianStatsFailure(state, action) {
-      state.loading = false;
+      state.statsLoading = false;
       state.error = action.payload;
     },
     // Technician Performance
     fetchTechnicianPerformanceRequest(state, action) {
-      state.loading = true;
+      state.performanceLoading = true;
       state.error = null;
     },
     fetchTechnicianPerformanceSuccess(state, action) {
-      state.loading = false;
+      state.performanceLoading = false;
       state.technicianPerformance = action.payload;
     },
     fetchTechnicianPerformanceFailure(state, action) {
-      state.loading = false;
+      state.performanceLoading = false;
       state.error = action.payload;
     },
   },

@@ -26,15 +26,12 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   const performanceData = useSelector(selectTechnicianPerformance);
   const loading = useSelector(selectTechniciansLoading);
   
-  console.log('TechnicianDetailsPopup render:', { isOpen, technician });
-  
-  // Fetch real technician data from backend using Redux saga
+  // Fetch technician data from backend using Redux saga
   useEffect(() => {
     if (isOpen && technician) {
       const serviceNum = technician.serviceNum || technician.serviceNumber;
       
       if (serviceNum) {
-        // Dispatch Redux actions to fetch data via saga
         dispatch(fetchTechnicianStatsRequest(serviceNum));
         dispatch(fetchTechnicianPerformanceRequest(serviceNum));
       }
@@ -42,10 +39,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   }, [isOpen, technician, dateRange, dispatch]);
 
   if (!isOpen) return null;
-  if (!technician) {
-    console.warn('Popup is open but no technician data provided');
-    return null;
-  }
+  if (!technician) return null;
 
   // Handle date range change
   const handleDateRangeApply = (newRange) => {
@@ -64,7 +58,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
 
   // Calculate metrics based on selected priority
   const getFilteredMetrics = () => {
-    if (!performanceData || !technicianStats) {
+    if (!performanceData) {
       return {
         totalIncidents: 0,
         responseOnTime: 0,
@@ -75,17 +69,18 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
         avgResolutionTime: 0
       };
     }
-    if (!performanceData) {
-      return {
-        responseOnTime: 0,
-        resolutionOnTime: 0,
-        totalIncidents: 0,
-        avgResponseTime: 0,
-        avgResolutionTime: 0
-      };
-    }
 
     if (selectedPriority === 'all') {
+      return {
+        responseOnTime: performanceData.responseOnTime || 0,
+        resolutionOnTime: performanceData.resolutionOnTime || 0,
+        totalIncidents: performanceData.totalIncidents || 0,
+        avgResponseTime: performanceData.avgResponseTime || 0,
+        avgResolutionTime: performanceData.avgResolutionTime || 0
+      };
+    }
+    
+    if (!technicianStats) {
       return {
         responseOnTime: performanceData.responseOnTime || 0,
         resolutionOnTime: performanceData.resolutionOnTime || 0,
@@ -286,7 +281,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                   >
                     <p className="text-gray-700 font-semibold mb-3 text-sm">Critical</p>
                     <div className="bg-red-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
-                      {loading ? '...' : technicianStats?.byPriority?.critical || 0}
+                      {technicianStats?.byPriority?.critical || 0}
                     </div>
                   </div>
                   <div 
@@ -297,7 +292,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                   >
                     <p className="text-gray-700 font-semibold mb-3 text-sm">High</p>
                     <div className="bg-orange-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
-                      {loading ? '...' : technicianStats?.byPriority?.high || 0}
+                      {technicianStats?.byPriority?.high || 0}
                     </div>
                   </div>
                   <div 
@@ -308,7 +303,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                   >
                     <p className="text-gray-700 font-semibold mb-3 text-sm">Medium</p>
                     <div className="bg-yellow-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
-                      {loading ? '...' : technicianStats?.byPriority?.medium || 0}
+                      {technicianStats?.byPriority?.medium || 0}
                     </div>
                   </div>
                 </div>
