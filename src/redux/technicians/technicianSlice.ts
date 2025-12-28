@@ -7,6 +7,8 @@ const initialState = {
   activeTechnicians: [] as Technician[],
   technicianSessions: null as TechnicianSession | null,
   teamTechnicianSessions: [] as TeamTechnicianSessions[],
+  technicianStats: null as any,
+  technicianPerformance: null as any,
    
   loading: false,
   error: null as string | null,
@@ -169,6 +171,32 @@ fetchTeamSessionsFailure(state, action) {
       state.loading = false;
       state.error = action.payload;
     },
+    // Technician Stats
+    fetchTechnicianStatsRequest(state, action) {
+      state.loading = true;
+      state.error = null;
+    },
+    fetchTechnicianStatsSuccess(state, action) {
+      state.loading = false;
+      state.technicianStats = action.payload;
+    },
+    fetchTechnicianStatsFailure(state, action) {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    // Technician Performance
+    fetchTechnicianPerformanceRequest(state, action) {
+      state.loading = true;
+      state.error = null;
+    },
+    fetchTechnicianPerformanceSuccess(state, action) {
+      state.loading = false;
+      state.technicianPerformance = action.payload;
+    },
+    fetchTechnicianPerformanceFailure(state, action) {
+      state.loading = false;
+      state.error = action.payload;
+    },
   },
 });
 
@@ -194,13 +222,19 @@ fetchTeamSessionsFailure,
   checkTechnicianStatusRequest,
   checkTechnicianStatusSuccess,
   checkTechnicianStatusFailure,
-  fetchActiveTechniciansRequest, // Re-add this
-  fetchActiveTechniciansSuccess, // Re-add this
-  fetchActiveTechniciansFailure, // Re-add this
+  fetchActiveTechniciansRequest,
+  fetchActiveTechniciansSuccess,
+  fetchActiveTechniciansFailure,
   updateTechnicianOnlineStatus,
   forceLogoutTechnicianRequest,
   forceLogoutTechnicianFailure,
-  forceLogoutTechnicianSuccess
+  forceLogoutTechnicianSuccess,
+  fetchTechnicianStatsRequest,
+  fetchTechnicianStatsSuccess,
+  fetchTechnicianStatsFailure,
+  fetchTechnicianPerformanceRequest,
+  fetchTechnicianPerformanceSuccess,
+  fetchTechnicianPerformanceFailure
 } = technicianSlice.actions;
 
 //Selectors
@@ -221,6 +255,12 @@ export const selectTechniciansLoading = (state: any) =>
 
 export const selectTechniciansError = (state: any) =>
   state.technicians.error;
+
+export const selectTechnicianStats = (state: any) =>
+  state.technicians.technicianStats;
+
+export const selectTechnicianPerformance = (state: any) =>
+  state.technicians.technicianPerformance;
 
 
 export default technicianSlice.reducer;

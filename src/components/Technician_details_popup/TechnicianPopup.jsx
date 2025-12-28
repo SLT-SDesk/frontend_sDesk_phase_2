@@ -1,9 +1,17 @@
 // TechnicianPopup.jsx
 import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import DateRangePopup from '../AdminDateRangePopup/DateRangePopup';
-import { apiClient } from '../../api/axiosInstance';
+import { 
+  fetchTechnicianStatsRequest, 
+  fetchTechnicianPerformanceRequest,
+  selectTechnicianStats,
+  selectTechnicianPerformance,
+  selectTechniciansLoading
+} from '../../redux/technicians/technicianSlice';
 
 const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
+  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState(0);
   const [selectedPriority, setSelectedPriority] = useState('all'); // 'all', 'critical', 'high', 'medium'
   const [dateRangePopupOpen, setDateRangePopupOpen] = useState(false);
@@ -12,52 +20,26 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
     startDate: new Date(),
     endDate: new Date()
   });
-  const [technicianStats, setTechnicianStats] = useState(null);
-  const [performanceData, setPerformanceData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  
+  // Get data from Redux store
+  const technicianStats = useSelector(selectTechnicianStats);
+  const performanceData = useSelector(selectTechnicianPerformance);
+  const loading = useSelector(selectTechniciansLoading);
   
   console.log('TechnicianDetailsPopup render:', { isOpen, technician });
   
-  // Fetch real technician data from backend
+  // Fetch real technician data from backend using Redux saga
   useEffect(() => {
     if (isOpen && technician) {
-      const loadData = async () => {
-        setLoading(true);
-        try {
-          const serviceNum = technician.serviceNum || technician.serviceNumber;
-         
-          // Fetch assigned incidents stats
-          const statsResponse = await apiClient.get(`/incident/technician/${serviceNum}/stats`);
-          setTechnicianStats(statsResponse.data);
-          console.log(statsResponse);
-          // Fetch performance metrics
-          const performanceResponse = await apiClient.get(`/incident/technician/${serviceNum}/performance`);
-          setPerformanceData(performanceResponse.data);
-        } catch (error) {
-          console.error('Failed to fetch technician data:', error);
-          // Set default values on error
-          setTechnicianStats({
-            totalIncidents: 0,
-            byPriority: { critical: 0, high: 0, medium: 0, low: 0 },
-            byStatus: { open: 0, inProgress: 0, hold: 0, closed: 0 }
-          });
-          setPerformanceData({
-            totalIncidents: 0,
-            responseOnTime: 0,
-            resolutionOnTime: 0,
-            responseOnTimePercent: 0,
-            resolutionOnTimePercent: 0,
-            avgResponseTime: 0,
-            avgResolutionTime: 0
-          });
-        } finally {
-          setLoading(false);
-        }
-      };
+      const serviceNum = technician.serviceNum || technician.serviceNumber;
       
-      loadData();
+      if (serviceNum) {
+        // Dispatch Redux actions to fetch data via saga
+        dispatch(fetchTechnicianStatsRequest(serviceNum));
+        dispatch(fetchTechnicianPerformanceRequest(serviceNum));
+      }
     }
-  }, [isOpen, technician, dateRange]);
+  }, [isOpen, technician, dateRange, dispatch]);
 
   if (!isOpen) return null;
   if (!technician) {
@@ -82,6 +64,17 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
 
   // Calculate metrics based on selected priority
   const getFilteredMetrics = () => {
+    if (!performanceData || !technicianStats) {
+      return {
+        totalIncidents: 0,
+        responseOnTime: 0,
+        resolutionOnTime: 0,
+        responseOnTimePercent: 0,
+        resolutionOnTimePercent: 0,
+        avgResponseTime: 0,
+        avgResolutionTime: 0
+      };
+    }
     if (!performanceData) {
       return {
         responseOnTime: 0,
