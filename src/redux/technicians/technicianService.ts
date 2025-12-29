@@ -86,7 +86,23 @@ export const checkTechnicianStatus = async () => {
   }
 };
 
+// Fetch technician stats
+export const fetchTechnicianStats = async (serviceNum: string) => {
+  try {
+    return await apiClient.get(buildUrl(API_BASE, `/incident/technician/${serviceNum}/stats`));
+  } catch (error) {
+    throw error;
+  }
+};
 
+// Fetch technician performance
+export const fetchTechnicianPerformance = async (serviceNum: string) => {
+  try {
+    return await apiClient.get(buildUrl(API_BASE, `/incident/technician/${serviceNum}/performance`));
+  } catch (error) {
+    throw error;
+  }
+};
 
 // NEW: Force logout technician (admin only)
 export const forceLogoutTechnician = async (serviceNum: string) => {

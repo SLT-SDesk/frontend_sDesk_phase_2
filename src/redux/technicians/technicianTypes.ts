@@ -44,3 +44,29 @@ export interface TeamTechnicianSessions {
   name: string;
   sessions: Session[];
 }
+
+export interface TechnicianStats {
+  totalIncidents: number;
+  byPriority: {
+    critical: number;
+    high: number;
+    medium: number;
+    low: number;
+  };
+  byStatus: {
+    open: number;
+    inProgress: number;
+    hold: number;
+    closed: number;
+  };
+}
+
+export interface TechnicianPerformance {
+  totalIncidents: number;
+  responseOnTime: number;
+  resolutionOnTime: number;
+  responseOnTimePercent: number;
+  resolutionOnTimePercent: number;
+  avgResponseTime: number;
+  avgResolutionTime: number;
+}

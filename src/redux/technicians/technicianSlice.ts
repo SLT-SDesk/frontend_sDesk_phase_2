@@ -7,6 +7,8 @@ const initialState = {
   activeTechnicians: [] as Technician[],
   technicianSessions: null as TechnicianSession | null,
   teamTechnicianSessions: [] as TeamTechnicianSessions[],
+  technicianStats: null as any,
+  technicianPerformance: null as any,
    
   loading: false,
   error: null as string | null,
@@ -51,6 +53,44 @@ fetchTeamSessionsSuccess(state, action) {
 },
 
 fetchTeamSessionsFailure(state, action) {
+  state.loading = false;
+  state.error = action.payload;
+},
+
+// =====================
+// Technician Stats
+// =====================
+
+fetchTechnicianStatsRequest(state, action) {
+  state.loading = true;
+  state.error = null;
+},
+
+fetchTechnicianStatsSuccess(state, action) {
+  state.loading = false;
+  state.technicianStats = action.payload;
+},
+
+fetchTechnicianStatsFailure(state, action) {
+  state.loading = false;
+  state.error = action.payload;
+},
+
+// =====================
+// Technician Performance
+// =====================
+
+fetchTechnicianPerformanceRequest(state, action) {
+  state.loading = true;
+  state.error = null;
+},
+
+fetchTechnicianPerformanceSuccess(state, action) {
+  state.loading = false;
+  state.technicianPerformance = action.payload;
+},
+
+fetchTechnicianPerformanceFailure(state, action) {
   state.loading = false;
   state.error = action.payload;
 },
@@ -179,6 +219,12 @@ fetchTechnicianSessionsFailure,
 fetchTeamSessionsRequest,
 fetchTeamSessionsSuccess,
 fetchTeamSessionsFailure,
+fetchTechnicianStatsRequest,
+fetchTechnicianStatsSuccess,
+fetchTechnicianStatsFailure,
+fetchTechnicianPerformanceRequest,
+fetchTechnicianPerformanceSuccess,
+fetchTechnicianPerformanceFailure,
   fetchTechniciansRequest,
   fetchTechniciansSuccess,
   fetchTechniciansFailure,
@@ -212,6 +258,12 @@ export const selectTechnicianSessions = (state: any) =>
 
 export const selectTeamSessions = (state: any) =>
   state.technician.teamTechnicianSessions;
+
+export const selectTechnicianStats = (state: any) =>
+  state.technicians.technicianStats;
+
+export const selectTechnicianPerformance = (state: any) =>
+  state.technicians.technicianPerformance;
 // FIXED selectors (MATCH reducer key)
 export const selectTechnicians = (state: any) =>
   state.technicians.technicians;

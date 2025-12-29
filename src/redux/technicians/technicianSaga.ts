@@ -6,6 +6,12 @@ import {
   fetchTeamSessionsRequest,
   fetchTeamSessionsSuccess,
   fetchTeamSessionsFailure,
+  fetchTechnicianStatsRequest,
+  fetchTechnicianStatsSuccess,
+  fetchTechnicianStatsFailure,
+  fetchTechnicianPerformanceRequest,
+  fetchTechnicianPerformanceSuccess,
+  fetchTechnicianPerformanceFailure,
   fetchTechniciansRequest,
   fetchTechniciansSuccess,
   fetchTechniciansFailure,
@@ -51,6 +57,30 @@ function* fetchTeamSessionsSaga(action: any): Generator<any, any, any> {
     yield put(fetchTeamSessionsSuccess(res.data));
   } catch (err: any) {
     yield put(fetchTeamSessionsFailure(err.message));
+  }
+}
+
+function* fetchTechnicianStatsSaga(action: any): Generator<any, any, any> {
+  try {
+    const res = yield call(
+      technicianService.fetchTechnicianStats,
+      action.payload
+    );
+    yield put(fetchTechnicianStatsSuccess(res.data));
+  } catch (err: any) {
+    yield put(fetchTechnicianStatsFailure(err.message));
+  }
+}
+
+function* fetchTechnicianPerformanceSaga(action: any): Generator<any, any, any> {
+  try {
+    const res = yield call(
+      technicianService.fetchTechnicianPerformance,
+      action.payload
+    );
+    yield put(fetchTechnicianPerformanceSuccess(res.data));
+  } catch (err: any) {
+    yield put(fetchTechnicianPerformanceFailure(err.message));
   }
 }
 
@@ -136,4 +166,6 @@ export default function* technicianSaga() {
   yield takeLatest(forceLogoutTechnicianRequest.type, handleForceLogoutTechnician);
   yield takeLatest(fetchTechnicianSessionsRequest.type, fetchTechnicianSessionsSaga);
   yield takeLatest(fetchTeamSessionsRequest.type, fetchTeamSessionsSaga);
+  yield takeLatest(fetchTechnicianStatsRequest.type, fetchTechnicianStatsSaga);
+  yield takeLatest(fetchTechnicianPerformanceRequest.type, fetchTechnicianPerformanceSaga);
 }
