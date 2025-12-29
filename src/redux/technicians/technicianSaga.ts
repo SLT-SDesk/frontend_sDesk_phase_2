@@ -26,13 +26,7 @@ fetchActiveTechniciansSuccess,
 fetchActiveTechniciansFailure,
 forceLogoutTechnicianRequest,
 forceLogoutTechnicianSuccess,
-forceLogoutTechnicianFailure,
-fetchTechnicianStatsRequest,
-fetchTechnicianStatsSuccess,
-fetchTechnicianStatsFailure,
-fetchTechnicianPerformanceRequest,
-fetchTechnicianPerformanceSuccess,
-fetchTechnicianPerformanceFailure
+forceLogoutTechnicianFailure
 } from './technicianSlice';
 import * as technicianService from './technicianService';
 
@@ -132,24 +126,6 @@ function* handleForceLogoutTechnician(action){
   }
 }
 
-function* handleFetchTechnicianStats(action) {
-  try {
-    const response = yield call(technicianService.fetchTechnicianStats, action.payload);
-    yield put(fetchTechnicianStatsSuccess(response.data));
-  } catch (error) {
-    yield put(fetchTechnicianStatsFailure(error.message || 'Failed to fetch technician stats'));
-  }
-}
-
-function* handleFetchTechnicianPerformance(action) {
-  try {
-    const response = yield call(technicianService.fetchTechnicianPerformance, action.payload);
-    yield put(fetchTechnicianPerformanceSuccess(response.data));
-  } catch (error) {
-    yield put(fetchTechnicianPerformanceFailure(error.message || 'Failed to fetch technician performance'));
-  }
-}
-
 export default function* technicianSaga() {
   yield takeLatest(fetchTechniciansRequest.type, handleFetchTechnicians);
   yield takeLatest(createTechnicianRequest.type, handleCreateTechnician);
@@ -160,6 +136,4 @@ export default function* technicianSaga() {
   yield takeLatest(forceLogoutTechnicianRequest.type, handleForceLogoutTechnician);
   yield takeLatest(fetchTechnicianSessionsRequest.type, fetchTechnicianSessionsSaga);
   yield takeLatest(fetchTeamSessionsRequest.type, fetchTeamSessionsSaga);
-  yield takeLatest(fetchTechnicianStatsRequest.type, handleFetchTechnicianStats);
-  yield takeLatest(fetchTechnicianPerformanceRequest.type, handleFetchTechnicianPerformance);
 }
