@@ -99,25 +99,3 @@ export const forceLogoutTechnician = async (serviceNum: string) => {
     throw error;
   }
 };
-
-// Fetch technician statistics
-export const fetchTechnicianStats = async (serviceNum: string) => {
-  try {
-    return await apiClient.get(
-      buildUrl(API_BASE, `/incident/technician/${serviceNum}/stats`)
-    );
-  } catch (error) {
-    throw error;
-  }
-};
-
-// Fetch technician performance metrics
-export const fetchTechnicianPerformance = async (serviceNum: string) => {
-  try {
-    return await apiClient.get(
-      buildUrl(API_BASE, `/incident/technician/${serviceNum}/performance`)
-    );
-  } catch (error) {
-    throw error;
-  }
-};
