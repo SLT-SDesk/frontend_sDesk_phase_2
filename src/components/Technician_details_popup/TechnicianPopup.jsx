@@ -2,6 +2,9 @@
 import { useState, useEffect } from 'react';
 import DateRangePopup from '../AdminDateRangePopup/DateRangePopup';
 import { apiClient } from '../../api/axiosInstance';
+import { fetchTechnicianSessionsRequest } from "../../redux/technicians/technicianSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { te } from 'date-fns/locale';
 
 const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   const [activeTab, setActiveTab] = useState(0);
@@ -14,9 +17,66 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   });
   const [technicianStats, setTechnicianStats] = useState(null);
   const [performanceData, setPerformanceData] = useState(null);
+  const[technicianServiceNumber, setTechnicianServiceNumber] = useState(technician?.serviceNum || technician?.serviceNumber || null);
+  const[technicianSSessions, setTechnicianSSessions] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const dispatch = useDispatch();
+
+  const { technicianSessions } = useSelector((state) => state.technicians);
   
   console.log('TechnicianDetailsPopup render:', { isOpen, technician });
+
+  useEffect(() => {
+    setTechnicianServiceNumber(technician?.serviceNum || technician?.serviceNumber || null);
+    dispatch(fetchTechnicianSessionsRequest(technicianServiceNumber));
+    const sessions = transformSessionData(technicianSessions?.sessions || []);
+    setTechnicianSSessions(sessions);
+  }, [dispatch, technicianServiceNumber, technician, technicianSessions]);
+
+  // console.log('Technician Sessions from Redux:', technicianSSessions);
+  // console.log('Technician Service Number:', technicianServiceNumber);
+  // console.log('Performances from Redux:', performances);
+  // console.log('Incidents from Redux:', incidents);
+  // console.log('Assigned To Me from Redux:', assignedToMe);
+
+  const calculateDuration = (loginTime, logoutTime) => {
+  if (!logoutTime) {
+    return 'Still Active';
+  }
+  
+  const login = new Date(loginTime);
+  const logout = new Date(logoutTime);
+  const diffMs = logout - login;
+  
+  const hours = Math.floor(diffMs / (1000 * 60 * 60));
+  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  
+  return `${hours}h ${minutes}m`;
+};
+
+// Function to format time from ISO string to HH:MM:SS
+const formatTime = (isoString) => {
+  if (!isoString) return null;
+  
+  const date = new Date(isoString);
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  
+  return `${hours}:${minutes}:${seconds}`;
+};
+
+// Main transformation function
+const transformSessionData = (apiResponse) => {
+  return apiResponse.map(session => ({
+    id: session.id,
+    duration: calculateDuration(session.login_time, session.logout_time),
+    loginTime: formatTime(session.login_time),
+    logoutTime: formatTime(session.logout_time),
+    isActive: session.logout_time === null
+  }));
+};
   
   // Fetch real technician data from backend
   useEffect(() => {
@@ -29,12 +89,12 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
           // Fetch assigned incidents stats
           const statsResponse = await apiClient.get(`/incident/technician/${serviceNum}/stats`);
           setTechnicianStats(statsResponse.data);
-          console.log(statsResponse);
+          // console.log(statsResponse);
           // Fetch performance metrics
           const performanceResponse = await apiClient.get(`/incident/technician/${serviceNum}/performance`);
           setPerformanceData(performanceResponse.data);
         } catch (error) {
-          console.error('Failed to fetch technician data:', error);
+          // console.error('Failed to fetch technician data:', error);
           // Set default values on error
           setTechnicianStats({
             totalIncidents: 0,
@@ -131,24 +191,6 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
     ? Math.round((filteredMetrics.resolutionOnTime / filteredMetrics.totalIncidents) * 100) 
     : 0;
 
-  // Mock session data
-  const sessions = [
-    {
-      id: 1,
-      duration: 'Still Active',
-      loginTime: '01:30:00',
-      logoutTime: null,
-      isActive: true
-    },
-    {
-      id: 2,
-      duration: '2h 50m',
-      loginTime: '09:00:00',
-      logoutTime: '11:50:00',
-      isActive: false
-    }
-  ];
-
   const getInitials = (name) => {
     return name
       .split(' ')
@@ -157,6 +199,8 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
       .toUpperCase()
       .slice(0, 2);
   };
+
+  console.log('Technician Stats:', technicianStats);
 
   return (
     <div 
@@ -400,7 +444,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
               </h3>
               <p className="mb-6 text-sm text-gray-500">Total Duration: Still Active</p>
 
-              {sessions.map((session) => (
+              {technicianSSessions.map((session) => (
                 <div key={session.id} className="mb-6">
                   <div className="flex items-center gap-2 mb-4 text-gray-600">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
