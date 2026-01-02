@@ -66,13 +66,10 @@ const TechnicianPerformance = ({ dateRange, onRowClick }) => {
   const techniciansFromStore = useSelector(selectTechnicians);
   const loading = useSelector(selectTechniciansLoading);
 
-  // technician mapping according to ui data(redux data structure to component structure)
-  const technicians = (techniciansFromStore || []).map((tech) => ({
-  id: tech.id,
-  serviceNumber: tech.serviceNum,
-  name: tech.name,
-  status: tech.active ? "Active" : "Inactive",
-}));
+  // NEW-Logged-in admin user
+  const admin = useSelector((state) => state.auth?.user);
+  const adminTeamName = admin?.teamName;
+
 
 
   // Saga ,technicianService ,axios ,backend , Redux store
@@ -82,9 +79,19 @@ const TechnicianPerformance = ({ dateRange, onRowClick }) => {
 
 
   /* Apply search + status filter */
- useEffect(() => {
-  let result = technicians;
+  useEffect(() => {
+  if (!adminTeamName) return;
 
+  let result = (techniciansFromStore || [])
+    .filter((tech) => tech.team === adminTeamName)
+    .map((tech) => ({
+      id: tech.id,
+      serviceNumber: tech.serviceNum,
+      name: tech.name,
+      status: tech.active ? "Active" : "Inactive",
+    }));
+
+  // 🔍 Search filter
   if (search.trim()) {
     result = result.filter(
       (t) =>
@@ -93,12 +100,19 @@ const TechnicianPerformance = ({ dateRange, onRowClick }) => {
     );
   }
 
+  // 🎯 Status filter
   if (statusFilter !== "All") {
     result = result.filter((t) => t.status === statusFilter);
   }
 
   setFilteredTechnicians(result);
-}, [techniciansFromStore, search, statusFilter]);
+}, [
+  techniciansFromStore,
+  adminTeamName,
+  search,
+  statusFilter,
+]);
+
 
 
   return (
@@ -117,7 +131,8 @@ const TechnicianPerformance = ({ dateRange, onRowClick }) => {
           textAlign: "right",
         }}
       >
-        {filteredTechnicians.length} of {technicians.length} technicians
+        {filteredTechnicians.length} technicians
+
       </div>
 
       {/* Search + Filters */}

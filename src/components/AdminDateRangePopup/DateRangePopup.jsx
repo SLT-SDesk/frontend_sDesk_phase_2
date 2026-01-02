@@ -96,13 +96,13 @@ function DateRangePopup({ open, onClose, onApply, selectedRange }) {
     const today = new Date();
 
     switch (activeSelection) {
-// ++++Modified 'Today' case to use helper functions +++++++++++++++
+      // ++++Modified 'Today' case to use helper functions +++++++++++++++
       case 'Today': {
         startDate = startOfDay(today);
         endDate = endOfDay(today);
         break;
       }
-// ++++Added missing case for 'Yesterday' ++++++++++++++++++++++++++++++
+      // ++++Added missing case for 'Yesterday' ++++++++++++++++++++++++++++++
       case 'Yesterday': {
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
@@ -192,10 +192,21 @@ function DateRangePopup({ open, onClose, onApply, selectedRange }) {
                     <DatePicker
                       value={fromDate}
                       onChange={(newValue) => setFromDate(newValue)}
-                      renderInput={(params) => (
-                        <TextField {...params} size="small" fullWidth />
-                      )}
+                      slotProps={{
+                        textField: {
+                          size: 'small',
+                          fullWidth: true
+                        },
+                        popper: {
+                          sx: {
+                            zIndex: 20000
+                          }
+                        }
+                      }}
                     />
+
+
+
                   </Box>
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
@@ -204,10 +215,20 @@ function DateRangePopup({ open, onClose, onApply, selectedRange }) {
                     <DatePicker
                       value={toDate}
                       onChange={(newValue) => setToDate(newValue)}
-                      renderInput={(params) => (
-                        <TextField {...params} size="small" fullWidth />
-                      )}
+                      slotProps={{
+                        textField: {
+                          size: 'small',
+                          fullWidth: true
+                        },
+                        popper: {
+                          sx: {
+                            zIndex: 20000
+                          }
+                        }
+                      }}
                     />
+
+
                   </Box>
                 </Box>
               </LocalizationProvider>
