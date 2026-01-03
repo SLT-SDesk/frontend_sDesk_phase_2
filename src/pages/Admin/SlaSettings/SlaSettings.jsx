@@ -15,6 +15,7 @@ import TechnicianDetailsPopup from "../../../components/Technician_details_popup
 
 //incident slice
 import {
+  fetchAllIncidentsRequest,
   fetchIncidentsByMainCategoryCodeRequest,
   fetchTechnicianPerformanceRequest,
 } from "../../../redux/incident/incidentSlice";
@@ -53,6 +54,7 @@ const SlaSettings = () => {
   });
 
   useEffect(() => {
+    dispatch(fetchAllIncidentsRequest());//fetch all incidents
     dispatch(fetchIncidentsByMainCategoryCodeRequest(currentAdmin.teamId));
     dispatch(fetchTechnicianPerformanceRequest());
     dispatch(fetchTechniciansRequest());

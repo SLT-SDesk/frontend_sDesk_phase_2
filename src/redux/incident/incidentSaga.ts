@@ -90,6 +90,30 @@ import {
 
 } from "./incidentSlice";
 
+const SLA = {
+  response: {
+    Critical: 15,
+    High: 30,
+    Medium: 60
+  },
+  resolution: {
+    Critical: 120,
+    High: 240,
+    Medium: 480
+  }
+};
+
+const minutesBetween = (a?: string, b?: string) => {
+  if (!a || !b) return 0;
+  return Math.round(
+    (new Date(b).getTime() - new Date(a).getTime()) / 60000
+  );
+};
+
+const label = (actual: number, allowed: number) =>
+  actual <= allowed ? "On Time" : "Late";
+
+
 function* handleFetchTechnicianPerformance() {
   try {
     const response = yield call(getAllTechnicianPerformance);
@@ -107,7 +131,34 @@ function* handleFetchTechnicianPerformance() {
 function* handleFetchAllIncidents() {
   try {
     const response = yield call(fetchAllIncidents);
-    yield put(fetchAllIncidentsSuccess(response.data));
+    const enrichedIncidents = response.data.map((incident: any) => {
+      const responseMinutes = minutesBetween(
+        incident.createdAt,
+        incident.firstResponseAt
+      );
+
+      const resolveMinutes = minutesBetween(
+        incident.createdAt,
+        incident.resolvedAt
+      );
+
+      return {
+        ...incident,
+        responseTimeMinutes: responseMinutes,
+        resolveTimeMinutes: resolveMinutes,
+        responseTimeLabel: label(
+          responseMinutes,
+          SLA.response[incident.priority]
+        ),
+        resolveTimeLabel: label(
+          resolveMinutes,
+          SLA.resolution[incident.priority]
+        )
+      };
+    });
+
+    yield put(fetchAllIncidentsSuccess(enrichedIncidents));
+
   } catch (error) {
     const errorMessage =
       error.response?.data?.message ||

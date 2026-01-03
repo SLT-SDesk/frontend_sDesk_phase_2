@@ -13,6 +13,10 @@ export interface Incident {
   Attachment?: string;
   createdAt?: string;
   updatedAt?: string;
+  responseTimeMinutes?: number; //
+  resolveTimeMinutes?: number; //
+  responseTimeLabel?: 'On Time' | 'Late';//
+  resolveTimeLabel?: 'On Time' | 'Late';//
 }
 
 export enum IncidentStatus {
