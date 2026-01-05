@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { PieChart, Pie, Sector, Cell, Legend } from 'recharts';
 
+  const TEAM_COLORS = {
+    IT: '#1E40AF',
+    HR: '#FF5F1F',
+    Security: '#00FF00',
+  };
 
 const renderActiveShape = (props) => {
 
@@ -50,19 +55,10 @@ const renderActiveShape = (props) => {
 
 const PieChartComponent = ({ data }) => {
 
-  function stringToColor(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    let color = '#';
-    for (let i = 0; i < 3; i++) {
-      color += ('00' + ((hash >> (i * 8)) & 0xFF).toString(16)).slice(-2);
-    }
-    return color;
-  }
+  const colors = data.map(
+    item => TEAM_COLORS[item.name] || '#9CA3AF'
+  );
 
-  const colors = data.map(item => stringToColor(item.name));
 
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -100,9 +96,14 @@ const PieChartComponent = ({ data }) => {
         onClick={onPieClick}
       >
         {/* Generate colors based on names */}
-        {data.map((_, index) => (
-          <Cell key={`cell-${index}`} fill={colors[index]} />
+        {data.map((entry, index) => (
+          <Cell
+            key={`cell-${index}`}
+            fill={colors[index]}
+            opacity={activeIndex === index ? 1 : 0.6}
+          />
         ))}
+
 
       </Pie>
       <Legend

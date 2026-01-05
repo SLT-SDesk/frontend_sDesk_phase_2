@@ -1,7 +1,9 @@
 // TechnicianPopup.jsx
 import { useState, useEffect } from 'react';
 import DateRangePopup from '../AdminDateRangePopup/DateRangePopup';
-import { apiClient } from '../../api/axiosInstance';
+
+import { fetchTechnicianSessionsRequest } from "../../redux/technicians/technicianSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   const [activeTab, setActiveTab] = useState(0);
@@ -12,58 +14,127 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
     startDate: new Date(),
     endDate: new Date()
   });
-  const [technicianStats, setTechnicianStats] = useState(null);
-  const [performanceData, setPerformanceData] = useState(null);
+  const [technicianServiceNumber, setTechnicianServiceNumber] = useState(technician?.serviceNum || technician?.serviceNumber || null);
+  const [technicianSSessions, setTechnicianSSessions] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
+  const dispatch = useDispatch();
+
+  const { technicianSessions } = useSelector((state) => state.technicians);
+  const { incidents } = useSelector((state) => state.incident);
+  const { performances } = useSelector((state) => state.incident);
+
   console.log('TechnicianDetailsPopup render:', { isOpen, technician });
-  
-  // Fetch real technician data from backend
+
+  const technicianServiceNum =
+    technician?.serviceNum || technician?.serviceNumber;
+
+
+  const startOfDay = new Date(dateRange.startDate);
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date(dateRange.endDate);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const filteredIncidents = (incidents || []).filter((incident) => {
+    if (!technicianServiceNum) return false;
+
+    // assigned technician (string-safe comparison)
+    if (String(incident.handler) !== String(technicianServiceNum)) return false;
+
+
+    const incidentDate = new Date(
+      incident.updatedAt ||
+      incident.updated_at ||
+      incident.update_on ||
+      incident.createdAt ||
+      incident.created_at
+    );
+
+    if (isNaN(incidentDate)) return false;
+
+
+    return incidentDate >= startOfDay && incidentDate <= endOfDay;
+  });
+
   useEffect(() => {
-    if (isOpen && technician) {
-      const loadData = async () => {
-        setLoading(true);
-        try {
-          const serviceNum = technician.serviceNum || technician.serviceNumber;
-         
-          // Fetch assigned incidents stats
-          const statsResponse = await apiClient.get(`/incident/technician/${serviceNum}/stats`);
-          setTechnicianStats(statsResponse.data);
-          console.log(statsResponse);
-          // Fetch performance metrics
-          const performanceResponse = await apiClient.get(`/incident/technician/${serviceNum}/performance`);
-          setPerformanceData(performanceResponse.data);
-        } catch (error) {
-          console.error('Failed to fetch technician data:', error);
-          // Set default values on error
-          setTechnicianStats({
-            totalIncidents: 0,
-            byPriority: { critical: 0, high: 0, medium: 0, low: 0 },
-            byStatus: { open: 0, inProgress: 0, hold: 0, closed: 0 }
-          });
-          setPerformanceData({
-            totalIncidents: 0,
-            responseOnTime: 0,
-            resolutionOnTime: 0,
-            responseOnTimePercent: 0,
-            resolutionOnTimePercent: 0,
-            avgResponseTime: 0,
-            avgResolutionTime: 0
-          });
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-      loadData();
+    setTechnicianServiceNumber(
+      technician?.serviceNum || technician?.serviceNumber || null
+    );
+  }, [technician]);
+
+
+  useEffect(() => {
+    if (!technicianServiceNumber) return;
+
+    dispatch(fetchTechnicianSessionsRequest(technicianServiceNumber));
+  }, [dispatch, technicianServiceNumber]);
+
+  useEffect(() => {
+    const sessions = transformSessionData(
+      technicianSessions?.sessions || []
+    );
+    setTechnicianSSessions(sessions);
+  }, [technicianSessions]);
+
+
+  // console.log('Technician Sessions from Redux:', technicianSSessions);
+  // console.log('Technician Service Number:', technicianServiceNumber);
+  // console.log('Performances from Redux:', performances);
+  // console.log('Incidents from Redux:', incidents);
+  // console.log('Assigned To Me from Redux:', assignedToMe);
+
+  const calculateDuration = (loginTime, logoutTime) => {
+    if (!logoutTime) {
+      return 'Still Active';
     }
-  }, [isOpen, technician, dateRange]);
+
+    const login = new Date(loginTime);
+    const logout = new Date(logoutTime);
+    const diffMs = logout - login;
+
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+    return `${hours}h ${minutes}m`;
+  };
+
+  // Function to format time from ISO string to HH:MM:SS
+  const formatTime = (isoString) => {
+    if (!isoString) return null;
+
+    const date = new Date(isoString);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${hours}:${minutes}:${seconds}`;
+  };
+
+  // Main transformation function
+  const transformSessionData = (apiResponse) => {
+    return apiResponse.map(session => ({
+      id: session.id,
+      rawLoginTime: session.login_time, // REQUIRED
+      duration: calculateDuration(session.login_time, session.logout_time),
+      loginTime: formatTime(session.login_time),
+      logoutTime: formatTime(session.logout_time),
+      isActive: session.logout_time === null
+    }));
+  };
+
+  const filteredSessions = technicianSSessions.filter((session) => {
+    if (!session.rawLoginTime) return false;
+
+    const sessionDate = new Date(session.rawLoginTime);
+
+    return sessionDate >= startOfDay && sessionDate <= endOfDay;
+  });
+
+
 
   if (!isOpen) return null;
-  if (!technician) {
-    console.warn('Popup is open but no technician data provided');
-    return null;
-  }
+  if (!technician) return null;
 
   // Handle date range change
   const handleDateRangeApply = (newRange) => {
@@ -81,66 +152,111 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   };
 
   // Calculate metrics based on selected priority
+  const SLA = {
+    critical: { response: 15, resolve: 120 },
+    high: { response: 30, resolve: 720 },
+    medium: { response: 240, resolve: 960 }
+  };
+
+  const performanceMap = (performances || []).reduce((acc, p) => {
+    const key = p.incidentNumber || p.incident_number;
+    if (key) acc[key] = p;
+    return acc;
+  }, {});
+
   const getFilteredMetrics = () => {
-    if (!performanceData) {
-      return {
-        responseOnTime: 0,
-        resolutionOnTime: 0,
-        totalIncidents: 0,
-        avgResponseTime: 0,
-        avgResolutionTime: 0
-      };
-    }
+    const incidentsToUse =
+      selectedPriority === 'all'
+        ? filteredIncidents
+        : filteredIncidents.filter(
+          i => String(i.priority).toLowerCase() === selectedPriority
+        );
 
-    if (selectedPriority === 'all') {
-      return {
-        responseOnTime: performanceData.responseOnTime || 0,
-        resolutionOnTime: performanceData.resolutionOnTime || 0,
-        totalIncidents: performanceData.totalIncidents || 0,
-        avgResponseTime: performanceData.avgResponseTime || 0,
-        avgResolutionTime: performanceData.avgResolutionTime || 0
-      };
-    }
+    let responseOnTime = 0;
+    let responseTotal = 0;
+    let responseMinutesSum = 0;
 
-    // For priority filtering, calculate proportionally
-    const priorityCount = technicianStats?.byPriority?.[selectedPriority] || 0;
-    const totalIncidents = technicianStats?.totalIncidents || 1;
-    const ratio = priorityCount / totalIncidents;
+    let resolveOnTime = 0;
+    let resolveTotal = 0;
+    let resolveMinutesSum = 0;
+
+    incidentsToUse.forEach((incident) => {
+      const priority = incident.priority?.toLowerCase();
+      const sla = SLA[priority];
+      if (!sla) return;
+
+      const perf = performanceMap[incident.incident_number];
+      if (!perf) return;
+
+
+      // ===== RESPONSE SLA =====
+      if (perf.responseTimeMinutes != null) {
+        const r = Number(perf.responseTimeMinutes);
+        responseMinutesSum += r;
+        responseTotal += 1;
+
+        if (r <= sla.response) {
+          responseOnTime += 1;
+        }
+      } else {
+        // no response time recorded = SLA breach
+        responseTotal += 1;
+      }
+
+
+      // ===== RESOLVE SLA (only resolved tickets) =====
+      const resolveMinutes =
+        perf.resolutionTimeMinutes ?? perf.resolveTimeMinutes;
+
+      if (resolveMinutes != null && resolveMinutes > 0) {
+        const res = Number(resolveMinutes);
+        resolveMinutesSum += res;
+        resolveTotal += 1;
+
+        if (res <= sla.resolve) {
+          resolveOnTime += 1;
+        }
+      } else {
+        // unresolved ticket = SLA breach
+        resolveTotal += 1;
+      }
+
+    });
 
     return {
-      responseOnTime: Math.round((performanceData.responseOnTime || 0) * ratio),
-      resolutionOnTime: Math.round((performanceData.resolutionOnTime || 0) * ratio),
-      totalIncidents: priorityCount,
-      avgResponseTime: performanceData.avgResponseTime || 0,
-      avgResolutionTime: performanceData.avgResolutionTime || 0
+      response: {
+        total: responseTotal,
+        onTime: responseOnTime,
+        percent:
+          responseTotal > 0
+            ? Math.round((responseOnTime / responseTotal) * 100)
+            : 0,
+        avgMinutes:
+          responseTotal > 0
+            ? Math.round(responseMinutesSum / responseTotal)
+            : 0
+      },
+      resolve: {
+        total: resolveTotal,
+        onTime: resolveOnTime,
+        percent:
+          resolveTotal > 0
+            ? Math.round((resolveOnTime / resolveTotal) * 100)
+            : 0,
+        avgHours:
+          resolveTotal > 0
+            ? Math.round((resolveMinutesSum / resolveTotal / 60) * 10) / 10
+            : 0
+      }
     };
   };
 
-  const filteredMetrics = getFilteredMetrics();
-  const responseTimePercent = filteredMetrics.totalIncidents > 0 
-    ? Math.round((filteredMetrics.responseOnTime / filteredMetrics.totalIncidents) * 100) 
-    : 0;
-  const resolutionTimePercent = filteredMetrics.totalIncidents > 0 
-    ? Math.round((filteredMetrics.resolutionOnTime / filteredMetrics.totalIncidents) * 100) 
-    : 0;
 
-  // Mock session data
-  const sessions = [
-    {
-      id: 1,
-      duration: 'Still Active',
-      loginTime: '01:30:00',
-      logoutTime: null,
-      isActive: true
-    },
-    {
-      id: 2,
-      duration: '2h 50m',
-      loginTime: '09:00:00',
-      logoutTime: '11:50:00',
-      isActive: false
-    }
-  ];
+
+  const filteredMetrics = getFilteredMetrics();
+  const responseTimePercent = filteredMetrics.response.percent;
+  const resolutionTimePercent = filteredMetrics.resolve.percent;
+
 
   const getInitials = (name) => {
     return name
@@ -152,9 +268,9 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   };
 
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" 
-      style={{ 
+    <div
+      className="fixed inset-0 flex items-center justify-center p-4 bg-black bg-opacity-50"
+      style={{
         position: 'fixed',
         top: 0,
         left: 0,
@@ -168,7 +284,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
         padding: '1rem'
       }}
     >
-      <div 
+      <div
         className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
         style={{
           backgroundColor: 'white',
@@ -185,13 +301,13 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
         {/* Header */}
         <div className="flex items-start justify-between p-6 border-b">
           <div>
-            <h2 className="text-lg font-bold text-gray-900 mb-1">Technician Details</h2>
+            <h2 className="mb-1 text-lg font-bold text-gray-900">Technician Details</h2>
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setDateRangePopupOpen(true);
               }}
-              className="flex items-center gap-2 text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
+              className="flex items-center gap-2 text-xs font-medium text-blue-600 transition-colors hover:text-blue-800"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -202,9 +318,9 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
               </svg>
             </button>
           </div>
-          <button 
+          <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 transition-colors hover:text-gray-600"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -214,46 +330,44 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
 
         {/* Fixed Section - Technician Info Card */}
         <div className="p-6 pb-0">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl p-6 flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between p-6 mb-4 bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center">
-                <span className="text-blue-600 font-bold text-lg">
+              <div className="flex items-center justify-center bg-white rounded-full w-14 h-14">
+                <span className="text-lg font-bold text-blue-600">
                   {technician.initials || getInitials(technician.name)}
                 </span>
               </div>
               <div>
-                <h3 className="text-white text-lg font-bold">{technician.name}</h3>
-                <p className="text-blue-100 text-sm">{technician.serviceNum || technician.serviceNumber || technician.id}</p>
+                <h3 className="text-lg font-bold text-white">{technician.name}</h3>
+                <p className="text-sm text-blue-100">{technician.serviceNum || technician.serviceNumber || technician.id}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 bg-green-500 px-4 py-2 rounded-lg">
+            <div className="flex items-center gap-2 px-4 py-2 bg-green-500 rounded-lg">
               <div className="w-2 h-2 bg-white rounded-full"></div>
-              <span className="text-white font-semibold text-sm">{technician.status || 'Active'}</span>
+              <span className="text-sm font-semibold text-white">{technician.status || 'Active'}</span>
             </div>
           </div>
 
           {/* Tabs */}
           <div className="flex justify-center gap-2 border-b">
-            <button 
+            <button
               onClick={() => setActiveTab(0)}
-              className={`flex items-center gap-2 px-6 py-3 font-medium text-sm transition-all border-b-2 ${
-                activeTab === 0 
-                  ? 'border-blue-600 text-gray-900' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+              className={`flex items-center gap-2 px-6 py-3 font-medium text-sm transition-all border-b-2 ${activeTab === 0
+                ? 'border-blue-600 text-gray-900'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
               <span>Overview</span>
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab(1)}
-              className={`flex items-center gap-2 px-6 py-3 font-medium text-sm transition-all border-b-2 ${
-                activeTab === 1 
-                  ? 'border-blue-600 text-gray-900' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+              className={`flex items-center gap-2 px-6 py-3 font-medium text-sm transition-all border-b-2 ${activeTab === 1
+                ? 'border-blue-600 text-gray-900'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -264,7 +378,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
         </div>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto flex-1 p-6">
+        <div className="flex-1 p-6 overflow-y-auto">
           {/* Tab Content */}
           {activeTab === 0 && (
             <div>
@@ -275,47 +389,51 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                     <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span className="font-semibold text-gray-700 text-sm">Assigned Incidents</span>
+                    <span className="text-sm font-semibold text-gray-700">Assigned Incidents</span>
                   </div>
                   {loading ? (
                     <div className="text-2xl font-bold text-gray-400">...</div>
                   ) : (
-                    <span className="text-3xl font-bold text-gray-900">{technicianStats?.totalIncidents || 0}</span>
+                    <span className="text-3xl font-bold text-gray-900">{filteredIncidents.length}</span>
                   )}
                 </div>
-                
+
                 <div className="grid grid-cols-3 gap-4">
-                  <div 
+                  <div
                     onClick={() => setSelectedPriority(selectedPriority === 'critical' ? 'all' : 'critical')}
-                    className={`bg-red-100 rounded-lg p-4 text-center cursor-pointer transition-all transform hover:scale-105 ${
-                      selectedPriority === 'critical' ? 'ring-2 ring-red-500 shadow-lg' : 'hover:shadow-md'
-                    }`}
+                    className={`bg-red-100 rounded-lg p-4 text-center cursor-pointer transition-all transform hover:scale-105 ${selectedPriority === 'critical' ? 'ring-2 ring-red-500 shadow-lg' : 'hover:shadow-md'
+                      }`}
                   >
-                    <p className="text-gray-700 font-semibold mb-3 text-sm">Critical</p>
-                    <div className="bg-red-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
-                      {loading ? '...' : technicianStats?.byPriority?.critical || 0}
+                    <p className="mb-3 text-sm font-semibold text-gray-700">Critical</p>
+                    <div className="flex items-center justify-center mx-auto text-lg font-bold text-white bg-red-500 rounded-full w-11 h-11">
+                      {filteredIncidents.filter(
+                        i => String(i.priority).toLowerCase() === 'critical'
+                      ).length
+                      }
                     </div>
                   </div>
-                  <div 
+                  <div
                     onClick={() => setSelectedPriority(selectedPriority === 'high' ? 'all' : 'high')}
-                    className={`bg-orange-200 rounded-lg p-4 text-center cursor-pointer transition-all transform hover:scale-105 ${
-                      selectedPriority === 'high' ? 'ring-2 ring-orange-500 shadow-lg' : 'hover:shadow-md'
-                    }`}
+                    className={`bg-orange-200 rounded-lg p-4 text-center cursor-pointer transition-all transform hover:scale-105 ${selectedPriority === 'high' ? 'ring-2 ring-orange-500 shadow-lg' : 'hover:shadow-md'
+                      }`}
                   >
-                    <p className="text-gray-700 font-semibold mb-3 text-sm">High</p>
-                    <div className="bg-orange-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
-                      {loading ? '...' : technicianStats?.byPriority?.high || 0}
+                    <p className="mb-3 text-sm font-semibold text-gray-700">High</p>
+                    <div className="flex items-center justify-center mx-auto text-lg font-bold text-white bg-orange-500 rounded-full w-11 h-11">
+                      {filteredIncidents.filter(
+                        i => String(i.priority).toLowerCase() === 'high'
+                      ).length}
                     </div>
                   </div>
-                  <div 
+                  <div
                     onClick={() => setSelectedPriority(selectedPriority === 'medium' ? 'all' : 'medium')}
-                    className={`bg-yellow-100 rounded-lg p-4 text-center cursor-pointer transition-all transform hover:scale-105 ${
-                      selectedPriority === 'medium' ? 'ring-2 ring-yellow-500 shadow-lg' : 'hover:shadow-md'
-                    }`}
+                    className={`bg-yellow-100 rounded-lg p-4 text-center cursor-pointer transition-all transform hover:scale-105 ${selectedPriority === 'medium' ? 'ring-2 ring-yellow-500 shadow-lg' : 'hover:shadow-md'
+                      }`}
                   >
-                    <p className="text-gray-700 font-semibold mb-3 text-sm">Medium</p>
-                    <div className="bg-yellow-500 text-white rounded-full w-11 h-11 flex items-center justify-center mx-auto font-bold text-lg">
-                      {loading ? '...' : technicianStats?.byPriority?.medium || 0}
+                    <p className="mb-3 text-sm font-semibold text-gray-700">Medium</p>
+                    <div className="flex items-center justify-center mx-auto text-lg font-bold text-white bg-yellow-500 rounded-full w-11 h-11">
+                      {filteredIncidents.filter(
+                        i => String(i.priority).toLowerCase() === 'medium'
+                      ).length}
                     </div>
                   </div>
                 </div>
@@ -328,58 +446,64 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                     <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
-                    <span className="font-semibold text-gray-700 text-sm">Performance Metrics</span>
+                    <span className="text-sm font-semibold text-gray-700">Performance Metrics</span>
                   </div>
                   {selectedPriority !== 'all' && (
-                    <span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium">
+                    <span className="px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full">
                       Filtered: {selectedPriority.charAt(0).toUpperCase() + selectedPriority.slice(1)}
                     </span>
                   )}
                 </div>
 
                 {/* Response Time */}
-                <div className="bg-yellow-50 rounded-lg p-5 mb-4 border border-yellow-100">
+                <div className="p-5 mb-4 border border-yellow-100 rounded-lg bg-yellow-50">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span className="font-semibold text-gray-700 text-sm">Response Time</span>
+                      <span className="text-sm font-semibold text-gray-700">Response Time</span>
                     </div>
                     <span className="text-xl font-bold text-gray-900">{responseTimePercent}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
-                    <div 
+                    <div
                       className="bg-gray-900 h-2.5 rounded-full transition-all duration-500"
                       style={{ width: `${responseTimePercent}%` }}
                     ></div>
                   </div>
-                  <div className="flex items-center justify-between text-xs text-gray-600 px-1">
-                    <span>{filteredMetrics.responseOnTime}/{filteredMetrics.totalIncidents} on time</span>
-                    <span>Avg: {filteredMetrics.avgResponseTime} min</span>
+                  <div className="flex items-center justify-between px-1 text-xs text-gray-600">
+                    <span>
+                      {filteredMetrics.response.onTime}/{filteredMetrics.response.total} on time
+                    </span>
+                    <span>Avg: {filteredMetrics.response.avgMinutes} min</span>
+
                   </div>
                 </div>
 
                 {/* Resolution Time */}
-                <div className="bg-yellow-50 rounded-lg p-5 border border-yellow-100">
+                <div className="p-5 border border-yellow-100 rounded-lg bg-yellow-50">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span className="font-semibold text-gray-700 text-sm">Resolution Time</span>
+                      <span className="text-sm font-semibold text-gray-700">Resolution Time</span>
                     </div>
                     <span className="text-xl font-bold text-gray-900">{resolutionTimePercent}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
-                    <div 
+                    <div
                       className="bg-gray-900 h-2.5 rounded-full transition-all duration-500"
                       style={{ width: `${resolutionTimePercent}%` }}
                     ></div>
                   </div>
-                  <div className="flex items-center justify-between text-xs text-gray-600 px-1">
-                    <span>{filteredMetrics.resolutionOnTime}/{filteredMetrics.totalIncidents} on time</span>
-                    <span>Avg: {filteredMetrics.avgResolutionTime} hrs</span>
+                  <div className="flex items-center justify-between px-1 text-xs text-gray-600">
+                    <span>
+                      {filteredMetrics.resolve.onTime}/{filteredMetrics.resolve.total} on time
+                    </span>
+                    <span>Avg: {filteredMetrics.resolve.avgHours} hrs</span>
+
                   </div>
                 </div>
               </div>
@@ -388,50 +512,50 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
 
           {activeTab === 1 && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">
+              <h3 className="mb-2 text-lg font-semibold text-gray-700">
                 Active Sessions for {technician.name}
               </h3>
-              <p className="text-sm text-gray-500 mb-6">Total Duration: Still Active</p>
+              <p className="mb-6 text-sm text-gray-500">Total Duration: Still Active</p>
 
-              {sessions.map((session) => (
+              {filteredSessions.map((session) => (
                 <div key={session.id} className="mb-6">
-                  <div className="flex items-center gap-2 text-gray-600 mb-4">
+                  <div className="flex items-center gap-2 mb-4 text-gray-600">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span className="font-semibold text-sm">Duration: {session.duration}</span>
+                    <span className="text-sm font-semibold">Duration: {session.duration}</span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     {/* Login Time */}
-                    <div className="bg-green-100 rounded-lg p-4">
-                      <div className="flex items-center gap-2 text-green-700 mb-3">
+                    <div className="p-4 bg-green-100 rounded-lg">
+                      <div className="flex items-center gap-2 mb-3 text-green-700">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                         </svg>
-                        <span className="font-semibold text-sm">Login Time</span>
+                        <span className="text-sm font-semibold">Login Time</span>
                       </div>
                       <p className="text-2xl font-bold text-gray-800 ml-7">{session.loginTime}</p>
                     </div>
 
                     {/* Logout Time or Currently Active */}
                     {session.isActive ? (
-                      <div className="bg-blue-100 rounded-lg p-4">
-                        <div className="flex items-center gap-2 text-blue-700 mb-3">
+                      <div className="p-4 bg-blue-100 rounded-lg">
+                        <div className="flex items-center gap-2 mb-3 text-blue-700">
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                           </svg>
-                          <span className="font-semibold text-sm">Currently Active</span>
+                          <span className="text-sm font-semibold">Currently Active</span>
                         </div>
                         <p className="text-base text-gray-700 ml-7">Still logged in</p>
                       </div>
                     ) : (
-                      <div className="bg-red-100 rounded-lg p-4">
-                        <div className="flex items-center gap-2 text-red-700 mb-3">
+                      <div className="p-4 bg-red-100 rounded-lg">
+                        <div className="flex items-center gap-2 mb-3 text-red-700">
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                           </svg>
-                          <span className="font-semibold text-sm">Logout Time</span>
+                          <span className="text-sm font-semibold">Logout Time</span>
                         </div>
                         <p className="text-2xl font-bold text-gray-800 ml-7">{session.logoutTime}</p>
                       </div>

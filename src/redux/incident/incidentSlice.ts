@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { Incident, IncidentState, UploadedAttachment } from "./incidentTypes";
+import { Incident, IncidentState, UploadedAttachment, TechnicianPerformance } from "./incidentTypes";
 
 const initialState: IncidentState = {
   incidents: [],
@@ -21,6 +21,9 @@ const initialState: IncidentState = {
   locations: [],
   uploadedAttachment: null, // Add uploaded attachment state
   incidentsByMainCategory: [], // Add incidents by main category
+  performances: [],
+
+  
   loading: false,
   error: null,
 };
@@ -29,6 +32,23 @@ const incidentSlice = createSlice({
   name: "incident",
   initialState,
   reducers: {
+    // ===============================
+// Technician Performance
+// ===============================
+fetchTechnicianPerformanceRequest(state) {
+  state.loading = true;
+  state.error = null;
+},
+
+fetchTechnicianPerformanceSuccess(state, action) {
+  state.loading = false;
+  state.performances = action.payload;
+},
+
+fetchTechnicianPerformanceFailure(state, action) {
+  state.loading = false;
+  state.error = action.payload;
+},
     fetchDashboardStatsRequest(state) {
       state.loading = true;
       state.error = null;
@@ -462,6 +482,9 @@ const incidentSlice = createSlice({
 });
 
 export const {
+  fetchTechnicianPerformanceRequest,
+  fetchTechnicianPerformanceSuccess,
+  fetchTechnicianPerformanceFailure,
   fetchDashboardStatsRequest,
   fetchDashboardStatsSuccess,
   fetchDashboardStatsFailure,
@@ -547,5 +570,7 @@ export const fetchAssignedToMeFailure = getAssignedToMeFailure;
 export const fetchAssignedByMeRequest = getAssignedByMeRequest;
 export const fetchAssignedByMeSuccess = getAssignedByMeSuccess;
 export const fetchAssignedByMeFailure = getAssignedByMeFailure;
+export const selectTechnicianPerformance = (state: any) =>
+  state.incident.performances;
 
 export default incidentSlice.reducer;
