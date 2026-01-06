@@ -6,6 +6,7 @@
     touch-action: none;
   }
 }
+
 /* Sidebar main container */
 .SideBar-sidebar {
   width: 250px;
@@ -151,12 +152,14 @@
   .SideBar-sidebar-container {
     position: fixed;
     top: 0;
-    left: -100vw; /* Hidden off-screen by default */
+    left: -100vw;
+    /* Hidden off-screen by default */
     width: 100vw;
     max-width: 100vw;
     height: 100vh;
     background-color: #084e8c;
-    transition: left 0.3s ease; /* Smooth slide animation */
+    transition: left 0.3s ease;
+    /* Smooth slide animation */
     z-index: 1000;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
     touch-action: none;
@@ -169,7 +172,8 @@
   }
 
   .SideBar-sidebar-container.open {
-    left: 0; /* Slide in when open */
+    left: 0;
+    /* Slide in when open */
     overflow-x: hidden;
     overscroll-behavior: contain;
     touch-action: none;
@@ -178,6 +182,7 @@
   .SideBar-close-btn {
     display: block;
   }
+
   .SideBar-close-btn:hover {
     display: block;
     color: #dcd507;
@@ -220,24 +225,29 @@
   .SideBar-sidebar-container {
     position: relative;
     top: 0;
-    left: 0; /* Always visible on tablet */
+    left: 0;
+    /* Always visible on tablet */
     width: 350px;
     max-width: 350px;
     height: 100vh;
     background-color: #084e8c;
     z-index: 1000;
-    overflow-x: hidden; /* Prevent horizontal scrolling */
-    display: flex; /* Ensure the container is displayed */
+    overflow-x: hidden;
+    /* Prevent horizontal scrolling */
+    display: flex;
+    /* Ensure the container is displayed */
     flex-direction: column;
   }
 
   .SideBar-sidebar-container.open {
-    left: 0; /* Always visible */
+    left: 0;
+    /* Always visible */
     overflow-x: hidden;
   }
 
   .SideBar-close-btn {
-    display: none; /* Hide close button on tablet */
+    display: none;
+    /* Hide close button on tablet */
   }
 
   .SideBar-sdeskTitle {
@@ -252,7 +262,8 @@
     align-items: center;
     box-sizing: border-box;
     padding: 0 16px;
-    flex-shrink: 0; /* Prevent title from shrinking */
+    flex-shrink: 0;
+    /* Prevent title from shrinking */
   }
 
   .SideBar-icon_text_container {
@@ -267,9 +278,12 @@
     min-width: 0;
     padding-left: 20px;
     padding-right: 20px;
-    overflow-x: hidden; /* Prevent horizontal scrolling */
-    overflow-y: auto; /* Allow vertical scrolling */
-    flex: 1; /* Take remaining space */
+    overflow-x: hidden;
+    /* Prevent horizontal scrolling */
+    overflow-y: auto;
+    /* Allow vertical scrolling */
+    flex: 1;
+    /* Take remaining space */
     background-color: #084e8c;
     color: aliceblue;
   }
@@ -280,12 +294,79 @@
   }
 }
 
+/* ===== Brand name image next to sDESK ===== */
+/* Header height */
+.SideBar-sdeskTitle {
+  height: 80px !important;
+}
+
+/* Vertical stack */
+.brand-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+/* Home + sDESK row */
+.brand-top-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Text */
+.sdesk-text {
+  margin: 0;
+  font-size: 30px !important;
+  font-weight: 800;
+}
+
+/* Brand image */
+.transzent-logo {
+  height: 37px;
+  width: auto;
+  object-fit: contain;
+  opacity: 0.95;
+}
+
+/* Reduce space between sDESK row and Transzent */
+
+.brand-header {
+  gap: 1px !important; /* was 4–6px before */
+}
+
+.sdesk-text {
+  line-height: 1;      /* removes extra text height */
+}
+
+/* Brand image spacing */
+.transzent-logo {
+  margin-top: 0;
+}
+
+/* Home icon */
+.brand-top-row svg {
+  font-size: 1em !important; 
+}
+
+.brand-top-row {
+  gap: 1px !important;  /* try 4px–6px */
+}
+/* Give top & bottom breathing space to brand header */
+.SideBar-sdeskTitle {
+  
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
 /* Specific handling for medium tablets around 912px width */
 @media (min-width: 900px) and (max-width: 950px) {
   .SideBar-sidebar-container {
     position: relative;
     width: 300px;
-    left: 0; /* Always visible */
+    left: 0;
+    /* Always visible */
   }
 
   .SideBar-sidebar-container.open {
@@ -293,7 +374,8 @@
   }
 
   .SideBar-close-btn {
-    display: none; /* Hide close button */
+    display: none;
+    /* Hide close button */
   }
 
   .SideBar-sdeskTitle {
@@ -312,7 +394,8 @@
 @media (min-width: 1025px) {
   .SideBar-sidebar-container {
     position: relative;
-    left: 0; /* Always visible on desktop */
+    left: 0;
+    /* Always visible on desktop */
     width: 250px;
     background-color: #084e8c;
     color: aliceblue;
@@ -352,5 +435,12 @@
     height: 100vh;
     color: aliceblue;
     overflow-y: auto;
+  }
+}
+
+/* mobile */
+@media (max-width: 768px) {
+  .transzent-logo {
+    height: 16px;
   }
 }
