@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
 import { PieChart, Pie, Sector, Cell, Legend } from 'recharts';
 
-  const TEAM_COLORS = {
-    IT: '#1E40AF',
-    HR: '#FF5F1F',
-    Security: '#00FF00',
-  };
+// Generate a list of colors based on string hashing(dynamic colors for any number of categories))
+const stringToColor = (str) => {
+  let hash = 0;
+
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  const hue = Math.abs(hash) % 360;
+
+  return `hsl(${hue}, 65%, 55%)`;
+};
+
 
 const renderActiveShape = (props) => {
 
@@ -55,9 +63,6 @@ const renderActiveShape = (props) => {
 
 const PieChartComponent = ({ data }) => {
 
-  const colors = data.map(
-    item => TEAM_COLORS[item.name] || '#9CA3AF'
-  );
 
 
   const [activeIndex, setActiveIndex] = useState(0);
@@ -99,10 +104,11 @@ const PieChartComponent = ({ data }) => {
         {data.map((entry, index) => (
           <Cell
             key={`cell-${index}`}
-            fill={colors[index]}
+            fill={stringToColor(entry.name)}
             opacity={activeIndex === index ? 1 : 0.6}
           />
         ))}
+
 
 
       </Pie>
