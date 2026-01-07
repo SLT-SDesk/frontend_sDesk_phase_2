@@ -49,9 +49,19 @@ const SlaSettings = () => {
 
   //filtered incidents by date range
   const filteredIncidents = incidentsByMainCategory.filter((incident) => {
-    const incidentDate = new Date(incident.update_on);
-    return incidentDate >= range.start && incidentDate <= range.end;
-  });
+  const incidentDate = new Date(incident.update_on);
+
+  const start = new Date(range.start);
+  const end = new Date(range.end);
+
+  // normalize to date-only
+  incidentDate.setHours(0, 0, 0, 0);
+  start.setHours(0, 0, 0, 0);
+  end.setHours(23, 59, 59, 999);
+
+  return incidentDate >= start && incidentDate <= end;
+});
+
 
   useEffect(() => {
     dispatch(fetchAllIncidentsRequest());//fetch all incidents
