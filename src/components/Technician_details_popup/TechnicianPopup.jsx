@@ -36,26 +36,27 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   const endOfDay = new Date(dateRange.endDate);
   endOfDay.setHours(23, 59, 59, 999);
 
+
   const filteredIncidents = (incidents || []).filter((incident) => {
     if (!technicianServiceNum) return false;
 
-    // assigned technician (string-safe comparison)
     if (String(incident.handler) !== String(technicianServiceNum)) return false;
 
-
-    const incidentDate = new Date(
+    const incidentDateRaw =
       incident.updatedAt ||
       incident.updated_at ||
       incident.update_on ||
       incident.createdAt ||
-      incident.created_at
-    );
+      incident.created_at;
 
-    if (isNaN(incidentDate)) return false;
+    if (!incidentDateRaw) return false;
 
-
+    const incidentDate = new Date(incidentDateRaw);
     return incidentDate >= startOfDay && incidentDate <= endOfDay;
+
   });
+
+
 
   useEffect(() => {
     setTechnicianServiceNumber(
@@ -216,11 +217,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
         if (res <= sla.resolve) {
           resolveOnTime += 1;
         }
-      } else {
-        // unresolved ticket = SLA breach
-        resolveTotal += 1;
       }
-
     });
 
     return {
