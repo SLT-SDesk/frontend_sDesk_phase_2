@@ -26,6 +26,7 @@ function* handleLoginWithMicrosoft(action: any) {
     const { user } = response.data;
     if (user) {
       yield put(loginWithMicrosoftSuccess(user));
+      yield put(fetchLoggedUserRequest());
     } else {
       yield put(
         loginWithMicrosoftFailure("Failed to get user info from backend")

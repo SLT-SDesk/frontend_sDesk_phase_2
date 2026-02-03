@@ -5,10 +5,12 @@ import { fetchLoggedUserRequest, refreshTokenRequest } from '../../redux/auth/au
 
 const PrivateRoute = () => {
   const dispatch = useAppDispatch();
-  const { user, isLoggedIn, loading, authInitialized } = useAppSelector((state) => state.auth);
+  const { isLoggedIn, loading, authInitialized } = useAppSelector(
+    (state) => state.auth
+  );
+
   const hasJwtCookie = document.cookie.includes('jwt');
 
-  // 🔁 Only try fetching once on mount if not initialized
   useEffect(() => {
     if (!authInitialized && !loading) {
       if (hasJwtCookie) {
@@ -19,17 +21,17 @@ const PrivateRoute = () => {
     }
   }, [authInitialized, loading, dispatch, hasJwtCookie]);
 
-  // 🟡 Still initializing: show loading
   if (!authInitialized || loading) {
     return <div>Loading...</div>;
   }
 
-  // ❌ After initialization, if no user or not logged in —> redirect
-  if (!user || !isLoggedIn) {
-    return <Navigate to="/login" replace />;
+  // ONLY check authentication
+  if (!isLoggedIn) {
+    return <Navigate to="/LogIn" replace />;
   }
 
   return <Outlet />;
 };
+
 
 export default PrivateRoute;

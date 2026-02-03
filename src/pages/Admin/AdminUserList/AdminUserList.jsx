@@ -22,7 +22,7 @@ import {
 import { fetchSubCategoriesRequest } from "../../../redux/categories/categorySlice";
 import AdminAddUser from "../../../components/AdminAddUser/AdminAddUser";
 import ConfirmPopup from "../../../components/ConfirmPopup/ConfirmPopup";
-import { updateUserRoleById } from "../../../redux/sltusers/sltusersService";
+
 
 function AdminUserList() {
   const dispatch = useDispatch();
@@ -71,6 +71,19 @@ function AdminUserList() {
       socket.off("technician_status_changed", handleStatusChange);
     };
   }, [dispatch, selectShowOption]);
+
+  const updateUserRole = async (serviceNumber, role) => {
+    const res = await fetch("http://localhost:3001/user-role/assign", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ serviceNumber, role }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to update user role");
+    }
+  };
 
   const getTeamName = (teamId) => {
     const main = mainCategories.find((m) => m.id === teamId);
@@ -145,20 +158,25 @@ function AdminUserList() {
   const confirmDelete = async () => {
     if (userToDelete) {
       try {
-        const sltServiceNum =
+        const serviceNum =
           userToDelete.serviceNum || userToDelete.serviceNumber;
-        if (sltServiceNum) {
-          await updateUserRoleById(sltServiceNum, "user");
-          console.log("Successfully updated SLT user role to user");
+
+        if (serviceNum) {
+          try {
+            await updateUserRole(serviceNum, "user");
+          } catch (err) {
+            console.warn("Failed to downgrade role", err);
+          }
         }
+
       } catch (err) {
         console.warn("Failed to update SLT user role to user:", err);
       }
       dispatch(
         deleteTechnicianRequest(
           userToDelete.serviceNum ||
-            userToDelete.serviceNumber ||
-            userToDelete.id
+          userToDelete.serviceNumber ||
+          userToDelete.id
         )
       );
       setIsDeletePopupOpen(false);
@@ -172,6 +190,8 @@ function AdminUserList() {
   };
 
   const handleAddUser = () => setIsAddUserOpen(true);
+
+
 
   return (
     <div className="AdminUserList-main-content">
@@ -243,7 +263,7 @@ function AdminUserList() {
                   })
                   .filter((user) => {
                     const searchString = searchQuery.toLowerCase();
-                    
+
                     // Active search logic
                     if (searchString === "true") return user.active === true;
                     if (searchString === "false") return user.active === false;
@@ -329,10 +349,12 @@ function AdminUserList() {
             if (!newUser.isEdit) {
               if (newUser.serviceNum) {
                 try {
-                  await updateUserRoleById(newUser.serviceNum, "technician");
-                  // eslint-disable-next-line no-empty
-                } catch (err) {}
+                  await updateUserRole(newUser.serviceNum, "technician");
+                } catch (err) {
+                  console.warn("Role update failed", err);
+                }
               }
+
 
               dispatch(
                 createTechnicianRequest({

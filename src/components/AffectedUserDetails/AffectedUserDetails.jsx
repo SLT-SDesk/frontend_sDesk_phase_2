@@ -66,15 +66,18 @@ const AffectedUserDetails = ({ formData, setFormData, handleInputChange }) => {
   // Auto-fill form when user data is found, butonly fill empty fields (do not overwrite manual edits)
   useEffect(() => {
     if (user) {
+      console.log("LOOKUP USER:", user);
+
       setFormData((prevData) => ({
         ...prevData,
         name: prevData.name || user.display_name || "",
         email: prevData.email || user.email || "",
-        designation: prevData.designation || user.role || "",
+        designation: prevData.designation || user.designation || "",
         tpNumber: prevData.tpNumber || user.contactNumber || "",
       }));
     }
   }, [user, setFormData]);
+
 
   // Clear lookup user data on component unmount
   useEffect(() => {
