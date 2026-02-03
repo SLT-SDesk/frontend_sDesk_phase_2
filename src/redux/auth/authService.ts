@@ -1,21 +1,38 @@
+import axios from "axios";
 import apiClient from "../../api/axiosInstance";
 
-export const loginWithMicrosoft = async ({ code, state, redirect_uri }) => {
-  const url = `/auth/login`;
+interface MicrosoftLoginPayload {
+  code: string;
+  state?: string;
+  redirect_uri: string;
+}
 
+// Login with Microsoft OAuth new**S
+export const loginWithMicrosoft = async (
+  payload: MicrosoftLoginPayload
+) => {
   try {
-    const response = await apiClient.post(url, {
-      code,
-      state,
-      redirect_uri,
-      client_id: import.meta.env.VITE_MICROSOFT_CLIENT_ID,
-      client_secret: import.meta.env.VITE_MICROSOFT_CLIENT_SECRET,
-    });
-    return response;
-  } catch (error) {
+    return await apiClient.post("/auth/login", payload);
+  } catch (error: any) {
+    // Preserve backend error message if available
+    if (axios.isAxiosError(error)) {
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Microsoft login failed";
+      throw new Error(message);
+    }
+
     throw error;
   }
 };
+
+export const fetchMyAdminInfo = async () => {
+  const response = await apiClient.get('/admin/me');
+  return response.data;
+};
+
+
 
 export const logout = async () => {
   try {
