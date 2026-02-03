@@ -6,19 +6,22 @@ import {
   updateTeamAdminRequest,
   deleteTeamAdminRequest,
 } from "../../../redux/teamAdmin/teamAdminSlice";
-import { fetchUserByServiceNum } from "../../../redux/sltusers/sltusersService";
-import { useDispatch as useSagaDispatch } from "react-redux";
 import { fetchMainCategoriesRequest, fetchSubCategoriesByMainCategoryIdRequest } from "../../../redux/categories/categorySlice";
 import { useSelector as useAppSelector } from "react-redux";
 // Removed unused sDesk_t2_users_dataset import
 import "./ManageTeamAdmin.css";
 import { MdEdit, MdDeleteForever } from 'react-icons/md';
+import {
+  lookupUserRequest,
+  clearLookupUser,
+} from "../../../redux/userLookup/userLookupSlice";
+
 
 const initialForm = {
   serviceNumber: "",
   userName: "",
   contactNumber: "",
-  designation: "",
+  designation: "admin",
   email: "",
   cat1: "",
   cat2: "",
@@ -26,10 +29,24 @@ const initialForm = {
   cat4: "",
   teamId: "",
   teamName: "",
-  userRole: "",
 };
 
 const MAX_CATEGORIES = 4;
+
+
+
+const updateUserRole = async (serviceNumber, role) => {
+  const res = await fetch("http://localhost:3001/user-role/assign", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ serviceNumber, role }),
+  });
+
+  if (!res.ok) throw new Error("Failed to update user role");
+};
+
+
 
 const ManageTeamAdmin = () => {
   const dispatch = useDispatch();
@@ -42,9 +59,10 @@ const ManageTeamAdmin = () => {
   const [form, setForm] = useState(initialForm);
   const [submitError, setSubmitError] = useState("");
   // Get sltusers error from Redux (for backend error display)
-  const sltusersError = useSelector(state => state.sltusers?.error);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [availableCategories, setAvailableCategories] = useState([]);
+  const [hasCheckedUser, setHasCheckedUser] = useState(false);
+
   // --- Category/Team Redux State ---
   const mainCategories = useAppSelector(state => state.categories?.mainCategories || []);
   const subCategories = useAppSelector(state => state.categories?.subCategories || []);
@@ -53,6 +71,10 @@ const ManageTeamAdmin = () => {
   const subCategoriesLoading = useAppSelector(state => state.categories?.subCategoriesLoading);
   const subCategoriesError = useAppSelector(state => state.categories?.subCategoriesError);
   // Fetch main categories (teams) on mount
+
+  const { user, loading: lookupLoading, error: lookupError } =
+    useSelector((state) => state.userLookup);
+
   useEffect(() => {
     dispatch(fetchMainCategoriesRequest());
   }, [dispatch]);
@@ -75,99 +97,33 @@ const ManageTeamAdmin = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
+
     setForm((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
   // Service Number change: fetch user, always auto-fill designation as 'admin'
-  const handleServiceNumberChange = async (e) => {
+  const handleServiceNumberChange = (e) => {
     const value = e.target.value;
+
     setForm((prev) => ({ ...prev, serviceNumber: value }));
-    if (!value.trim()) {
+    setHasCheckedUser(false);
+    setSubmitError("");
+
+    if (!value.trim() || value.trim().length < 3) {
+      dispatch(clearLookupUser());
       setForm((prev) => ({
         ...prev,
         userName: "",
-        designation: "admin",
         email: "",
         contactNumber: "",
+        designation: "admin",
       }));
-      setSubmitError("");
       return;
     }
 
-    // Check if the user is already a team admin
-    if (!editMode && Array.isArray(teamAdmins)) {
-      const existingAdmin = teamAdmins.find(admin => admin.serviceNumber === value);
-      if (existingAdmin) {
-        setSubmitError("This User Already Team admin");
-        setForm((prev) => ({
-          ...prev,
-          userName: "",
-          designation: "admin",
-          email: "",
-          contactNumber: "",
-        }));
-        return;
-      }
-    }
-
-    setSubmitError("");
-    setForm((prev) => ({
-      ...prev,
-      userName: "Loading...",
-      designation: "admin",
-      email: "Loading...",
-    }));
-
-    try {
-      const response = await fetchUserByServiceNum(value);
-      const user = response.data;
-      if (user) {
-        // Check if user role is valid for promotion to admin
-        const userRole = user.role?.toLowerCase();
-        if (userRole === "technician" || userRole === "team leader") {
-          setForm((prev) => ({
-            ...prev,
-            userName: "",
-            designation: "admin",
-            email: "",
-            contactNumber: "",
-          }));
-          setSubmitError(`Cannot add user with role "${user.role}" as admin. Only users with role "user" can be promoted to admin.`);
-          return;
-        }
-        
-        setForm((prev) => ({
-          ...prev,
-          userName: user.display_name || "",
-          designation: "admin",
-          email: user.email || "",
-          contactNumber: user.contactNumber ? user.contactNumber.replace(/\D/g, '').slice(0, 10) : "",
-          userRole: user.role || "", // Store user role for validation
-        }));
-        setSubmitError("");
-      } else {
-        setForm((prev) => ({
-          ...prev,
-          userName: "",
-          designation: "admin",
-          email: "",
-          contactNumber: "",
-        }));
-        setSubmitError("User not found in database.");
-      }
-    } catch (error) {
-      setForm((prev) => ({
-        ...prev,
-        userName: "",
-        designation: "admin",
-        email: "",
-        contactNumber: "",
-      }));
-      setSubmitError("User not found in database.");
-    }
+    dispatch(lookupUserRequest(value.trim()));
   };
 
   // --- Edit with Confirmation on Pencil Icon Click ---
@@ -226,19 +182,45 @@ const ManageTeamAdmin = () => {
     setTimeout(() => setInfoMessage(""), 2000);
   };
 
-  const handleAddClick = () => {
-    setForm(initialForm);
-    setShowModal(true);
-    setSubmitError("");
-    setSubmitSuccess(false);
-    setEditMode(false);
-    setEditId(null);
-  };
+ const handleAddClick = () => {
+  setForm(initialForm);
+  setHasCheckedUser(false);
+  setShowModal(true);
+  setSubmitError("");
+  setSubmitSuccess(false);
+  setEditMode(false);
+  setEditId(null);
+  dispatch(clearLookupUser()); // 👈 add this
+};
+
 
   const handleClose = () => {
     setShowModal(false);
     setSubmitError("");
+    setHasCheckedUser(false);
+    dispatch(clearLookupUser());
   };
+
+  useEffect(() => {
+    if (user) {
+      setForm((prev) => ({
+        ...prev,
+        userName: user.display_name || "",
+        email: user.email || "",
+        contactNumber: user.contactNumber
+          ? user.contactNumber.replace(/\D/g, "").slice(0, 10)
+          : "",
+        designation: "admin",
+      }));
+      setHasCheckedUser(true);
+    }
+
+    if (lookupError) {
+      setHasCheckedUser(true);
+      setSubmitError("User not found in ERP");
+    }
+  }, [user, lookupError]);
+
 
   // When teamName changes, update teamId and fetch subcategories from backend
   useEffect(() => {
@@ -302,104 +284,66 @@ const ManageTeamAdmin = () => {
   // Add/Edit form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!hasCheckedUser || !form.userName) {
+      setSubmitError("Please enter a valid service number from ERP");
+      return;
+    }
     setSubmitError("");
     setSubmitSuccess(false);
-    
-    // Check if this is edit mode
+
     const isEdit = editMode && editId;
-    
-    // Additional validation for new admin creation - check user role
-    if (!isEdit) {
-      const userRole = form.userRole?.toLowerCase();
-      if (userRole === "technician" || userRole === "team leader") {
-        setSubmitError(`Cannot promote user with role "${form.userRole}" to admin. Only users with role "user" can be promoted to admin.`);
-        return;
-      }
-      if (userRole && userRole !== "user") {
-        setSubmitError(`Invalid user role "${form.userRole}". Only users with role "user" can be promoted to admin.`);
-        return;
-      }
+
+    if (!isEdit && teamsWithAdmin.includes(form.teamName)) {
+      setSubmitError("This team already has an admin");
+      return;
     }
+
     const payload = {
       serviceNumber: form.serviceNumber,
       userName: form.userName,
       contactNumber: form.contactNumber,
-      designation: isEdit ? form.designation : "admin",
+      designation: "admin",
       email: form.email,
-      cat1: selectedCategories[0] || "",
-      cat2: selectedCategories[1] || "",
-      cat3: selectedCategories[2] || "",
-      cat4: selectedCategories[3] || "",
       teamId: form.teamId,
       teamName: form.teamName,
     };
-    // Prevent adding admin to a team that already has one (unless editing that admin)
-    if (!isEdit && teamsWithAdmin.includes(form.teamName)) {
-      setSubmitError("An admin already exists for this team. Please select another team.");
-      return;
-    }
-    const errors = validateForm(payload, selectedCategories);
-    if (Object.keys(errors).length > 0) {
-      setSubmitError(Object.values(errors).join(" | "));
-      return;
-    }
-    if (isEdit) {
-      dispatch(updateTeamAdminRequest({ id: editId, data: payload }));
-      setInfoMessage("Admin updated successfully!");
-      setShowModal(false);
-      setTimeout(() => setInfoMessage(""), 2000);
-    } else {
-      try {
-        // Call both APIs in parallel: createTeamAdminRequest and updateUserRoleRequest
-        const results = await Promise.allSettled([
-          dispatch(createTeamAdminRequest({ ...payload, teamId: form.teamId })),
-          dispatch({
-            type: 'sltusers/updateUserRoleRequest',
-            payload: { serviceNum: form.serviceNumber, role: "admin" }
-          })
+
+    try {
+      if (isEdit) {
+        dispatch(updateTeamAdminRequest({ id: editId, data: payload }));
+      } else {
+
+        await Promise.all([
+          dispatch(createTeamAdminRequest(payload)),
+          updateUserRole(form.serviceNumber, "admin"),
         ]);
-        // Check for errors in both results
-        const errors = results
-          .filter(r => r.status === 'rejected')
-          .map(r => r.reason?.message || r.reason || 'Unknown error');
-        if (errors.length > 0) {
-          setSubmitError("Failed to add admin and/or update user role: " + errors.join(' | '));
-        } else {
-          setInfoMessage("Admin added successfully!");
-          setSubmitSuccess(true);
-          setTimeout(() => {
-            setShowModal(false);
-            setSubmitSuccess(false);
-            setEditMode(false);
-            setEditId(null);
-            setInfoMessage("");
-          }, 1000);
-        }
-      } catch (err) {
-        setSubmitError("Failed to add admin and/or update user role: " + (err?.message || err));
       }
+
+      setSubmitSuccess(true);
+      setInfoMessage(isEdit ? "Admin updated" : "Admin added");
+      setShowModal(false);
+      setEditMode(false);
+      setEditId(null);
+    } catch (err) {
+      setSubmitError(err.message || "Operation failed");
     }
   };
 
+
   const handleDeleteClick = (admin) => {
-    if (!admin || !admin.teamId || !admin.id) {
-      alert("Cannot delete: Missing admin data!");
-      return;
-    }
     setConfirmMessage("Are you sure you want to delete this admin?");
     setShowConfirm(true);
-    setConfirmAction(() => () => {
-      dispatch(deleteTeamAdminRequest({ teamId: admin.teamId, id: admin.id }));
-      // Change role in slt_users table from admin to user
-      dispatch({
-        type: 'sltusers/updateUserRoleRequest',
-        payload: { serviceNum: admin.serviceNumber, role: "user" }
-      });
-      setInfoMessage("Admin deleted successfully!");
-      setShowConfirm(false);
-      setTimeout(() => setInfoMessage(""), 2000);
+
+    setConfirmAction(() => async () => {
+      await Promise.all([
+        dispatch(deleteTeamAdminRequest({ teamId: admin.teamId, id: admin.id })),
+        updateUserRole(admin.serviceNumber, "user"),
+      ]);
+      setInfoMessage("Admin deleted");
     });
   };
+
 
   return (
     <div className="superadmin-container">
@@ -412,13 +356,10 @@ const ManageTeamAdmin = () => {
 
       {loading && <p className="loading-message">Loading team admins...</p>}
       {error && <p className="error-message">{error}</p>}
-      {(submitError || sltusersError) && (
-        <div className="error-message">
-          {submitError}
-          {sltusersError && <div>{sltusersError}</div>}
-        </div>
+      {submitError && hasCheckedUser && (
+        <div className="error-message">{submitError}</div>
       )}
-      
+
       {!loading && !error && teamAdmins.length === 0 && (
         <div className="info-message">No admins found.</div>
       )}
