@@ -1,6 +1,6 @@
 import apiClient from "../../api/axiosInstance";
 import axios from "axios"; // only for isAxiosError type guard in error handling
-import { MainCategory, SubCategory, CategoryItem } from "./categoryTypes";
+import { MainCategory, SubCategory } from "./categoryTypes";
 import { buildUrl, API_BASE } from "../../utils/apiUtils";
 
 export const fetchMainCategories = async () => {
