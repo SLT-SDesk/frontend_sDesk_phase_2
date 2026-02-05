@@ -1,0 +1,121 @@
+.sla-settings-page {
+  height: calc(100vh - 60px); /* fit below header */
+  overflow-y: auto;           /* allow scroll inside if needed */
+  background-color: #ffffff;
+}
+
+.sla-header {
+  background: linear-gradient(135deg, #3333ff 0%, #ccddff 100%);
+  padding: 10px 32px;
+  color: white;
+  border-radius: 0 0 30px 30px;
+  height: 60px;
+}
+
+.sla-title {
+  font-weight: 600;
+  font-size: 28px;
+  margin: 0;
+}
+
+.sla-content {
+  padding: 24px 32px;
+}
+
+.sla-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.team-metrics-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.team-icon {
+  font-size: 20px;
+}
+
+.metrics-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  max-width: 1400px;
+}
+
+/* NEW: Team Section Styling */
+.team-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+}
+
+/* Ensure both cards in team section have equal height */
+.team-section > * {
+  flex: 1;
+  min-height: 0;
+}
+
+@media (max-width: 768px) {
+  .sla-top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sla-content {
+    padding: 16px;
+  }
+
+  /* Stack team section normally on mobile */
+  .team-section {
+    gap: 16px;
+  }
+}
+
+/* Make date picker button align properly when narrow */
+.sla-date-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Date button styling */
+.sla-date-button {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.12);
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: rgba(0,0,0,0.85);
+  box-shadow: 0 1px 3px rgba(16,24,40,0.04);
+}
+
+.sla-date-button:hover {
+  background: #f5f6fb;
+}
+
+.sla-date-button:active {
+  transform: translateY(1px);
+}

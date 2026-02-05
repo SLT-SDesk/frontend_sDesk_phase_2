@@ -53,6 +53,19 @@ const CancelButton = styled(Button)(({ theme }) => ({
   }
 }));
 
+// ++++Helper functions to get start and end of day +++++++++++++++++++++
+const startOfDay = (date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+const endOfDay = (date) => {
+  const d = new Date(date);
+  d.setHours(23, 59, 59, 999);
+  return d;
+};
+
 function DateRangePopup({ open, onClose, onApply, selectedRange }) {
   const [activeSelection, setActiveSelection] = useState('Today');
   const [showCustomRange, setShowCustomRange] = useState(false);
@@ -61,7 +74,7 @@ function DateRangePopup({ open, onClose, onApply, selectedRange }) {
 
   const dateOptions = [
     'Today',
-    'Yesterday', 
+    'Yesterday',
     'Last 7 Days',
     'Last 30 Days',
     'This Month',
@@ -81,16 +94,22 @@ function DateRangePopup({ open, onClose, onApply, selectedRange }) {
   const handleApply = () => {
     let startDate, endDate;
     const today = new Date();
-    
+
     switch (activeSelection) {
-      case 'Today':
-        startDate = endDate = today;
+      // ++++Modified 'Today' case to use helper functions +++++++++++++++
+      case 'Today': {
+        startDate = startOfDay(today);
+        endDate = endOfDay(today);
         break;
-      case 'Yesterday':
+      }
+      // ++++Added missing case for 'Yesterday' ++++++++++++++++++++++++++++++
+      case 'Yesterday': {
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
-        startDate = endDate = yesterday;
+        startDate = startOfDay(yesterday);
+        endDate = endOfDay(yesterday);
         break;
+      }
       case 'Last 7 Days':
         startDate = new Date(today);
         startDate.setDate(today.getDate() - 7);
@@ -132,11 +151,14 @@ function DateRangePopup({ open, onClose, onApply, selectedRange }) {
   };
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      sx={{
+        zIndex: 10000
+      }}
       PaperProps={{
         style: {
           borderRadius: '12px',
@@ -170,10 +192,21 @@ function DateRangePopup({ open, onClose, onApply, selectedRange }) {
                     <DatePicker
                       value={fromDate}
                       onChange={(newValue) => setFromDate(newValue)}
-                      renderInput={(params) => (
-                        <TextField {...params} size="small" fullWidth />
-                      )}
+                      slotProps={{
+                        textField: {
+                          size: 'small',
+                          fullWidth: true
+                        },
+                        popper: {
+                          sx: {
+                            zIndex: 20000
+                          }
+                        }
+                      }}
                     />
+
+
+
                   </Box>
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
@@ -182,10 +215,20 @@ function DateRangePopup({ open, onClose, onApply, selectedRange }) {
                     <DatePicker
                       value={toDate}
                       onChange={(newValue) => setToDate(newValue)}
-                      renderInput={(params) => (
-                        <TextField {...params} size="small" fullWidth />
-                      )}
+                      slotProps={{
+                        textField: {
+                          size: 'small',
+                          fullWidth: true
+                        },
+                        popper: {
+                          sx: {
+                            zIndex: 20000
+                          }
+                        }
+                      }}
                     />
+
+
                   </Box>
                 </Box>
               </LocalizationProvider>
