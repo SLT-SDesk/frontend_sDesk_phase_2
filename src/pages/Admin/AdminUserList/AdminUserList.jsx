@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-/* eslint-disable no-undef */
+ 
 import React, { useEffect, useState, useMemo } from "react";
 import "./AdminUserList.css";
 import { FaHouseUser, FaSearch, FaEdit, FaTrash } from "react-icons/fa";

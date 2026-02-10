@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+ 
 import React, { useState, useEffect } from "react";
 import "./AdminAddLocation.css";
 import { IoIosClose } from "react-icons/io";
