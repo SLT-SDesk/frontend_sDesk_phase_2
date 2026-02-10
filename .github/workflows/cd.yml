@@ -1,43 +1,30 @@
-name: Deploy SDesk Frontend Phase 2 (Testing)
+name: SDesk Frontend Production CD
 
 on:
-  # Step 1.1: 
-  # Trigger on push to testing branch
-  
-  push:
-    branches:
-      - testing
-
-  # Step 1.2: 
-  # Trigger workflow when a PR targets testing branch
-
-  pull_request:
-    branches:
-      - testing
-
-  # Step 1.3: 
-  # Allow manual trigger
- 
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["SDesk Frontend CI (Production Grade)"]
+    types:
+      - completed
 
 jobs:
   deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
-      
       # STEP 1 — Checkout repository
-     
-      - name: ⬇️ Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      
-      # STEP 2 — Create .env file using GitHub secrets
-      
-      # This .env file is added to the uploaded source and then
-      # copied into the project folder on the server before build.
-     
-      - name: 🔐 Generate .env file
+      # STEP 2 — Download validated build artifact from CI
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: dist
+
+      # STEP 3 — Generate production .env file
+      - name: Generate .env
         run: |
           echo "VITE_APP_URL=${{ secrets.VITE_APP_URL }}" >> .env
           echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env
@@ -45,32 +32,21 @@ jobs:
           echo "VITE_MICROSOFT_CLIENT_ID=${{ secrets.VITE_MICROSOFT_CLIENT_ID }}" >> .env
           echo "VITE_MICROSOFT_TENANT_ID=${{ secrets.VITE_MICROSOFT_TENANT_ID }}" >> .env
           echo "AZURE_REDIRECT_URI=${{ secrets.AZURE_REDIRECT_URI }}" >> .env
-     
-      # STEP 3 — Upload SOURCE CODE to server
-      
-      
-      # The server will run npm install + npm run build.
-      
-      # Uploaded source is stored temporarily at: ~/sdesk_frontend_src_tmp/
-      
-      # Later on, SSH script replaces the project directory, then performs a fresh build.
-     
-      - name: 📤 Upload source code to server
+
+      # STEP 4 — Upload new build to temporary location on server
+      - name: Upload Build to Server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 3251
-          source: "./"
-          target: "/home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_src_tmp/"
+          source: "dist/*,.env"
+          target: "/home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_bluegreen_tmp/"
           overwrite: true
 
-      
-      # STEP 4 — SSH: Clone repo only one and then check the existing code, pull latest changes
-      # Replace the source code with the uploaded version, then build on server.
-
-      - name: 🔄 Build & Deploy on Server
+      # STEP 5 — Perform Blue/Green deployment via SSH
+      - name: Execute Blue-Green Deployment
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -78,76 +54,59 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 3251
           script: |
-            FRONTEND_PATH="/var/www/sdesk_new/frontend_sDesk_phase_2"
-            TMP_SRC="/home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_src_tmp"
+            BASE_DIR="/var/www/sdesk_new"
+            ACTIVE_LINK="$BASE_DIR/frontend_sDesk_phase_2"
+            BLUE_DIR="$BASE_DIR/frontend_blue"
+            GREEN_DIR="$BASE_DIR/frontend_green"
+            TMP_SRC="/home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_bluegreen_tmp"
 
-            # STEP 4.1 — Clone repo if not exists, else pull latest changes
-            echo "Checking if the frontend project directory exists..."
-            
+            echo "Detecting current active environment..."
 
-            if [ ! -d "$FRONTEND_PATH" ]; then
-              echo "Project directory NOT found. Creating & cloning..."
-              sudo mkdir -p $FRONTEND_PATH
-              sudo git clone https://github.com/SLT-SDesk/frontend_sDesk_phase_2 $FRONTEND_PATH
+            if [ -L "$ACTIVE_LINK" ]; then
+              CURRENT_TARGET=$(readlink -f $ACTIVE_LINK)
             else
-              echo "Project directory exists — pulling latest Git updates..."
-              cd $FRONTEND_PATH
-              git config --global --add safe.directory $FRONTEND_PATH
-              sudo git pull || true
+              CURRENT_TARGET="$BLUE_DIR"
             fi
-            
-            
-            
-            # STEP 4.2 — Replace source code with uploaded version, install dependencies, build
 
-            echo "--------------------------------------------------"
-            echo "Fixing permissions for BUILD (give to gayal)..."
-            echo "--------------------------------------------------"
-            sudo chown -R $USER:$USER /var/www/sdesk_new
+            if [ "$CURRENT_TARGET" = "$BLUE_DIR" ]; then
+              NEW_TARGET="$GREEN_DIR"
+              OLD_TARGET="$BLUE_DIR"
+            else
+              NEW_TARGET="$BLUE_DIR"
+              OLD_TARGET="$GREEN_DIR"
+            fi
 
+            echo "Current active: $CURRENT_TARGET"
+            echo "Deploying new version to: $NEW_TARGET"
 
-            # STEP 4.3 — Replace source code with uploaded version
-            echo "--------------------------------------------------"
-            echo "Replacing server-side source code with uploaded version..."
-            echo "--------------------------------------------------"
-            rm -rf $FRONTEND_PATH/*
-            cp -r $TMP_SRC/* $FRONTEND_PATH/
+            sudo rm -rf $NEW_TARGET
+            sudo mkdir -p $NEW_TARGET
 
-            # STEP 4.4 — Copy .env file into project
-            echo "--------------------------------------------------"
-            echo "Copying .env file into project..."
-            echo "--------------------------------------------------"
-            cp $TMP_SRC/.env $FRONTEND_PATH/.env
+            sudo cp -r $TMP_SRC/* $NEW_TARGET/
 
-            # STEP 4.5 — Install dependencies & build
-            echo "--------------------------------------------------"
-            echo "Installing npm dependencies..."
-            echo "--------------------------------------------------"
-            cd $FRONTEND_PATH
-            npm install
+            echo "Setting permissions..."
+            sudo chown -R nginx:nginx $NEW_TARGET
 
-            # STEP 4.6 — Build the project
-            echo "--------------------------------------------------"
-            echo "Building frontend (Vite) on server..."
-            echo "--------------------------------------------------"
-            npm run build
+            echo "Performing atomic switch..."
+            sudo ln -sfn $NEW_TARGET $ACTIVE_LINK
 
-
-            # STEP 4.7 — Move built files to NGINX directory
-            echo "--------------------------------------------------"
-            echo "Fixing permissions for NGINX (give to nginx)..."
-            echo "--------------------------------------------------"
-            sudo chown -R nginx:nginx /var/www/sdesk_new
-
-
-            # STEP 4.8 — Copy built files to NGINX directory
-            echo "--------------------------------------------------"
             echo "Restarting Nginx..."
-            echo "--------------------------------------------------"
             sudo systemctl restart nginx
 
+            echo "Verifying deployment..."
 
-            # Final Step — Deployment completed message
-            echo "--------------------------------------------------"
-            echo "Frontend Deployment Completed Successfully! 🎉"
-            echo "--------------------------------------------------"
+            if systemctl is-active --quiet nginx; then
+              echo "Deployment successful."
+              echo "Cleaning old environment..."
+              sudo rm -rf $OLD_TARGET
+            else
+              echo "Deployment failed. Rolling back..."
+
+              sudo ln -sfn $OLD_TARGET $ACTIVE_LINK
+              sudo systemctl restart nginx
+
+              echo "Rollback completed."
+              exit 1
+            fi
+
+            echo "Blue-Green Deployment Completed Successfully"
