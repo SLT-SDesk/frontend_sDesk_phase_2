@@ -66,7 +66,12 @@ jobs:
           echo "VITE_SOCKET_URL=${{ secrets.VITE_SOCKET_URL }}" >> .env
           echo "VITE_MICROSOFT_CLIENT_ID=${{ secrets.VITE_MICROSOFT_CLIENT_ID }}" >> .env
           echo "VITE_MICROSOFT_TENANT_ID=${{ secrets.VITE_MICROSOFT_TENANT_ID }}" >> .env
+          echo "VITE_AZURE_CLIENT_SECRET=${{ secrets.VITE_AZURE_CLIENT_SECRET }}" >> .env
           echo "AZURE_REDIRECT_URI=${{ secrets.AZURE_REDIRECT_URI }}" >> .env
+
+      - name: Show Generated Env
+        run: cat .env
+
 
       - name: Build Frontend
         run: npm run build
