@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { createCategoryRequest, fetchMainCategoriesRequest, fetchSubCategoriesRequest, fetchSubCategoriesByMainCategoryIdRequest, createCategoryItemRequest, updateCategoryItemRequest } from '../../redux/categories/categorySlice';
+import { createCategoryRequest, fetchMainCategoriesRequest, fetchSubCategoriesRequest, fetchSubCategoriesByMainCategoryIdRequest, createCategoryItemRequest, updateCategoryItemRequest,updateSubCategoryRequest
+ } from '../../redux/categories/categorySlice';
 import './AdminAddCategory.css';
 
 const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = null }) => {
@@ -150,6 +151,38 @@ const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = nu
                 setTimeout(() => setIsSubmitting(false), 1000);
                 return;
             }
+            // ✅ Edit Sub Category
+        if (categoryType === 'sub' && editCategory?.id) {
+           if (!formData.parent) {
+              setErrors({ parent: 'Parent Category is required' });
+              setIsSubmitting(false);
+             return;
+         }
+
+          if (!formData.name || formData.name.trim() === '') {
+            setErrors({ name: 'Name is required' });
+            setIsSubmitting(false);
+           return;
+        }
+
+         const payload = {
+         id: editCategory.id,
+         name: formData.name.trim(),
+         mainCategoryId: formData.parent,
+        };
+
+        dispatch(updateSubCategoryRequest(payload));
+
+        setLocalSuccess('Sub category updated successfully!✅');
+        setTimeout(() => {
+        setLocalSuccess('');
+        onClose();
+      }, 1000);
+
+       setTimeout(() => setIsSubmitting(false), 1000);
+       return;
+      }
+
             // Optionally handle other types if needed
         }
         if (Object.keys(newErrors).length > 0) {
