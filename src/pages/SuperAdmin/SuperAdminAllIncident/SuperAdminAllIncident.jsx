@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TechnicianInsident from "../../Technician/TechnicianIncident/TechnicianInsident";
-import { FaHistory, FaSearch, FaRegClock } from "react-icons/fa";
+import { FaHistory, FaSearch,FaRegClock } from "react-icons/fa";
 import { TiExportOutline } from "react-icons/ti";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAdminTeamDataRequest } from "../../../redux/incident/incidentSlice";
@@ -42,9 +42,6 @@ const SuperAdminAllIncident = () => {
   } = useSelector((state) => state.incident);
   const { user } = useSelector((state) => state.auth);
 
-  console.log("Raw Incidents from Redux:", incidents);
-
-
   useEffect(() => {
     dispatch(fetchAdminTeamDataRequest());
   }, [dispatch, user]);
@@ -65,9 +62,7 @@ const SuperAdminAllIncident = () => {
       })) || [];
 
     const found = transformedCategories.find(
-      (cat) =>
-        cat.grandchild_category_number === categoryItemCode ||
-        cat.grandchild_category_name === categoryItemCode
+      (cat) => cat.grandchild_category_number === categoryItemCode
     );
     if (found) return found.parent_category_name;
 
@@ -127,15 +122,7 @@ const SuperAdminAllIncident = () => {
     );
     const matchesStatus = statusFilter ? item.status === statusFilter : true;
     const matchesCategory = categoryFilter
-      ? (() => {
-        const match = item.mainCategory?.toLowerCase()?.trim() === categoryFilter?.toLowerCase()?.trim();
-        console.log(`Checking incident ${item.refNo}:`, {
-          itemMainCategory: item.mainCategory,
-          filter: categoryFilter,
-          match
-        });
-        return match;
-      })()
+      ? item.mainCategory === categoryFilter
       : true;
 
     return matchesSearch && matchesStatus && matchesCategory;
@@ -211,7 +198,7 @@ const SuperAdminAllIncident = () => {
       item.mainCategory,
       item.location,
       item.status,
-      item.priority,
+      item.priority, 
     ]);
 
     const finalData = [...headerInfo, ...tableHeaders, ...tableRows];
@@ -274,7 +261,6 @@ const SuperAdminAllIncident = () => {
         <td>{getUserName(row.assignedTo)}</td>
         <td>{getUserName(row.affectedUser)}</td>
         <td>{row.category}</td>
-        <td>{row.mainCategory}</td>
         <td>{row.location}</td>
         <td className="team-status-text">{row.status}</td>
         <td>
@@ -462,7 +448,6 @@ const SuperAdminAllIncident = () => {
                 <th>Assigned To</th>
                 <th>Affected User</th>
                 <th>Category</th>
-                <th>Main Category</th>
                 <th>Location</th>
                 <th>Status</th>
                 <th>Actions</th>
