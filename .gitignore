@@ -1,95 +1,32 @@
-# Logs
-logs
+# Node.js
+node_modules/
+dist/
+build/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+.npm
+.eslintcache
 
-# Dependencies
-node_modules
-
-# Build outputs
-dist
-dist-ssr
-*.local
-build
-out
-
-# Environment files
+# Environment
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-.env.*.local
-.env.example
 
-# Cache directories
-.cache
-.parcel-cache
-.next
-.nuxt
-.vuepress/dist
-.serverless
-.turbo
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage
-*.lcov
-.nyc_output
-
-# ESLint cache
-.eslintcache
-
-# TypeScript cache
-*.tsbuildinfo
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Yarn
-.yarn-integrity
-.yarn/cache
-.yarn/unplugged
-.yarn/build-state.yml
-.yarn/install-state.gz
-.pnp.*
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# OS
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-*~
-
-# OS generated files
 Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
 
-# Vercel
-.vercel
-
-# Temporary folders
+# Project specific
 tmp/
 temp/
-
-# Storybook build outputs
-storybook-static
+coverage/

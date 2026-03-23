@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { createCategoryRequest, fetchMainCategoriesRequest, fetchSubCategoriesRequest, fetchSubCategoriesByMainCategoryIdRequest, createCategoryItemRequest, updateCategoryItemRequest } from '../../redux/categories/categorySlice';
+import { createCategoryRequest, fetchMainCategoriesRequest, fetchSubCategoriesRequest, fetchSubCategoriesByMainCategoryIdRequest, createCategoryItemRequest, updateCategoryItemRequest, updateSubCategoryRequest } from '../../redux/categories/categorySlice';
 import './AdminAddCategory.css';
 
 const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = null }) => {
@@ -18,10 +18,10 @@ const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = nu
     const [formData, setFormData] = useState(
         isEdit && editCategory
             ? {
-                  name: editCategory.name || '',
-                  parent: editCategory.parent || '',
-                  sub: editCategory.sub || '',
-              }
+                name: editCategory.name || '',
+                parent: editCategory.parent || '',
+                sub: editCategory.sub || '',
+            }
             : { name: '', parent: '', sub: '' }
     );
     const [errors, setErrors] = useState({});
@@ -143,6 +143,29 @@ const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = nu
                 };
                 dispatch(updateCategoryItemRequest(payload));
                 setLocalSuccess('Category item updated successfully!✅');
+                setTimeout(() => {
+                    setLocalSuccess('');
+                    onClose();
+                }, 1000);
+                setTimeout(() => setIsSubmitting(false), 1000);
+                return;
+            }
+            if (categoryType === 'sub' && editCategory?.id) {
+                if (!formData.name || !formData.parent) {
+                    setErrors({
+                        name: !formData.name ? 'Name is required' : undefined,
+                        parent: !formData.parent ? 'Parent Category is required' : undefined,
+                    });
+                    setIsSubmitting(false);
+                    return;
+                }
+                const payload = {
+                    id: editCategory.id,
+                    name: formData.name.trim(),
+                    mainCategoryId: formData.parent,
+                };
+                dispatch(updateSubCategoryRequest(payload));
+                setLocalSuccess('Sub-category updated successfully!✅');
                 setTimeout(() => {
                     setLocalSuccess('');
                     onClose();
@@ -378,15 +401,15 @@ const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = nu
                             </>
                         )}
                         <div className="AdminAddCategory-content1-formContainer-form-submit">
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 disabled={isSubmitting}
                                 aria-describedby="submit-button-help"
                             >
                                 {isEdit ? '💾 Save Changes' : '➕ Add Category'}
                             </button>
-                            <button 
-                                type="button" 
+                            <button
+                                type="button"
                                 onClick={onClose}
                                 aria-label="Cancel and close form"
                             >

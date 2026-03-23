@@ -22,6 +22,10 @@ interface CategoryState extends MainCategoryState {
   createCategoryItemLoading: boolean;
   createCategoryItemError: string | null;
   createCategoryItemSuccess: boolean;
+  deleteSubCategoryLoading: boolean;
+  deleteSubCategoryError: string | null;
+  updateSubCategoryLoading: boolean;
+  updateSubCategoryError: string | null;
 }
 
 const initialState: CategoryState = {
@@ -43,6 +47,10 @@ const initialState: CategoryState = {
   createCategoryItemLoading: false,
   createCategoryItemError: null,
   createCategoryItemSuccess: false,
+  deleteSubCategoryLoading: false,
+  deleteSubCategoryError: null,
+  updateSubCategoryLoading: false,
+  updateSubCategoryError: null,
 };
 
 const categorySlice = createSlice({
@@ -219,6 +227,41 @@ const categorySlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+
+    // Delete sub-category
+    deleteSubCategoryRequest(state, _action: PayloadAction<string>) {
+      state.deleteSubCategoryLoading = true;
+      state.deleteSubCategoryError = null;
+    },
+    deleteSubCategorySuccess(state, action: PayloadAction<string>) {
+      state.deleteSubCategoryLoading = false;
+      state.subCategories = state.subCategories.filter(
+        (sub) => sub.id !== action.payload
+      );
+    },
+    deleteSubCategoryFailure(state, action: PayloadAction<string>) {
+      state.deleteSubCategoryLoading = false;
+      state.deleteSubCategoryError = action.payload;
+    },
+
+    // Update sub-category
+    updateSubCategoryRequest(
+      state,
+      _action: PayloadAction<{ id: string; name: string; mainCategoryId: string }>
+    ) {
+      state.updateSubCategoryLoading = true;
+      state.updateSubCategoryError = null;
+    },
+    updateSubCategorySuccess(state, action: PayloadAction<SubCategory>) {
+      state.updateSubCategoryLoading = false;
+      state.subCategories = state.subCategories.map((sub) =>
+        sub.id === action.payload.id ? { ...sub, ...action.payload } : sub
+      );
+    },
+    updateSubCategoryFailure(state, action: PayloadAction<string>) {
+      state.updateSubCategoryLoading = false;
+      state.updateSubCategoryError = action.payload;
+    },
   },
 });
 
@@ -253,6 +296,12 @@ export const {
   updateCategoryItemRequest,
   updateCategoryItemSuccess,
   updateCategoryItemFailure,
+  deleteSubCategoryRequest,
+  deleteSubCategorySuccess,
+  deleteSubCategoryFailure,
+  updateSubCategoryRequest,
+  updateSubCategorySuccess,
+  updateSubCategoryFailure,
 } = categorySlice.actions;
 
 export default categorySlice.reducer;

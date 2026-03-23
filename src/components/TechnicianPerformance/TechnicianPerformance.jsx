@@ -117,7 +117,7 @@ const TechnicianPerformance = ({ dateRange, onRowClick }) => {
 
   return (
     <Container>
-      <Title>Technician Performance</Title>
+      <Title>Technical Officer Performance</Title>
 
       <h6 style={{ fontWeight: "bold", marginBottom: "10px" }}>
         Individual Metric and Individual Statistics
@@ -131,7 +131,7 @@ const TechnicianPerformance = ({ dateRange, onRowClick }) => {
           textAlign: "right",
         }}
       >
-        {filteredTechnicians.length} technicians
+        {filteredTechnicians.length} Technical Officers
 
       </div>
 
@@ -256,7 +256,7 @@ const TechnicianPerformance = ({ dateRange, onRowClick }) => {
             {filteredTechnicians.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={3} align="center" sx={{ padding: 3 }}>
-                  No technicians found.
+                  No Technical Officers found.
                 </TableCell>
               </TableRow>
             ) : (

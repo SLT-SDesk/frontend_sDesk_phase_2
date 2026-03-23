@@ -10,7 +10,9 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchCategoryItemsRequest,
   deleteCategoryItemRequest,
+  deleteSubCategoryRequest,
   fetchMainCategoriesRequest,
+  fetchSubCategoriesRequest,
 } from "../../../redux/categories/categorySlice";
 import * as XLSX from "xlsx";
 
@@ -20,12 +22,14 @@ const AdminCategory = () => {
   const [editCategory, setEditCategory] = useState(null);
   const [deleteConfirmPopup, setDeleteConfirmPopup] = useState(false);
   const [deleteTargetID, setDeleteTargetID] = useState(null);
+  const [deleteTargetType, setDeleteTargetType] = useState(null); // 'item' or 'sub'
   const [searchQuery, setSearchQuery] = useState("");
   const [selectShowOption, setSelectShowOption] = useState("All");
   const [successMessage, setSuccessMessage] = useState("");
 
   const dispatch = useDispatch();
   const categoryItems = useSelector((state) => state.categories.categoryItems);
+  const subCategories = useSelector((state) => state.categories.subCategories);
   const mainCategories = useSelector(
     (state) => state.categories.mainCategories
   );
@@ -33,55 +37,102 @@ const AdminCategory = () => {
   React.useEffect(() => {
     dispatch(fetchCategoryItemsRequest());
     dispatch(fetchMainCategoriesRequest());
+    dispatch(fetchSubCategoriesRequest());
   }, [dispatch]);
 
-  // Transform categoryItems for table display
-  const categories = categoryItems.map((item) => ({
+  // Transform categoryItems (grandchild) for table display
+  const categoryItemRows = categoryItems.map((item) => ({
     catID: item.category_code,
     categoryName: item.name,
     subCategoryName: item.subCategory?.name || "",
     parentCategoryName: item.subCategory?.mainCategory?.name || "",
+    rowType: "item",
   }));
+
+  // Build a set of sub-category IDs that already have at least one category item
+  const subCatIdsWithItems = new Set(
+    categoryItems.map((item) => item.subCategory?.id).filter(Boolean)
+  );
+
+  // Only show a standalone sub-category row when it has NO items yet
+  // (once items exist, the sub-category is already visible in those item rows)
+  const subCategoryRows = subCategories
+    .filter((sub) => !subCatIdsWithItems.has(sub.id))
+    .map((sub) => ({
+      catID: sub.category_code,
+      categoryName: "",
+      subCategoryName: sub.name,
+      parentCategoryName: sub.mainCategory?.name || "",
+      rowType: "sub",
+    }));
+
+  // Merge: orphan sub-category rows first, then category item rows
+  const categories = [...subCategoryRows, ...categoryItemRows];
 
   // Get unique parent category names for dropdown (from mainCategories)
   const parentCategoryOptions = Array.from(
     new Set(mainCategories.map((cat) => cat.name).filter(Boolean))
   );
 
-  const handleEdit = (catID) => {
-    // Only allow editing for grandchild/category-item
-    const item = categoryItems.find((item) => item.category_code === catID);
-    if (item) {
-      setEditCategory({
-        id: item.id,
-        name: item.name,
-        parent: item.subCategory?.mainCategory?.id || "",
-        sub: item.subCategory?.id || "",
-        type: "grandchild",
-      });
-      setIsEditCategoryOpen(true);
+  const handleEdit = (catID, rowType) => {
+    if (rowType === 'item') {
+      const item = categoryItems.find((item) => item.category_code === catID);
+      if (item) {
+        setEditCategory({
+          id: item.id,
+          name: item.name,
+          parent: item.subCategory?.mainCategory?.id || "",
+          sub: item.subCategory?.id || "",
+          type: "grandchild",
+        });
+        setIsEditCategoryOpen(true);
+      }
+    } else if (rowType === 'sub') {
+      const sub = subCategories.find((s) => s.category_code === catID);
+      if (sub) {
+        setEditCategory({
+          id: sub.id,
+          name: sub.name,
+          parent: sub.mainCategory?.id || "",
+          sub: "",
+          type: "sub",
+        });
+        setIsEditCategoryOpen(true);
+      }
     }
   };
 
-  const handleDelete = (catID) => {
+  const handleDelete = (catID, rowType) => {
     setDeleteTargetID(catID);
+    setDeleteTargetType(rowType);
     setDeleteConfirmPopup(true);
   };
 
   const confirmDelete = () => {
     if (deleteTargetID) {
-      // Find the item by catID to get its DB id
-      const item = categoryItems.find(
-        (item) => item.category_code === deleteTargetID
-      );
-      if (item && item.id) {
-        dispatch(deleteCategoryItemRequest(item.id));
-        setSuccessMessage("Category item deleted successfully!");
-        setTimeout(() => setSuccessMessage(""), 3000);
+      if (deleteTargetType === 'item') {
+        const item = categoryItems.find(
+          (item) => item.category_code === deleteTargetID
+        );
+        if (item && item.id) {
+          dispatch(deleteCategoryItemRequest(item.id));
+          setSuccessMessage("Category item deleted successfully!");
+          setTimeout(() => setSuccessMessage(""), 3000);
+        }
+      } else if (deleteTargetType === 'sub') {
+        const sub = subCategories.find(
+          (s) => s.category_code === deleteTargetID
+        );
+        if (sub && sub.id) {
+          dispatch(deleteSubCategoryRequest(sub.id));
+          setSuccessMessage("Sub-category deleted successfully!");
+          setTimeout(() => setSuccessMessage(""), 3000);
+        }
       }
     }
     setDeleteConfirmPopup(false);
     setDeleteTargetID(null);
+    setDeleteTargetType(null);
   };
 
   const handleChange = (e) => {
@@ -107,8 +158,9 @@ const AdminCategory = () => {
   };
 
   const filteredCategories = categories.filter((category) => {
+    const catID = (category.catID || "").toLowerCase();
     const matchesSearch =
-      category.catID.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      catID.includes(searchQuery.toLowerCase()) ||
       category.categoryName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       category.subCategoryName
         .toLowerCase()
@@ -188,8 +240,8 @@ const AdminCategory = () => {
             </thead>
             <tbody>
               {filteredCategories.length > 0 ? (
-                filteredCategories.map((category) => (
-                  <tr key={category.catID}>
+                filteredCategories.map((category, idx) => (
+                  <tr key={`${category.rowType}-${category.catID || idx}`}>
                     <td>{category.catID}</td>
                     <td>{category.categoryName}</td>
                     <td>{category.subCategoryName}</td>
@@ -197,13 +249,15 @@ const AdminCategory = () => {
                     <td>
                       <button
                         className="AdminCategory-table-edit-btn"
-                        onClick={() => handleEdit(category.catID)}
+                        onClick={() => handleEdit(category.catID, category.rowType)}
+                        title="Edit"
                       >
                         <FaEdit />
                       </button>
                       <button
                         className="AdminCategory-table-delete-btn"
-                        onClick={() => handleDelete(category.catID)}
+                        onClick={() => handleDelete(category.catID, category.rowType)}
+                        title="Delete"
                       >
                         <FaTrash />
                       </button>
@@ -223,10 +277,15 @@ const AdminCategory = () => {
       </div>
       {isAddCategoryOpen && (
         <AdminAddCategory
-          onClose={() => setIsAddCategoryOpen(false)}
+          onClose={() => {
+            setIsAddCategoryOpen(false);
+            // Refresh all category data so the table updates
+            dispatch(fetchCategoryItemsRequest());
+            dispatch(fetchSubCategoriesRequest());
+            dispatch(fetchMainCategoriesRequest());
+          }}
           onSubmit={() => {
-            // TODO: handle new category with real data
-            setSuccessMessage("Parent category added successfully!");
+            setSuccessMessage("Category added successfully!");
             setTimeout(() => setSuccessMessage(""), 3000);
           }}
         />
@@ -235,7 +294,12 @@ const AdminCategory = () => {
         <AdminAddCategory
           isEdit
           editCategory={editCategory}
-          onClose={() => setIsEditCategoryOpen(false)}
+          onClose={() => {
+            setIsEditCategoryOpen(false);
+            dispatch(fetchCategoryItemsRequest());
+            dispatch(fetchSubCategoriesRequest());
+            dispatch(fetchMainCategoriesRequest());
+          }}
           onSubmit={() => {
             setIsEditCategoryOpen(false);
           }}
