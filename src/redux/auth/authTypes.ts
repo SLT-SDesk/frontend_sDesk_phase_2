@@ -8,5 +8,7 @@ export interface User {
 
   name?: string;
   contactNumber?: string;
+  designation?: string;
+  gradeName?: string;
 }
 

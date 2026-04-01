@@ -298,7 +298,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
         {/* Header */}
         <div className="flex items-start justify-between p-6 border-b">
           <div>
-            <h2 className="mb-1 text-lg font-bold text-gray-900">Technician Details</h2>
+            <h2 className="mb-1 text-lg font-bold text-gray-900">Technical Officer Details</h2>
             <button
               onClick={(e) => {
                 e.stopPropagation();
