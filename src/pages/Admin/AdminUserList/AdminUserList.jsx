@@ -73,7 +73,7 @@ function AdminUserList() {
   }, [dispatch, selectShowOption]);
 
   const updateUserRole = async (serviceNumber, role) => {
-    const res = await fetch("http://localhost:3001/user-role/assign", {
+    const res = await fetch("http://localhost:8000/user-role/assign", {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -200,14 +200,14 @@ function AdminUserList() {
       <div className="AdminUserList-content2">
         <div className="AdminUserList-TitleBar">
           <div className="AdminUserList-TitleBar-NameAndIcon">
-            <FaHouseUser /> Technicians List
+            <FaHouseUser /> Technical Officers List
           </div>
           <div className="AdminUserList-TitleBar-buttons">
             <button
               onClick={handleAddUser}
               className="AdminUserList-TitleBar-buttons-AddUser"
             >
-              <IoIosAddCircleOutline /> Add Technician
+              <IoIosAddCircleOutline /> Add Technical Officer
             </button>
             <button className="AdminUserList-TitleBar-buttons-ExportData">
               <TiExportOutline /> Export Data

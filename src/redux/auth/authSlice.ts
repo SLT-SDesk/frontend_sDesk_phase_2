@@ -35,6 +35,8 @@ const authSlice = createSlice({
         teamId: action.payload.teamId ?? null,
         teamName: action.payload.teamName ?? null,
         contactNumber: action.payload.contactNumber ?? null,
+        designation: action.payload.designation ?? null,
+        gradeName: action.payload.gradeName ?? null,
       };
       state.isLoggedIn = true;
       state.authInitialized = true;

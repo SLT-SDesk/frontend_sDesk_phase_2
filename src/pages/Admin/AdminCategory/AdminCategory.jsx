@@ -10,10 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchCategoryItemsRequest,
   deleteCategoryItemRequest,
-  deleteSubCategoryRequest,
   fetchMainCategoriesRequest,
-  fetchSubCategoriesRequest,
-
 } from "../../../redux/categories/categorySlice";
 import * as XLSX from "xlsx";
 
@@ -22,71 +19,39 @@ const AdminCategory = () => {
   const [isEditCategoryOpen, setIsEditCategoryOpen] = useState(false);
   const [editCategory, setEditCategory] = useState(null);
   const [deleteConfirmPopup, setDeleteConfirmPopup] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteTargetID, setDeleteTargetID] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectShowOption, setSelectShowOption] = useState("All");
   const [successMessage, setSuccessMessage] = useState("");
 
   const dispatch = useDispatch();
   const categoryItems = useSelector((state) => state.categories.categoryItems);
-  const mainCategories = useSelector((state) => state.categories.mainCategories);
-  const subCategories = useSelector((state) => state.categories.subCategories);
-
+  const mainCategories = useSelector(
+    (state) => state.categories.mainCategories
+  );
 
   React.useEffect(() => {
     dispatch(fetchCategoryItemsRequest());
     dispatch(fetchMainCategoriesRequest());
-    dispatch(fetchSubCategoriesRequest());
   }, [dispatch]);
 
-  /// Build a set of subCategoryIds that already have items  
-  const subIdsWithItems = new Set(
-    categoryItems
-      .map((item) => item.subCategory?.id)
-      .filter(Boolean)
-  );
-
-  // Items rows (always show)
-  const itemRows = categoryItems.map((item) => ({
-    rowType: "item",
-    id: item.id,
-    key: `item-${item.id}`,
+  // Transform categoryItems for table display
+  const categories = categoryItems.map((item) => ({
     catID: item.category_code,
     categoryName: item.name,
     subCategoryName: item.subCategory?.name || "",
     parentCategoryName: item.subCategory?.mainCategory?.name || "",
   }));
 
-  // Subcategory rows (ONLY show if it has NO items)
-  const subRows = subCategories
-    .filter((sub) => !subIdsWithItems.has(sub.id))
-    .map((sub) => ({
-      rowType: "sub",
-      id: sub.id,
-      key: `sub-${sub.id}`,
-      catID: sub.category_code || "",
-      categoryName: "",
-      subCategoryName: sub.name || "",
-      parentCategoryName: sub.mainCategory?.name || "",
-    }));
-
-  // Final table rows
-  const categories = [...itemRows, ...subRows];
-
-
-
   // Get unique parent category names for dropdown (from mainCategories)
   const parentCategoryOptions = Array.from(
     new Set(mainCategories.map((cat) => cat.name).filter(Boolean))
   );
 
-  const handleEdit = (row) => {
-    console.log("EDIT CLICKED:", row);
-    if (row.rowType === "item") {
-      const item = categoryItems.find((x) => x.id === row.id);
-
-      if (!item) return;
-
+  const handleEdit = (catID) => {
+    // Only allow editing for grandchild/category-item
+    const item = categoryItems.find((item) => item.category_code === catID);
+    if (item) {
       setEditCategory({
         id: item.id,
         name: item.name,
@@ -95,44 +60,28 @@ const AdminCategory = () => {
         type: "grandchild",
       });
       setIsEditCategoryOpen(true);
-    } else {
-      // sub category edit
-      const sub = subCategories.find((x) => x.id === row.id);
-
-      if (!sub) return;
-
-      setEditCategory({
-        id: sub.id,
-        name: sub.name,
-        parent: sub.mainCategory?.id || "",
-        sub: "",
-        type: "sub",
-      });
-      setIsEditCategoryOpen(true);
     }
   };
 
-
-  const handleDelete = (row) => {
-    console.log("DELETE CLICKED:", row);
-    setDeleteTarget(row);
+  const handleDelete = (catID) => {
+    setDeleteTargetID(catID);
     setDeleteConfirmPopup(true);
   };
 
   const confirmDelete = () => {
-    if (!deleteTarget) return;
-
-    if (deleteTarget.rowType === "item") {
-      dispatch(deleteCategoryItemRequest(deleteTarget.id));
-      setSuccessMessage("Category item deleted successfully!");
-    } else if (deleteTarget.rowType === "sub") {
-      dispatch(deleteSubCategoryRequest(deleteTarget.id));
-      setSuccessMessage("Sub category deleted successfully!");
+    if (deleteTargetID) {
+      // Find the item by catID to get its DB id
+      const item = categoryItems.find(
+        (item) => item.category_code === deleteTargetID
+      );
+      if (item && item.id) {
+        dispatch(deleteCategoryItemRequest(item.id));
+        setSuccessMessage("Category item deleted successfully!");
+        setTimeout(() => setSuccessMessage(""), 3000);
+      }
     }
-
     setDeleteConfirmPopup(false);
-    setDeleteTarget(null);
-    setTimeout(() => setSuccessMessage(""), 3000);
+    setDeleteTargetID(null);
   };
 
   const handleChange = (e) => {
@@ -231,7 +180,7 @@ const AdminCategory = () => {
             <thead>
               <tr>
                 <th>CAT ID</th>
-                <th>Category Item Name</th>
+                <th>Category Name</th>
                 <th>Sub Category Name</th>
                 <th>Parent Category Name</th>
                 <th>Options</th>
@@ -240,7 +189,7 @@ const AdminCategory = () => {
             <tbody>
               {filteredCategories.length > 0 ? (
                 filteredCategories.map((category) => (
-                  <tr key={category.key || category.catID}>
+                  <tr key={category.catID}>
                     <td>{category.catID}</td>
                     <td>{category.categoryName}</td>
                     <td>{category.subCategoryName}</td>
@@ -248,13 +197,13 @@ const AdminCategory = () => {
                     <td>
                       <button
                         className="AdminCategory-table-edit-btn"
-                        onClick={() => handleEdit(category)}
+                        onClick={() => handleEdit(category.catID)}
                       >
                         <FaEdit />
                       </button>
                       <button
                         className="AdminCategory-table-delete-btn"
-                        onClick={() => handleDelete(category)}
+                        onClick={() => handleDelete(category.catID)}
                       >
                         <FaTrash />
                       </button>
@@ -298,7 +247,7 @@ const AdminCategory = () => {
           onConfirm={confirmDelete}
           onCancel={() => {
             setDeleteConfirmPopup(false);
-            setDeleteTarget(null);
+            setDeleteTargetID(null);
           }}
         />
       )}

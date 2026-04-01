@@ -6,6 +6,9 @@ import { IoMdAdd, IoMdRemove } from "react-icons/io";
 import "./IncidentDetails.css";
 import { fetchCategoriesRequest } from "../../redux/categories/categorySlice";
 import { uploadAttachmentRequest } from "../../redux/incident/incidentSlice";
+import useChatbot from "../../hooks/useChatbot";
+import ChatbotModal from "../Chatbot/ChatbotModal";
+import { getPriorityFromDesignation } from "../../utils/priorityMapper";
 
 const IncidentDetails = ({
   userData,
@@ -29,6 +32,21 @@ const IncidentDetails = ({
   const [localIsCategoryPopupOpen, setLocalIsCategoryPopupOpen] =
     useState(false);
 
+  // Chatbot Hook
+  const {
+    loading: chatbotLoading,
+    error: chatbotError,
+    clarification,
+    analysisResult,
+    analyzeDescription,
+    respondToClarification,
+    resetChatbot
+  } = useChatbot();
+
+  // Get logged-in user and lookup user from Redux
+  const loginUser = useSelector((state) => state.auth.user);
+  const lookupUser = useSelector((state) => state.userLookup.user);
+
   // Fetch categories from backend using redux
   const dispatch = useDispatch();
   const categoryDataset = useSelector((state) => state.categories.list);
@@ -38,6 +56,116 @@ const IncidentDetails = ({
   useEffect(() => {
     dispatch(fetchCategoriesRequest());
   }, [dispatch]);
+
+  // Effect to handle Chatbot Analysis Result
+  useEffect(() => {
+    if (analysisResult) {
+      console.log("Chatbot Analysis Result:", analysisResult);
+      console.log("Available Categories (Redux):", categoryDataset);
+
+      // 1. Auto-select Category
+      if (analysisResult.category && categoryDataset && categoryDataset.length > 0) {
+        const resultCat = analysisResult.category.trim().toLowerCase();
+
+        let foundItem = null;
+
+        // Recursive search or 3-level loop (Main -> Sub -> Item)
+        // Based on CategoryDropdown.jsx structure: Main -> subCategories -> categoryItems
+        for (const mainCat of categoryDataset) {
+          if (!mainCat.subCategories) continue;
+
+          for (const subCat of mainCat.subCategories) {
+            if (!subCat.categoryItems) continue;
+
+            for (const item of subCat.categoryItems) {
+              const itemName = item.name.trim().toLowerCase();
+              // Check for exact match or strong partial match
+              if (itemName === resultCat || itemName.includes(resultCat) || resultCat.includes(itemName)) {
+                foundItem = item;
+                break;
+              }
+            }
+            if (foundItem) break;
+          }
+          if (foundItem) break;
+        }
+
+        if (foundItem) {
+          console.log("Category Matched (Item):", foundItem);
+          // Auto-select the LEAF item
+          handleCategorySelect({
+            name: foundItem.name,
+            number: foundItem.category_code || foundItem.id // Prefer category_code if available
+          });
+        } else {
+          console.warn(`Category '${analysisResult.category}' not found in nested dataset.`);
+        }
+      }
+
+      // 2. Auto-select Priority
+      if (analysisResult.priority) {
+        // Map chatbot priority (lowercase) to frontend format (Title Case)
+        const priorityMap = {
+          'critical': 'Critical',
+          'high': 'High',
+          'medium': 'Medium',
+          'low': 'Medium' // Default low to medium if needed
+        };
+        const mappedPriority = priorityMap[analysisResult.priority.toLowerCase()] || 'Medium';
+
+        setSelectedPriority(mappedPriority);
+        setFormData((prev) => ({
+          ...prev,
+          priority: mappedPriority
+        }));
+      }
+
+      // 3. Update Description if modified (e.g. via troubleshooting)
+      if (analysisResult.description && analysisResult.description !== formData.description) {
+        setFormData((prev) => ({
+          ...prev,
+          description: analysisResult.description
+        }));
+      }
+    }
+  }, [analysisResult, categoryDataset]);
+
+  // Effect to handle Auto-Priority based on Business Rules (ERP Grade/Designation + Content)
+  useEffect(() => {
+    // Determine which user to use for priority (prefer affected/lookup user if available, else login user)
+    // ONLY use lookupUser if it actually has data (not null and has at least one identifying field)
+    const activeUser = (lookupUser && lookupUser.serviceNumber) ? { 
+      designation: lookupUser.designation, 
+      gradeName: lookupUser.gradeName 
+    } : loginUser;
+
+    console.log("[AUTO-PRIORITY] loginUser from Redux:", loginUser);
+
+    if (activeUser) {
+      const autoPriority = getPriorityFromDesignation(activeUser, formData);
+      
+      // DEBUG: Log the values to understand why it might be failing
+      console.log("[AUTO-PRIORITY DEBUG]", {
+        activeUser_designation: activeUser.designation,
+        activeUser_grade: activeUser.gradeName,
+        formData_category: formData.category?.name,
+        formData_description: formData.description,
+        calculatedPriority: autoPriority,
+        currentPriority: selectedPriority
+      });
+
+      // Update local state and parent form data if priority changed
+      if (autoPriority !== selectedPriority) {
+        setSelectedPriority(autoPriority);
+        setFormData((prev) => ({
+          ...prev,
+          priority: autoPriority
+        }));
+        console.log(`[AUTO-PRIORITY] Set to ${autoPriority} based on rules.`);
+      }
+    }
+  }, [loginUser, lookupUser, formData.category, formData.description]);
+
 
   const handleChange = (event) => {
     const newPriority = event.target.value;
@@ -55,6 +183,24 @@ const IncidentDetails = ({
       description,
     }));
   };
+
+  const handleDescriptionBlur = () => {
+    // Only trigger if description has enough content and we haven't already analyzed this exact text
+    // (For simplicity, just trigger on blur if length > 5)
+    if (formData.description && formData.description.length > 5) {
+      analyzeDescription(formData.description);
+    }
+  };
+
+  const handleChatbotSelection = (selection) => {
+    // Respond to chatbot clarification
+    respondToClarification(selection, formData.description);
+  };
+
+  const handleCloseChatbot = () => {
+    resetChatbot();
+  };
+
 
   return (
     <div className="AddInicident-content2-IncidentDetails">
@@ -119,8 +265,10 @@ const IncidentDetails = ({
             placeholder="Enter Description here..."
             value={formData.description}
             onChange={handleDescriptionChange}
+            onBlur={handleDescriptionBlur}
             required
           />
+          {chatbotLoading && <span className="chatbot-loading-text">Analyzing...</span>}
         </div>
         <div className="AddInicident-content2-IncidentDetails-Container3">
           <div className="AddInicident-content2-IncidentDetails-Container3-dropdown-container">
@@ -204,6 +352,15 @@ const IncidentDetails = ({
             setLocalIsLocationPopupOpen(false);
           }}
           onClose={() => setLocalIsLocationPopupOpen(false)}
+        />
+      )}
+      {/* Chatbot Modal */}
+      {clarification && (
+        <ChatbotModal
+          question={clarification.question}
+          options={clarification.options}
+          onSelect={handleChatbotSelection}
+          onClose={handleCloseChatbot}
         />
       )}
     </div>
