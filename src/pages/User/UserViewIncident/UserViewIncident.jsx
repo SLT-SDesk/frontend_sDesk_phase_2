@@ -117,7 +117,7 @@ const UserViewIncident = () => {
       ['Generated on: ' + new Date().toLocaleString()],
       ['Total Records: ' + filteredIncidents.length],
       [''],
-      ['Description: This report provides a detailed list of incidents viewed by the user, including incident details, reported user information, and assigned technician information.'],
+      ['Description: This report provides a detailed list of incidents viewed by the user, including incident details, reported user information, and assigned technical officer information.'],
       [''],
     ];
 

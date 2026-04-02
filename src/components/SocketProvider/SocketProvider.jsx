@@ -193,7 +193,7 @@ const SocketProvider = ({ children }) => {
       addAlert(
         {
           type: "technician_inactive",
-          title: "Technician Inactive",
+          title: "Technical Officer Inactive",
           message:
             data.message ||
             "You have been marked inactive by the admin.",
@@ -232,7 +232,7 @@ const SocketProvider = ({ children }) => {
         title: "Incident Closed!",
         message:
           data.message ||
-          `Your incident ${data.incident.incident_number} has been closed by the technician.`,
+          `Your incident ${data.incident.incident_number} has been closed by the technical officer.`,
         incidentNumber: data.incident.incident_number,
       });
 
@@ -260,10 +260,10 @@ const SocketProvider = ({ children }) => {
       if (user.role === "admin" || user.role === "superAdmin") {
         addAlert({
           type: "incident_closed_admin",
-          title: "Incident Closed by Technician",
+          title: "Incident Closed by Technical Officer",
           message:
             data.message ||
-            `Incident ${data.incident.incident_number} has been closed by technician ${data.incident.handler}.`,
+            `Incident ${data.incident.incident_number} has been closed by technical officer ${data.incident.handler}.`,
           incidentNumber: data.incident.incident_number,
         });
       }
