@@ -4,6 +4,8 @@ import {
   fetchCategoriesRequest,
   fetchCategoriesSuccess,
   fetchMainCategoriesRequest,
+  fetchMainCategoriesSuccess,
+  fetchMainCategoriesFailure,
   createCategoryRequest,
   createCategorySuccess,
   createCategoryFailure,
@@ -12,21 +14,17 @@ import {
   fetchSubCategoriesByMainCategoryIdFailure,
   createSubCategoryRequest,
   createCategoryItemRequest,
+  createCategoryItemSuccess,
+  createCategoryItemFailure,
   fetchCategoryItemsRequest,
   fetchCategoryItemsSuccess,
   fetchCategoryItemsFailure,
   deleteCategoryItemRequest,
   deleteCategoryItemSuccess,
   deleteCategoryItemFailure,
-  deleteSubCategoryRequest,
-  deleteSubCategorySuccess,
-  deleteSubCategoryFailure,
   updateCategoryItemRequest,
   updateCategoryItemSuccess,
   updateCategoryItemFailure,
-  updateSubCategoryRequest,
-  updateSubCategorySuccess,
-  updateSubCategoryFailure,
   fetchSubCategoriesRequest,
   fetchSubCategoriesSuccess,
   fetchSubCategoriesFailure,
@@ -40,9 +38,7 @@ import {
   createCategoryItem,
   fetchCategoryItems,
   deleteCategoryItem,
-  deleteSubCategory,
   updateCategoryItem,
-  updateSubCategory,
 } from "./categoryService";
 import { PayloadAction } from "@reduxjs/toolkit";
 import {
@@ -119,7 +115,43 @@ function* handleFetchSubCategoriesByMainCategoryId(
   }
 }
 
-
+function* handleCreateMainCategory(
+  action: PayloadAction<CreateMainCategoryPayload>
+) {
+  try {
+    const newCategory = yield call(createMainCategory, action.payload);
+    yield put({
+      type: "categories/createCategorySuccess",
+      payload: newCategory.data,
+    });
+    
+    // Refresh main categories list so UI shows the new category
+    yield put(fetchMainCategoriesRequest());
+    
+  } catch (error) {
+    if (error && error.code === "DUPLICATE_NAME") {
+      yield put({
+        type: "categories/createCategoryFailure",
+        payload: "DUPLICATE_NAME",
+      });
+    } else if (
+      error &&
+      error.message &&
+      typeof error.message === "string" &&
+      error.message.includes("already exists")
+    ) {
+      yield put({
+        type: "categories/createCategoryFailure",
+        payload: "DUPLICATE_NAME",
+      });
+    } else {
+      yield put({
+        type: "categories/createCategoryFailure",
+        payload: error.message || "Error creating main category",
+      });
+    }
+  }
+}
 
 function* handleCreateCategoryItem(
   action: PayloadAction<{ name: string; subCategoryId: string }>
@@ -188,18 +220,6 @@ function* handleDeleteCategoryItem(action: PayloadAction<string>) {
     yield put(deleteCategoryItemFailure(error.message || "Delete failed"));
   }
 }
-function* handleDeleteSubCategory(action: PayloadAction<string>) {
-  try {
-    yield call(deleteSubCategory, action.payload);
-    yield put(deleteSubCategorySuccess(action.payload));
-
-    // refresh lists
-    yield put(fetchSubCategoriesRequest());
-    yield put(fetchCategoryItemsRequest());
-  } catch (error: any) {
-    yield put(deleteSubCategoryFailure(error.message || "Delete failed"));
-  }
-}
 
 function* handleUpdateCategoryItem(
   action: PayloadAction<{ id: string; name: string; subCategoryId: string }>
@@ -217,29 +237,6 @@ function* handleUpdateCategoryItem(
     yield put(updateCategoryItemFailure(error.message || "Update failed"));
   }
 }
-
-function* handleUpdateSubCategory(
-  action: PayloadAction<{ id: string; name: string; mainCategoryId: string }>
-) {
-  try {
-    const { id, name, mainCategoryId } = action.payload;
-
-    const response: any = yield call(
-      (id: string, data: any) => updateSubCategory(id, data),
-      id,
-      { name, mainCategoryId }
-    );
-
-    yield put(updateSubCategorySuccess(response.data));
-    yield put(fetchSubCategoriesRequest());
-    yield put(fetchMainCategoriesRequest());
-  } catch (error: any) {
-    yield put(updateSubCategoryFailure(error.message || "Update failed"));
-  }
-}
-
-
-
 
 function* handleCreateSubCategory(
   action: PayloadAction<CreateSubCategoryPayload>
@@ -300,8 +297,6 @@ export default function* categorySaga() {
   yield takeLatest(createCategoryItemRequest.type, handleCreateCategoryItem);
   yield takeLatest(fetchCategoryItemsRequest.type, handleFetchCategoryItems);
   yield takeLatest(deleteCategoryItemRequest.type, handleDeleteCategoryItem);
-  yield takeLatest(deleteSubCategoryRequest.type, handleDeleteSubCategory);
   yield takeLatest(updateCategoryItemRequest.type, handleUpdateCategoryItem);
-  yield takeLatest(updateSubCategoryRequest.type, handleUpdateSubCategory);
   yield takeLatest(createSubCategoryRequest.type, handleCreateSubCategory);
 }

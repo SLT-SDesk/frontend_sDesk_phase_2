@@ -23,8 +23,8 @@ const TechnicianAddIncident = () => {
   const userData = [
     {
       service_number: user?.serviceNum || "TECH001", // Use logged-in user's serviceNum or fallback
-      user_name: user?.name || "Technician User",
-      email: user?.email || "technician@company.com",
+      user_name: user?.name || "Technical Officer User",
+      email: user?.email || "technicalofficer@company.com",
     },
   ];
 

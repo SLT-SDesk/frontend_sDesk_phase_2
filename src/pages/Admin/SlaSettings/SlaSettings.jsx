@@ -42,39 +42,50 @@ const SlaSettings = () => {
   const [teamTechnicians, setTeamTechnicians] = useState([]);
 
   const dispatch = useDispatch();
-  const { incidentsByMainCategory, performances } = useSelector(
+  const { incidents, incidentsByMainCategory, performances } = useSelector(
     (state) => state.incident
   );
   const { technicians } = useSelector((state) => state.technicians);
 
+  // Decide which data source to use based on role
+  const sourceIncidents =
+    user?.role === "superAdmin" ? incidents : incidentsByMainCategory;
+
   //filtered incidents by date range
-  const filteredIncidents = incidentsByMainCategory.filter((incident) => {
-  const incidentDate = new Date(incident.update_on);
+  const filteredIncidents = (sourceIncidents || []).filter((incident) => {
+    const incidentDate = new Date(incident.update_on || incident.createdAt);
 
-  const start = new Date(range.start);
-  const end = new Date(range.end);
+    const start = new Date(range.start);
+    const end = new Date(range.end);
 
-  // normalize to date-only
-  incidentDate.setHours(0, 0, 0, 0);
-  start.setHours(0, 0, 0, 0);
-  end.setHours(23, 59, 59, 999);
+    // normalize to date-only
+    incidentDate.setHours(0, 0, 0, 0);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59, 999);
 
-  return incidentDate >= start && incidentDate <= end;
-});
+    return incidentDate >= start && incidentDate <= end;
+  });
 
 
   useEffect(() => {
-    dispatch(fetchAllIncidentsRequest());//fetch all incidents
-    dispatch(fetchIncidentsByMainCategoryCodeRequest(currentAdmin.teamId));
+    dispatch(fetchAllIncidentsRequest()); //fetch all incidents
+    if (currentAdmin?.teamId) {
+      dispatch(fetchIncidentsByMainCategoryCodeRequest(currentAdmin.teamId));
+    }
     dispatch(fetchTechnicianPerformanceRequest());
     dispatch(fetchTechniciansRequest());
+  }, [dispatch, currentAdmin?.teamId]);
+
+  useEffect(() => {
     const incidentCounts = aggregateIncidentCounts(filteredIncidents);
     const teamTechs = aggregateTeamData(
-      technicians.filter((tech) => tech.teamId === currentAdmin.teamId)
+      currentAdmin?.teamId
+        ? technicians.filter((tech) => tech.teamId === currentAdmin.teamId)
+        : technicians
     );
     setTeamTechnicians(teamTechs);
     setTeamIncidents(incidentCounts);
-  }, [dispatch, currentAdmin.teamId, range.start, range.end, technicians]);
+  }, [filteredIncidents, technicians, currentAdmin?.teamId]);
 
   const dataSla = aggregateSeverityData(filteredIncidents, performances);
 

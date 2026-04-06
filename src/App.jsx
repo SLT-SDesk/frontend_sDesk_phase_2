@@ -122,6 +122,7 @@ function App() {
                 path="SuperAdminAddIncident"
                 element={<SuperAdminAddIncident />}
               />
+              <Route path="sla-settings" element={<SlaSettings />} />
             </Route>
           </Route>
 

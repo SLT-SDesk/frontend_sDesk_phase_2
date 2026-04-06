@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchSubCategoriesByMainCategoryIdRequest, fetchMainCategoriesRequest } from '../../redux/categories/categorySlice';
 import './AdminAddUser.css';
@@ -43,18 +43,34 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
 
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
-
-  //catergories
-  // Get subcategories based on the logged-in TeamAdmin's team
-  const filteredSubCategories = subCategories.filter(subCat => {
-    // Find the main category that matches the logged-in user's team
-    const userMainCategory = mainCategories.find(mainCat =>
-      mainCat => mainCat.id === loggedInUser.teamId
+  // Memoize filtered subcategories to prevent recalculation on every render
+  // For admins, show all subcategories based on teamName match instead of teamId
+  const filteredSubCategories = React.useMemo(() => {
+    if (!loggedInUser) return subCategories;
+    
+    // First try to find matching main category by teamId
+    let userMainCategory = mainCategories.find(mainCat =>
+      mainCat.id === loggedInUser?.teamId
     );
-
-    // Filter subcategories that belong to this main category
-    return userMainCategory && subCat.mainCategory?.id === userMainCategory.id;
-  });
+    
+    // If not found by teamId, try by teamName
+    if (!userMainCategory && loggedInUser?.teamName) {
+      userMainCategory = mainCategories.find(mainCat =>
+        mainCat.name === loggedInUser.teamName
+      );
+    }
+    
+    // If we found a matching main category, filter subcategories by it
+    if (userMainCategory) {
+      return subCategories.filter(subCat => 
+        subCat.mainCategory?.id === userMainCategory.id ||
+        subCat.mainCategory?.name === userMainCategory.name
+      );
+    }
+    
+    // If no match found, return all subcategories as fallback
+    return subCategories;
+  }, [subCategories, mainCategories, loggedInUser?.teamId, loggedInUser?.teamName]);
 
 
   useEffect(() => {
@@ -69,13 +85,21 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
     dispatch(fetchMainCategoriesRequest());
   }, [dispatch]);
 
-  // Fetch subcategories when component mounts or when loggedInUser changes
+  // Fetch all subcategories when component mounts
   useEffect(() => {
+    dispatch({ type: 'categories/fetchSubCategoriesRequest' });
+  }, [dispatch]);
+
+  // Fetch subcategories when mainCategories are loaded or when loggedInUser changes
+  useEffect(() => {
+    if (mainCategories.length === 0) return;
+    
     if (loggedInUser?.teamId || loggedInUser?.teamName) {
       // Find the main category that matches the logged-in user's team
       const userMainCategory = mainCategories.find(mainCat =>
         mainCat.name === loggedInUser?.teamName ||
-        mainCat.category_code === loggedInUser?.teamId
+        mainCat.category_code === loggedInUser?.teamId ||
+        mainCat.id === loggedInUser?.teamId
       );
 
       if (userMainCategory) {
@@ -133,8 +157,6 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
         return sub ? sub.id : name;
       });
 
-    // When editing, completely re-initialize the form data from the editUser prop.
-    // This prevents stale state from a previous user from persisting.
     setFormData({
       id: editUser.serviceNum || editUser.serviceNumber || editUser.id || '',
       name: editUser.name || '',
@@ -147,7 +169,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
       teamId: loggedInUser?.teamId || '',
       categories: editCategories,
     });
-  }, [isEdit, editUser, loggedInUser, filteredSubCategories]);
+  }, [isEdit, editUser, loggedInUser?.teamName, loggedInUser?.teamId, filteredSubCategories]);
 
   // Reset formData to initial state (with teamName) every time the modal is opened in add mode
   useEffect(() => {
@@ -293,7 +315,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
     <div className="AdminAddUser-modal">
       <div className="AdminAddUser-content">
         <div className="AdminAddUser-header">
-          <h2>{isEdit ? 'Edit Technician' : 'Add Technician'}</h2>
+          <h2>{isEdit ? 'Edit Technical Officer' : 'Add Technical Officer'}</h2>
           <button onClick={onClose}><IoIosClose size={30} /></button>
         </div>
         <form onSubmit={handleSubmit}>
@@ -359,7 +381,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
               <div>
                 <label>Position:</label>
                 <select name="position" value={formData.position} onChange={handleChange}>
-                  <option value="technician">Technician</option>
+                  <option value="technician">Technical Officer</option>
                   <option value="teamLeader">Team Leader</option>
                 </select>
                 {errors.position && <span className="error-message">{errors.position}</span>}
@@ -400,7 +422,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
               <div className="AdminAddUser-form-submit">
                 <button type="submit">{isEdit ? 'Save' : 'Add'}</button>
                 {showSubmitUserExists && (
-                  <span className="error-message message-margin">Technician already exists</span>
+                  <span className="error-message message-margin">Technical Officer already exists</span>
                 )}
               </div>
             </div>

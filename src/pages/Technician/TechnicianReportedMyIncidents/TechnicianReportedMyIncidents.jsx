@@ -191,13 +191,13 @@ const TechnicianReportedMyIncidents = () => {
     const description = [
       ['My Reported Incidents Report'],
       [''],
-      ['Technician: ' + (user.name || user.email)], // Using 'user' from Redux state
+      ['Technical Officer: ' + (user.name || user.email)], // Using 'user' from Redux state
       ['Service Number: ' + user.serviceNum], // Using 'user.serviceNum' from Redux state
-      ['Role: Technician'],
+      ['Role: Technical Officer'],
       ['Generated on: ' + new Date().toLocaleString()],
       ['Total Records: ' + filteredData.length],
       [''],
-      ['Description: This report provides a detailed list of incidents reported by the technician, including incident details, reported user information, and affected user information.'],
+      ['Description: This report provides a detailed list of incidents reported by the technical officer, including incident details, reported user information, and affected user information.'],
       [''],
     ];
 
@@ -280,7 +280,7 @@ const TechnicianReportedMyIncidents = () => {
     return <div>User data missing serviceNum. Please contact admin.</div>;
   }
   if (user.role !== 'technician') {
-    return <div>Unauthorized: Only technicians can view this page.</div>;
+    return <div>Unauthorized: Only technical officers can view this page.</div>;
   }
 
   return (

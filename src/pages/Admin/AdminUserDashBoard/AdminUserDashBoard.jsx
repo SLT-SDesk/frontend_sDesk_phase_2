@@ -4,10 +4,10 @@ import './AdminUserDashBoard.css';
 
 function AdminUserDashBoard({ userCounts = {} }) {
   const roles = [
-    { name: 'Admin', color: '#3498db', icon: FaCog },
-    { name: 'Technician', color: '#2ecc71', icon: FaWrench },
-    { name: 'Employee', color: '#f1c40f', icon: FaUser },
-    { name: 'Team Leader', color: '#9b59b6', icon: FaUsers },
+    { name: 'Admin', key: 'admin', color: '#3498db', icon: FaCog },
+    { name: 'Technical Officer', key: 'technician', color: '#2ecc71', icon: FaWrench },
+    { name: 'Employee', key: 'employee', color: '#f1c40f', icon: FaUser },
+    { name: 'Team Leader', key: 'teamleader', color: '#9b59b6', icon: FaUsers },
   ];
 
   const defaultUserCounts = {
@@ -38,7 +38,7 @@ function AdminUserDashBoard({ userCounts = {} }) {
                         {role.name}
                       </h3>
                       <p className="AdminUserDashBoard-content2-RoleCardGrid-RoleCard-Count">
-                        {counts[role.name.toLowerCase()] || 0}
+                        {counts[role.key] || 0}
                       </p>
                     </div>
                   </div>

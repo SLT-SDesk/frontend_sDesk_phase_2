@@ -63,7 +63,7 @@ const TechnicianAllTeam = () => {
             }}
           >
             <h3>Access Denied</h3>
-            <p>This page is only accessible to technicians.</p>
+            <p>This page is only accessible to technical officers.</p>
             <p>
               Your current role: <strong>{user?.role || "Unknown"}</strong>
             </p>
@@ -472,15 +472,15 @@ const TechnicianAllTeam = () => {
 
     // Description data
     const description = [
-      ['Technician All Team Incidents Report'],
+      ['Technical Officer All Team Incidents Report'],
       [''],
-      ['Technician: ' + (user.name || user.email)], // Using 'user' from Redux state
+      ['Technical Officer: ' + (user.name || user.email)], // Using 'user' from Redux state
       ['Service Number: ' + user.serviceNum], // Using 'user.serviceNum' from Redux state
-      ['Role: Technician'],
+      ['Role: Technical Officer'],
       ['Generated on: ' + new Date().toLocaleString()],
       ['Total Records: ' + filteredData.length],
       [''],
-      ['Description: This report provides a detailed list of all team incidents, including incident details, assigned technician information, and affected user information.'],
+      ['Description: This report provides a detailed list of all team incidents, including incident details, assigned technical officer information, and affected user information.'],
       [''],
     ];
 

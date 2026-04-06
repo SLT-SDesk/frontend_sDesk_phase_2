@@ -87,7 +87,7 @@ const TechnicianMyAssignedIncidents = () => {
                         textAlign: 'center'
                     }}>
                         <h3>Access Denied</h3>
-                        <p>This page is only accessible to technicians.</p>
+                        <p>This page is only accessible to technical officers.</p>
                         <p>Your current role: <strong>{user.role}</strong></p>
                         <p>Contact your administrator if you believe this is an error.</p>
                     </div>
@@ -318,13 +318,13 @@ const TechnicianMyAssignedIncidents = () => {
         const description = [
             ['My Assigned Incidents Report'],
             [''],
-            ['Technician: ' + (currentUser.name || currentUser.display_name || currentUser.serviceNum)],
+            ['Technical Officer: ' + (currentUser.name || currentUser.display_name || currentUser.serviceNum)],
             ['Service Number: ' + assignedUser],
-            ['Role: Technician'],
+            ['Role: Technical Officer'],
             ['Generated on: ' + new Date().toLocaleString()],
             ['Total Records: ' + filteredData.length],
             [''],
-            ['Description: This report provides a detailed list of incidents assigned to the technician, including incident details, and affected user information.'],
+            ['Description: This report provides a detailed list of incidents assigned to the technical officer, including incident details, and affected user information.'],
             [''],
         ];
 

@@ -11,7 +11,7 @@ import "./TopNotificationBar.css";
 const roleDisplayNames = {
   user: "User",
   admin: "Admin",
-  technician: "Technician",
+  technician: "Technical Officer",
   teamLeader: "Team Leader",
   superAdmin: "Super Admin",
 };
@@ -65,7 +65,7 @@ export default function TopNotificationBar({
           initialNotifications={[
             {
               id: 1,
-              message: "Incident #245 assigned to technician Alex.",
+              message: "Incident #245 assigned to technical officer Alex.",
               date: "2025-10-29T09:00:00Z",
               starred: false,
             },

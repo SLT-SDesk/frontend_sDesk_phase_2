@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
+import * as XLSX from "xlsx";
 import {
   MainCategory,
   MainCategoryState,
@@ -156,7 +156,7 @@ const categorySlice = createSlice({
       state.createCategoryItemError = null;
       state.createCategoryItemSuccess = false;
     },
-    createCategoryItemSuccess(state, _action) {
+    createCategoryItemSuccess(state, action) {
       state.createCategoryItemLoading = false;
       state.createCategoryItemSuccess = true;
     },
@@ -196,22 +196,6 @@ const categorySlice = createSlice({
       state.error = action.payload;
     },
 
-    // Delete sub category 
-    deleteSubCategoryRequest(state, _action: PayloadAction<string>) {
-      state.loading = true;
-      state.error = null;
-    },
-    deleteSubCategorySuccess(state, action: PayloadAction<string>) {
-      state.loading = false;
-      state.subCategories = state.subCategories.filter(
-      (sub) => sub.id !== action.payload
-    );
-    },
-   deleteSubCategoryFailure(state, action: PayloadAction<string>) {
-    state.loading = false;
-    state.error = action.payload;
-    },
-
     // Update category item
     updateCategoryItemRequest(
       state,
@@ -235,27 +219,6 @@ const categorySlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    // Update sub category
-    updateSubCategoryRequest(
-      state,
-      _action: PayloadAction<{ id: string; name: string; mainCategoryId: string }>
-    ) {
-      state.loading = true;
-      state.error = null;
-   },
-    updateSubCategorySuccess(state, action: PayloadAction<any>) {
-      state.loading = false;
-      const updated = action.payload;
-
-      state.subCategories = state.subCategories.map((sub) =>
-      sub.id === updated.id ? { ...sub, ...updated } : sub
-   );
-   },
-    updateSubCategoryFailure(state, action: PayloadAction<string>) {
-      state.loading = false;
-      state.error = action.payload;
-  },
-
   },
 });
 
@@ -287,15 +250,9 @@ export const {
   deleteCategoryItemRequest,
   deleteCategoryItemSuccess,
   deleteCategoryItemFailure,
-  deleteSubCategoryRequest,
-  deleteSubCategorySuccess,
-  deleteSubCategoryFailure,
   updateCategoryItemRequest,
   updateCategoryItemSuccess,
   updateCategoryItemFailure,
-  updateSubCategoryRequest,
-  updateSubCategorySuccess,
-  updateSubCategoryFailure,
 } = categorySlice.actions;
 
 export default categorySlice.reducer;
