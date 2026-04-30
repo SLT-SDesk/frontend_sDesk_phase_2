@@ -8,6 +8,7 @@ import { IoIosAddCircleOutline } from "react-icons/io";
 import { TiExportOutline } from "react-icons/ti";
 import { useSelector, useDispatch } from "react-redux";
 import socket from "../../../utils/socket.js";
+import { API_BASE } from "../../../utils/apiUtils";
 
 import {
   fetchTechniciansRequest,
@@ -73,7 +74,7 @@ function AdminUserList() {
   }, [dispatch, selectShowOption]);
 
   const updateUserRole = async (serviceNumber, role) => {
-    const res = await fetch("http://localhost:8000/user-role/assign", {
+    const res = await fetch(`${API_BASE}/user-role/assign`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
