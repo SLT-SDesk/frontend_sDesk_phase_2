@@ -15,6 +15,7 @@ import {
   lookupUserRequest,
   clearLookupUser,
 } from "../../../redux/userLookup/userLookupSlice";
+import { API_BASE } from "../../../utils/apiUtils";
 
 
 const initialForm = {
@@ -36,7 +37,7 @@ const MAX_CATEGORIES = 4;
 
 
 const updateUserRole = async (serviceNumber, role) => {
-  const res = await fetch("http://localhost:8000/user-role/assign", {
+  const res = await fetch(`${API_BASE}/user-role/assign`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
