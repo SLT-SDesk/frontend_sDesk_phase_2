@@ -27,6 +27,8 @@ const IncidentDetails = ({
   const [selectedPriority, setSelectedPriority] = useState(
     formData.priority || ""
   );
+  const [isManualPriority, setIsManualPriority] = useState(false);
+  const [debouncedDescription, setDebouncedDescription] = useState(formData.description || "");
   const [localIsLocationPopupOpen, setLocalIsLocationPopupOpen] =
     useState(false);
   const [localIsCategoryPopupOpen, setLocalIsCategoryPopupOpen] =
@@ -56,6 +58,17 @@ const IncidentDetails = ({
   useEffect(() => {
     dispatch(fetchCategoriesRequest());
   }, [dispatch]);
+
+  // Debounce description to prevent rapid priority changes while typing
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedDescription(formData.description);
+    }, 500); // 500ms delay
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [formData.description]);
 
   // Effect to handle Chatbot Analysis Result
   useEffect(() => {
@@ -93,12 +106,39 @@ const IncidentDetails = ({
         if (foundItem) {
           console.log("Category Matched (Item):", foundItem);
           // Auto-select the LEAF item
+          console.log("Auto-selecting category:", { name: foundItem.name, number: foundItem.category_code || foundItem.id });
           handleCategorySelect({
             name: foundItem.name,
             number: foundItem.category_code || foundItem.id // Prefer category_code if available
           });
         } else {
           console.warn(`Category '${analysisResult.category}' not found in nested dataset.`);
+          // Try to match against main or sub category names as fallback
+          for (const mainCat of categoryDataset) {
+            const mainName = mainCat.name?.trim().toLowerCase() || '';
+            if (mainName.includes(resultCat) || resultCat.includes(mainName)) {
+              console.log("Matched against main category:", mainCat);
+              handleCategorySelect({
+                name: mainCat.name,
+                number: mainCat.id || mainCat.code
+              });
+              return;
+            }
+            
+            if (!mainCat.subCategories) continue;
+            for (const subCat of mainCat.subCategories) {
+              const subName = subCat.name?.trim().toLowerCase() || '';
+              if (subName.includes(resultCat) || resultCat.includes(subName)) {
+                console.log("Matched against subcategory:", subCat);
+                handleCategorySelect({
+                  name: subCat.name,
+                  number: subCat.id || subCat.code
+                });
+                return;
+              }
+            }
+          }
+          console.warn(`No category match found for '${analysisResult.category}'`);
         }
       }
 
@@ -113,6 +153,7 @@ const IncidentDetails = ({
         };
         const mappedPriority = priorityMap[analysisResult.priority.toLowerCase()] || 'Medium';
 
+        console.log("Auto-selecting priority:", mappedPriority);
         setSelectedPriority(mappedPriority);
         setFormData((prev) => ({
           ...prev,
@@ -122,38 +163,36 @@ const IncidentDetails = ({
 
       // 3. Update Description if modified (e.g. via troubleshooting)
       if (analysisResult.description && analysisResult.description !== formData.description) {
+        console.log("Updating description from chatbot result");
         setFormData((prev) => ({
           ...prev,
           description: analysisResult.description
         }));
       }
     }
-  }, [analysisResult, categoryDataset]);
+  }, [analysisResult, categoryDataset, handleCategorySelect]);
 
   // Effect to handle Auto-Priority based on Business Rules (ERP Grade/Designation + Content)
   useEffect(() => {
+    // If user has manually selected a priority, do not overwrite it with auto-rules
+    if (isManualPriority) {
+      console.log("[AUTO-PRIORITY] Skipped because user manually selected priority.");
+      return;
+    }
+
     // Determine which user to use for priority (prefer affected/lookup user if available, else login user)
-    // ONLY use lookupUser if it actually has data (not null and has at least one identifying field)
     const activeUser = (lookupUser && lookupUser.serviceNumber) ? { 
       designation: lookupUser.designation, 
       gradeName: lookupUser.gradeName 
     } : loginUser;
 
-    console.log("[AUTO-PRIORITY] loginUser from Redux:", loginUser);
-
     if (activeUser) {
-      const autoPriority = getPriorityFromDesignation(activeUser, formData);
-      
-      // DEBUG: Log the values to understand why it might be failing
-      console.log("[AUTO-PRIORITY DEBUG]", {
-        activeUser_designation: activeUser.designation,
-        activeUser_grade: activeUser.gradeName,
-        formData_category: formData.category?.name,
-        formData_description: formData.description,
-        calculatedPriority: autoPriority,
-        currentPriority: selectedPriority
+      // Use debounced description to prevent flicker
+      const autoPriority = getPriorityFromDesignation(activeUser, {
+        ...formData,
+        description: debouncedDescription
       });
-
+      
       // Update local state and parent form data if priority changed
       if (autoPriority !== selectedPriority) {
         setSelectedPriority(autoPriority);
@@ -161,15 +200,16 @@ const IncidentDetails = ({
           ...prev,
           priority: autoPriority
         }));
-        console.log(`[AUTO-PRIORITY] Set to ${autoPriority} based on rules.`);
+        console.log(`[AUTO-PRIORITY] Set to ${autoPriority} based on rules (debounced).`);
       }
     }
-  }, [loginUser, lookupUser, formData.category, formData.description]);
+  }, [loginUser, lookupUser, formData.category, debouncedDescription, isManualPriority]);
 
 
   const handleChange = (event) => {
     const newPriority = event.target.value;
     setSelectedPriority(newPriority);
+    setIsManualPriority(true); // User manually set priority
     setFormData((prevFormData) => ({
       ...prevFormData,
       priority: newPriority,

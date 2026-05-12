@@ -76,7 +76,7 @@ function* handleDeleteTeamAdmin(action) {
       yield put(deleteTeamAdminFailure("teamId is undefined"));
       return;
     }
-    yield call(deleteTeamAdmin, teamId); // backend expects teamId
+    yield call(deleteTeamAdmin, id); // backend now expects record ID (UUID)
     yield put(deleteTeamAdminSuccess(id)); // reducer expects id
     yield put(fetchTeamAdminsRequest());
   } catch (error) {
