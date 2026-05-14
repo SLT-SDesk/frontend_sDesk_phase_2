@@ -80,38 +80,50 @@ const TechnicianPerformance = ({ dateRange, onRowClick }) => {
 
   /* Apply search + status filter */
   useEffect(() => {
-  if (!adminTeamName) return;
+    // If no admin or role, we can't decide what to show
+    if (!admin) return;
 
-  let result = (techniciansFromStore || [])
-    .filter((tech) => tech.team === adminTeamName)
-    .map((tech) => ({
+    let result = (techniciansFromStore || []);
+
+    // Filter by team only if the user is NOT a superAdmin
+    if (admin.role !== "superAdmin") {
+      if (!adminTeamName) {
+        setFilteredTechnicians([]);
+        return;
+      }
+      result = result.filter((tech) => tech.team === adminTeamName);
+    }
+
+    // Map to the format needed for the table
+    result = result.map((tech) => ({
       id: tech.id,
       serviceNumber: tech.serviceNum,
       name: tech.name,
       status: tech.active ? "Active" : "Inactive",
     }));
 
-  // 🔍 Search filter
-  if (search.trim()) {
-    result = result.filter(
-      (t) =>
-        t.name.toLowerCase().includes(search.toLowerCase()) ||
-        t.serviceNumber.toLowerCase().includes(search.toLowerCase())
-    );
-  }
+    // 🔍 Search filter
+    if (search.trim()) {
+      result = result.filter(
+        (t) =>
+          t.name.toLowerCase().includes(search.toLowerCase()) ||
+          t.serviceNumber.toLowerCase().includes(search.toLowerCase())
+      );
+    }
 
-  // 🎯 Status filter
-  if (statusFilter !== "All") {
-    result = result.filter((t) => t.status === statusFilter);
-  }
+    // 🎯 Status filter
+    if (statusFilter !== "All") {
+      result = result.filter((t) => t.status === statusFilter);
+    }
 
-  setFilteredTechnicians(result);
-}, [
-  techniciansFromStore,
-  adminTeamName,
-  search,
-  statusFilter,
-]);
+    setFilteredTechnicians(result);
+  }, [
+    techniciansFromStore,
+    admin,
+    adminTeamName,
+    search,
+    statusFilter,
+  ]);
 
 
 
