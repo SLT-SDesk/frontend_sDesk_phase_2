@@ -88,7 +88,9 @@ fetchTeamSessionsFailure(state, action) {
       state.loading = false;
       state.error = null;
       state.technicians = state.technicians.map((tech) =>
-        tech.id === action.payload.id ? action.payload : tech
+        tech.id === action.payload.id || tech.serviceNum === action.payload.serviceNum
+          ? action.payload
+          : tech
       );
     },
     updateTechnicianFailure(state, action) {

@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import axios from 'axios';
 
+import { CHATBOT_API_BASE, buildUrl } from '../utils/apiUtils';
+
 const useChatbot = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [clarification, setClarification] = useState(null); // { question, options }
     const [analysisResult, setAnalysisResult] = useState(null); // { category, priority, etc. }
 
-    const API_URL = 'http://localhost:5000/api/ticket'; // Adjust if backend runs elsewhere
+    const API_URL = buildUrl(CHATBOT_API_BASE, '/api/ticket');
 
     const analyzeDescription = async (description) => {
         if (!description || description.trim().length < 5) return;

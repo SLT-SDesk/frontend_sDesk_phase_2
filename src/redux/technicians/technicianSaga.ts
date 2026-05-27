@@ -89,12 +89,18 @@ function* handleCreateTechnician(action: PayloadAction<Partial<Technician>>) {
 }
 
 function* handleUpdateTechnician(
-    action: PayloadAction<{ serviceNum: string; data: Partial<Technician> }>
+    action: PayloadAction<{ serviceNum: string; data?: Partial<Technician> } & Partial<Technician>>
 ) {
     try {
-        const { serviceNum, data } = action.payload;
+        let { serviceNum, data } = action.payload;
+        // Handle flat payload if 'data' is not provided
+        if (!data) {
+            const { serviceNum: s, ...rest } = action.payload;
+            data = rest;
+        }
         const response = yield call(updateTechnician, serviceNum, data);
         yield put(updateTechnicianSuccess(response.data));
+        yield put(fetchTechniciansRequest());
     } catch (error: any) {
         yield put(updateTechnicianFailure(error.message));
     }

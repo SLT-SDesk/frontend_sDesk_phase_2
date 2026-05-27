@@ -6,6 +6,7 @@ import { IoIosArrowForward } from "react-icons/io";
 import UpdateStatus from "../../../components/UpdateStatus/UpdateStatus";
 import IncidentHistory from "../../../components/IncidentHistory/IncidentHistory";
 import AffectedUserDetail from "../../../components/AffectedUserDetail/AffectedUserDetail";
+import apiClient from "../../../api/axiosInstance";
 import {
   getIncidentByNumberRequest,
   fetchIncidentHistoryRequest,
@@ -54,6 +55,7 @@ const TechnicianInsident = ({
 
   // Auto-fill Name, Designation, Email when Service No changes
   useEffect(() => {
+    let active = true;
     const serviceNo = formData.serviceNo?.trim();
 
     // Clear fields if Service No is empty
@@ -88,15 +90,39 @@ const TechnicianInsident = ({
         tpNumber: user.contactNumber || "", // Auto-fill TP Number with contactNumber from backend
       }));
     } else {
-      // Clear fields if user not found
-      setFormData((prev) => ({
-        ...prev,
-        name: "",
-        designation: "",
-        email: "",
-        tpNumber: "",
-      }));
+      // Fallback: Fetch user details from ERP Lookup API
+      const fetchErpUser = async () => {
+        try {
+          const response = await apiClient.get(`/users/lookup/${serviceNo}`);
+          if (active && response.data) {
+            const erpUser = response.data;
+            setFormData((prev) => ({
+              ...prev,
+              name: erpUser.display_name || "",
+              designation: erpUser.designation || "",
+              email: erpUser.email || "",
+              tpNumber: erpUser.contactNumber || "",
+            }));
+          }
+        } catch (error) {
+          console.error("Failed to lookup user from ERP:", error);
+          if (active) {
+            setFormData((prev) => ({
+              ...prev,
+              name: "",
+              designation: "",
+              email: "",
+              tpNumber: "",
+            }));
+          }
+        }
+      };
+      fetchErpUser();
     }
+
+    return () => {
+      active = false;
+    };
   }, [formData.serviceNo, usersState.users]);
 
   const [incidentDetails, setIncidentDetails] = useState({

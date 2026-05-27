@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "./TechnicianAddIncident.css";
 import AffectedUserDetails from "../../../components/AffectedUserDetails/AffectedUserDetails";
@@ -78,25 +78,26 @@ const TechnicianAddIncident = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleCategorySelect = (selectedCategory) => {
-    setFormData({ ...formData, category: selectedCategory });
+  const handleCategorySelect = useCallback((selectedCategory) => {
+    console.log("Parent handleCategorySelect called with:", selectedCategory);
+    setFormData(prev => ({ ...prev, category: selectedCategory }));
     setIsCategoryPopupOpen(false);
-  };
+  }, []);
 
-  const handleLocationSelect = (selectedLocation) => {
-    setFormData({ ...formData, location: selectedLocation });
+  const handleLocationSelect = useCallback((selectedLocation) => {
+    setFormData(prev => ({ ...prev, location: selectedLocation }));
     setIsLocationPopupOpen(false);
-  };
+  }, []);
 
-  const handleClearCategory = () => {
-    setFormData({ ...formData, category: { name: "", number: "" } });
+  const handleClearCategory = useCallback(() => {
+    setFormData(prev => ({ ...prev, category: { name: "", number: "" } }));
     setIsCategoryPopupOpen(false);
-  };
+  }, []);
 
-  const handleClearLocation = () => {
-    setFormData({ ...formData, location: { name: "", number: "" } });
+  const handleClearLocation = useCallback(() => {
+    setFormData(prev => ({ ...prev, location: { name: "", number: "" } }));
     setIsLocationPopupOpen(false);
-  };
+  }, []);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];

@@ -403,8 +403,7 @@ function AdminUserList() {
                 });
               }
 
-              dispatch(updateTechnicianRequest({ ...updatedUser, serviceNum }));
-              dispatch(fetchTechniciansRequest());
+              dispatch(updateTechnicianRequest({ serviceNum, data: updatedUser }));
             }
             setIsEditUserOpen(false);
           }}

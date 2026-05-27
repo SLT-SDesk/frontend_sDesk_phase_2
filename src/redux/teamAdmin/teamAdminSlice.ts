@@ -53,7 +53,7 @@ const teamAdminSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.teamAdmins = state.teamAdmins.map((admin) =>
-        admin.teamId === action.payload.teamId ? action.payload : admin
+        admin.id === action.payload.id ? action.payload : admin
       );
     },
     updateTeamAdminFailure(state, action) {
@@ -68,10 +68,9 @@ const teamAdminSlice = createSlice({
     deleteTeamAdminSuccess(state, action) {
       state.loading = false;
       state.error = null;
-      // action.payload can be id or teamId, so filter by both
+      // Match by record ID
       state.teamAdmins = state.teamAdmins.filter(
-        (admin) =>
-          admin.teamId !== action.payload && admin.id !== action.payload
+        (admin) => admin.id !== action.payload
       );
     },
     deleteTeamAdminFailure(state, action) {

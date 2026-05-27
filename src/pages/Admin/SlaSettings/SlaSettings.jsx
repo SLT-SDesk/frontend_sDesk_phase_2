@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AdminDateRangePopup from "../../../components/AdminDateRangePopup/DateRangePopup";
 import SeverityCard from "../../../components/AdminSLA/SeverityCard";
@@ -51,20 +51,22 @@ const SlaSettings = () => {
   const sourceIncidents =
     user?.role === "superAdmin" ? incidents : incidentsByMainCategory;
 
-  //filtered incidents by date range
-  const filteredIncidents = (sourceIncidents || []).filter((incident) => {
-    const incidentDate = new Date(incident.update_on || incident.createdAt);
+  //filtered incidents by date range - MEMOIZED to prevent infinite loop
+  const filteredIncidents = useMemo(() => {
+    return (sourceIncidents || []).filter((incident) => {
+      const incidentDate = new Date(incident.update_on || incident.createdAt);
 
-    const start = new Date(range.start);
-    const end = new Date(range.end);
+      const start = new Date(range.start);
+      const end = new Date(range.end);
 
-    // normalize to date-only
-    incidentDate.setHours(0, 0, 0, 0);
-    start.setHours(0, 0, 0, 0);
-    end.setHours(23, 59, 59, 999);
+      // normalize to date-only
+      incidentDate.setHours(0, 0, 0, 0);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
 
-    return incidentDate >= start && incidentDate <= end;
-  });
+      return incidentDate >= start && incidentDate <= end;
+    });
+  }, [sourceIncidents, range]);
 
 
   useEffect(() => {
@@ -87,7 +89,9 @@ const SlaSettings = () => {
     setTeamIncidents(incidentCounts);
   }, [filteredIncidents, technicians, currentAdmin?.teamId]);
 
-  const dataSla = aggregateSeverityData(filteredIncidents, performances);
+  const dataSla = useMemo(() => {
+    return aggregateSeverityData(filteredIncidents, performances);
+  }, [filteredIncidents, performances]);
 
   // console.log('Incident by Main Category Code Data:', teamIncidents);
   console.log("Filtered Incidents:", filteredIncidents);
@@ -103,11 +107,11 @@ const SlaSettings = () => {
   const [popupOpen, setPopupOpen] = useState(false);
   const [selectedTechnician, setSelectedTechnician] = useState(null);
 
-  const handleRowClick = (tech) => {
+  const handleRowClick = useCallback((tech) => {
     // console.log('Row clicked, technician:', tech);
     setSelectedTechnician(tech);
     setPopupOpen(true);
-  };
+  }, []);
 
   const openDatePopup = () => setDatePopupOpen(true);
   const closeDatePopup = () => setDatePopupOpen(false);

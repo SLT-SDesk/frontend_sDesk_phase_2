@@ -154,7 +154,8 @@ const ManageTeamAdmin = () => {
       );
       setSelectedCategories(cats);
       setEditMode(true);
-      setEditId(admin.teamId);
+      setEditId(admin.id);
+      setHasCheckedUser(true);
       setShowModal(true);
       setSubmitError("");
       setSubmitSuccess(false);

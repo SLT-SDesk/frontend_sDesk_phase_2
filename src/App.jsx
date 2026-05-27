@@ -41,6 +41,8 @@ import AdminReportedMyIncidents from "./pages/Admin/AdminReportedMyIncidents/Adm
 import MainDashboard from "./pages/MainDashboard/MainDashboard.jsx";
 import KPIReport from "./pages/Admin/KPIHelpdesk/KPIReport.jsx";
 import SlaSettings from './pages/Admin/SlaSettings/SlaSettings.jsx';
+import Roster from "./pages/Admin/Roster/Roster.jsx";
+
 
 
 function App() {
@@ -61,6 +63,7 @@ function App() {
               <Route path="kpi-helpdesk" element={<KPIHelpdesk />} />
               <Route path="LoggingTimeLine" element={<LoggingTimeLine />} />
               <Route path="sla-settings" element={<SlaSettings />} />
+              <Route path="roster" element={<Roster />} />
               <Route path="AdminUserList" element={<AdminUserList />} />
               <Route
                 path="AdminUserDashBoard"
@@ -123,6 +126,7 @@ function App() {
                 element={<SuperAdminAddIncident />}
               />
               <Route path="sla-settings" element={<SlaSettings />} />
+              <Route path="roster" element={<Roster />} />
             </Route>
           </Route>
 

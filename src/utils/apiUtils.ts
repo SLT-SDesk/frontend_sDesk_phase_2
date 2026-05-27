@@ -7,6 +7,11 @@ export const getApiBaseUrl = (): string => {
     return (import.meta as any).env?.VITE_API_BASE_URL || "http://localhost:8000";
 };
 
+// Get the Chatbot API base URL from environment variables
+export const getChatbotApiBaseUrl = (): string => {
+    return (import.meta as any).env?.VITE_CHATBOT_API_BASE_URL || "http://localhost:5000";
+};
+
 /**
  * Helper function to construct proper URLs without double slashes
  * @param base - Base URL (e.g., 'https://api.example.com' or 'https://api.example.com/')
@@ -19,5 +24,6 @@ export const buildUrl = (base: string, endpoint: string): string => {
     return `${baseUrl}${endpointUrl}`;
 };
 
-// Pre-configured API base URL
+// Pre-configured API base URLs
 export const API_BASE = getApiBaseUrl();
+export const CHATBOT_API_BASE = getChatbotApiBaseUrl();
