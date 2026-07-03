@@ -5,13 +5,14 @@ import { IoIosClose } from 'react-icons/io';
 import './CategoryDropDown.css';
 import { fetchCategoriesRequest } from '../../redux/categories/categorySlice';
 
-const CategoryDropdown = ({ onSelect, onClose }) => {
+const CategoryDropdown = ({ onSelect, onClose, hideTier3 = false, showOnlyTier3 = false }) => {
     const [expanded, setExpanded] = useState({});
     const [searchTerm, setSearchTerm] = useState('');
     const dispatch = useDispatch();
     
     // Get data from Redux store
     const { list: mainCategories, loading: isLoading, error } = useSelector((state) => state.categories);
+    const loggedInUser = useSelector((state) => state.auth?.user);
 
     useEffect(() => {
         // Fetch categories using Redux action
@@ -32,11 +33,24 @@ const CategoryDropdown = ({ onSelect, onClose }) => {
 
     // Filter categories based on search term (case insensitive)
     const filterCategories = (categories) => {
-        if (!searchTerm.trim()) return categories;
+        let filtered = categories;
+
+        // Filter categories
+        if (showOnlyTier3) {
+            filtered = filtered.filter(mainCategory =>
+                mainCategory.name.toLowerCase().trim() === 'tier 3 support'
+            );
+        } else if (hideTier3 || loggedInUser?.role === 'user') {
+            filtered = filtered.filter(mainCategory =>
+                mainCategory.name.toLowerCase().trim() !== 'tier 3 support'
+            );
+        }
+
+        if (!searchTerm.trim()) return filtered;
 
         const searchLower = searchTerm.toLowerCase();
 
-        return categories.map(mainCategory => {
+        return filtered.map(mainCategory => {
             const filteredSubCategories = mainCategory.subCategories.map(subCategory => {
                 const filteredItems = subCategory.categoryItems.filter(item =>
                     item.name.toLowerCase().includes(searchLower)

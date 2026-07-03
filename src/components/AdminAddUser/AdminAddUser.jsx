@@ -33,7 +33,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
     contactNumber: '',
     teamName: loggedInUser?.teamName || '',
     position: 'technician',
-    tier: 'tier1' || 'tier2',
+    tier: 'tier1',
     active: true,
     teamId: loggedInUser?.teamId || '',
     categories: [],
@@ -48,6 +48,18 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
   const filteredSubCategories = React.useMemo(() => {
     if (!loggedInUser) return subCategories;
     
+    if (formData.tier === 'tier3') {
+      const tier3Category = mainCategories.find(mainCat =>
+        mainCat.name.toLowerCase().trim() === 'tier 3 support'
+      );
+      if (tier3Category) {
+        return subCategories.filter(subCat =>
+          subCat.mainCategory?.id === tier3Category.id ||
+          subCat.mainCategory?.name === tier3Category.name
+        );
+      }
+    }
+
     // First try to find matching main category by teamId
     let userMainCategory = mainCategories.find(mainCat =>
       mainCat.id === loggedInUser?.teamId
@@ -70,7 +82,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
     
     // If no match found, return all subcategories as fallback
     return subCategories;
-  }, [subCategories, mainCategories, loggedInUser?.teamId, loggedInUser?.teamName]);
+  }, [subCategories, mainCategories, loggedInUser?.teamId, loggedInUser?.teamName, formData.tier]);
 
 
   useEffect(() => {
@@ -90,11 +102,18 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
     dispatch({ type: 'categories/fetchSubCategoriesRequest' });
   }, [dispatch]);
 
-  // Fetch subcategories when mainCategories are loaded or when loggedInUser changes
+  // Fetch subcategories when mainCategories are loaded, when loggedInUser changes, or when the selected tier changes
   useEffect(() => {
     if (mainCategories.length === 0) return;
     
-    if (loggedInUser?.teamId || loggedInUser?.teamName) {
+    if (formData.tier === 'tier3') {
+      const tier3Category = mainCategories.find(mainCat =>
+        mainCat.name.toLowerCase().trim() === 'tier 3 support'
+      );
+      if (tier3Category) {
+        dispatch(fetchSubCategoriesByMainCategoryIdRequest(tier3Category.id));
+      }
+    } else if (loggedInUser?.teamId || loggedInUser?.teamName) {
       // Find the main category that matches the logged-in user's team
       const userMainCategory = mainCategories.find(mainCat =>
         mainCat.name === loggedInUser?.teamName ||
@@ -106,7 +125,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
         dispatch(fetchSubCategoriesByMainCategoryIdRequest(userMainCategory.id));
       }
     }
-  }, [dispatch, loggedInUser, mainCategories]);
+  }, [dispatch, loggedInUser, mainCategories, formData.tier]);
 
   useEffect(() => {
     if (isEdit) return;
@@ -163,7 +182,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
       email: editUser.email || '',
       contactNumber: editUser.contactNumber || '',
       teamName: loggedInUser?.teamName || '',
-      tier: editUser.tier || 'tier1' || 'tier2',
+      tier: editUser.tier || 'tier1',
       position: editUser.position || 'technician' || 'teamLeader',
       active: editUser.active !== undefined ? editUser.active : true,
       teamId: loggedInUser?.teamId || '',
@@ -280,13 +299,26 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
       return subCat ? subCat.name : catId; // fallback to catId if not found
     });
 
+    let finalTeamId = formData.teamId;
+    let finalTeamName = formData.teamName;
+
+    if (formData.tier === 'tier3') {
+      const tier3Category = mainCategories.find(mainCat =>
+        mainCat.name.toLowerCase().trim() === 'tier 3 support'
+      );
+      if (tier3Category) {
+        finalTeamId = tier3Category.id;
+        finalTeamName = tier3Category.name;
+      }
+    }
+
     const payload = {
       serviceNum: formData.id,
       email: emailToUse,
       name: nameToUse,
-      teamId: formData.teamId,
-      team: formData.teamName,
-      tier: String(formData.tier) === 'tier1' ? 'tier1' : 'tier2',
+      teamId: finalTeamId,
+      team: finalTeamName,
+      tier: formData.tier,
       active: formData.active,
       cat1: categoryNames[0] || '',
       cat2: categoryNames[1] || '',
@@ -294,8 +326,6 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
       cat4: categoryNames[3] || '',
       position: formData.position,
       contactNumber: formData.contactNumber,
-
-
       isEdit,
     };
 
@@ -373,7 +403,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
                 <input
                   type="text"
                   name="teamName"
-                  value={formData.teamName}
+                  value={formData.tier === 'tier3' ? 'Tier 3 Support' : formData.teamName}
                   readOnly
                   className="readonly-input"
                 />
@@ -391,6 +421,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
                 <select name="tier" value={formData.tier} onChange={handleChange}>
                   <option value="tier1">Tier1</option>
                   <option value="tier2">Tier2</option>
+                  <option value="tier3">Tier3</option>
                 </select>
               </div>
               <div className="form-left-ActiveCheckBox">

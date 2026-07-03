@@ -12,7 +12,7 @@ import {
   updateIncidentRequest,
 } from '../../../redux/incident/incidentSlice';
 import { fetchAllUsersRequest } from '../../../redux/sltusers/sltusersSlice';
-import { fetchCategoryItemsRequest } from '../../../redux/categories/categorySlice';
+import { fetchCategoryItemsRequest, fetchCategoriesRequest } from '../../../redux/categories/categorySlice';
 import { fetchLocationsRequest } from '../../../redux/location/locationSlice';
 
 const AdminUpdateIncident = () => {
@@ -76,6 +76,7 @@ const AdminUpdateIncident = () => {
   useEffect(() => {
     dispatch(fetchAllUsersRequest());
     dispatch(fetchCategoryItemsRequest());
+    dispatch(fetchCategoriesRequest());
     dispatch(fetchLocationsRequest());
 
     if (location.state?.incidentDetails?.refNo) {
@@ -112,6 +113,19 @@ const AdminUpdateIncident = () => {
   const handleUpdateClick = () => {
     if (!currentIncident) return;
 
+    // Validate Tier 3 category selection
+    if (updateStatusData.transferTo === 'tier3-auto') {
+      const isTier3 = (categoryItems || []).some(item => {
+        return item.name === updateStatusData.category && 
+          item.subCategory?.mainCategory?.name?.toLowerCase().trim() === 'tier 3 support';
+      });
+      
+      if (!isTier3) {
+        alert("Please select a Tier 3 category when transferring to Automatically Assign For Tier 3.");
+        return;
+      }
+    }
+
     const updatedIncidentData = {
       ...currentIncident,
       category: updateStatusData.category || currentIncident.category,
@@ -124,8 +138,6 @@ const AdminUpdateIncident = () => {
     };
     
     dispatch(updateIncidentRequest(updatedIncidentData));
-    
-    
   };
 
   const handleBackClick = () => {
