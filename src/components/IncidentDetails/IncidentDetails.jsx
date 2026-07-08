@@ -371,6 +371,7 @@ const IncidentDetails = ({
       {localIsCategoryPopupOpen && (
         <CategoryDropdown
           categoryDataset={categoryDataset}
+          hideTier3={true}
           onSelect={(category) => {
             setFormData((prev) => ({
               ...prev,

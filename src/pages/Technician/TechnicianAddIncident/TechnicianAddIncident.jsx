@@ -293,6 +293,7 @@ const TechnicianAddIncident = () => {
           <CategoryDropdown
             onSelect={handleCategorySelect}
             onClose={() => setIsCategoryPopupOpen(false)}
+            hideTier3={true}
           />
         </div>
       )}

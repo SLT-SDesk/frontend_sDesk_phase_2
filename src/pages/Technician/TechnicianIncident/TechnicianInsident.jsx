@@ -266,6 +266,19 @@ const TechnicianInsident = ({
       : incidentState.currentIncident;
     if (!currentIncident) return;
 
+    // Validate Tier 3 category selection
+    if (updateStatusData.transferTo === 'tier3-auto') {
+      const isTier3 = (categoryState.categoryItems || []).some(item => {
+        return item.name === updateStatusData.category && 
+          item.subCategory?.mainCategory?.name?.toLowerCase().trim() === 'tier 3 support';
+      });
+      
+      if (!isTier3) {
+        alert("Please select a Tier 3 category when transferring to Automatically Assign For Tier 3.");
+        return;
+      }
+    }
+
     // Create FormData for multipart form submission
     const formData = new FormData();
     
@@ -280,6 +293,9 @@ const TechnicianInsident = ({
       if (updateStatusData.transferTo === 'tier2-auto') {
         // Set the automaticallyAssignForTier2 flag for backend
         formData.append('automaticallyAssignForTier2', 'true');
+      } else if (updateStatusData.transferTo === 'tier3-auto') {
+        // Set the automaticallyAssignForTier3 flag for backend
+        formData.append('automaticallyAssignForTier3', 'true');
       } else if (updateStatusData.transferTo === 'teamadmin') {
         // Set the assignForTeamAdmin flag for backend
         formData.append('assignForTeamAdmin', 'true');

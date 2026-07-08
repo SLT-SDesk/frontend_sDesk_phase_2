@@ -4,6 +4,8 @@ import { FaPlusSquare } from "react-icons/fa";
 import CategoryDropdown from "../CategoryDropdown/CategoryDropDown";
 import LocationDropdown from "../LocationDropdown/LocationDropdown";
 import './UpdateStatus.css';
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCategoriesRequest } from "../../redux/categories/categorySlice";
 
 const UpdateStatus = forwardRef(({
   incidentData,
@@ -14,6 +16,9 @@ const UpdateStatus = forwardRef(({
   onStatusChange,
   loggedInUser,
 }, ref) => {
+  const dispatch = useDispatch();
+  const mainCategories = useSelector((state) => state.categories?.list || []);
+
   const [isCategoryPopupOpen, setIsCategoryPopupOpen] = useState(false);
   const [isLocationPopupOpen, setIsLocationPopupOpen] = useState(false);
   const categoryPopupRef = useRef(null);
@@ -32,6 +37,30 @@ const UpdateStatus = forwardRef(({
   const [notifyUser, setNotifyUser] = useState(false);
   const [priority, setPriority] = useState("");
   const [status, setStatus] = useState("");
+
+  useEffect(() => {
+    dispatch(fetchCategoriesRequest());
+  }, [dispatch]);
+
+  // Revert category if transfer target is changed from Tier 3 while a Tier 3 category is selected
+  useEffect(() => {
+    if (transferTo !== 'tier3-auto') {
+      const isCurrentTier3 = mainCategories.some(mainCat => {
+        if (mainCat.name?.toLowerCase().trim() !== 'tier 3 support') return false;
+        return mainCat.subCategories?.some(subCat => 
+          subCat.categoryItems?.some(item => item.name === selectedCategory.name)
+        );
+      });
+      
+      if (isCurrentTier3 && incident && categoryDataset) {
+        const categoryItem = categoryDataset.find((item) => item.grandchild_category_number === incident.category);
+        setSelectedCategory({ 
+          name: categoryItem ? categoryItem.grandchild_category_name : incidentData.category || "", 
+          number: categoryItem ? categoryItem.grandchild_category_number : "" 
+        });
+      }
+    }
+  }, [transferTo, incident, incidentData, categoryDataset, mainCategories, selectedCategory.name]);
 
   const handleCategorySelect = (selectedCategory) => {
     setSelectedCategory(selectedCategory);
@@ -124,8 +153,8 @@ const UpdateStatus = forwardRef(({
             <Form.Group as={Col} md="3" controlId="category">
               <Form.Label>
                 <FaPlusSquare
-                  onClick={() => loggedInUser.role !== 'technician' && setIsCategoryPopupOpen(true)}
-                  className={`me-1 ${loggedInUser.role !== 'technician' ? 'clickable-icon' : ''}`}
+                  onClick={() => (loggedInUser?.role !== 'technician' || transferTo === 'tier3-auto') && setIsCategoryPopupOpen(true)}
+                  className={`me-1 ${loggedInUser?.role !== 'technician' || transferTo === 'tier3-auto' ? 'clickable-icon' : ''}`}
                 />
                 Category
               </Form.Label>
@@ -133,8 +162,8 @@ const UpdateStatus = forwardRef(({
                 type="text"
                 value={selectedCategory.name}
                 readOnly
-                disabled={loggedInUser.role === 'technician'}
-                onClick={() => loggedInUser.role !== 'technician' && setIsCategoryPopupOpen(true)}
+                disabled={loggedInUser?.role === 'technician' && transferTo !== 'tier3-auto'}
+                onClick={() => (loggedInUser?.role !== 'technician' || transferTo === 'tier3-auto') && setIsCategoryPopupOpen(true)}
               />
             </Form.Group>
 
@@ -151,7 +180,8 @@ const UpdateStatus = forwardRef(({
               <Form.Select value={transferTo} onChange={(e) => setTransferTo(e.target.value)}>
                 <option value="">Select One</option>
                 <option value="tier2-auto">Automatically Assign For Tier2</option>
-                  <option value="teamadmin">Assign For TeamAdmin</option>
+                <option value="tier3-auto">Automatically Assign For Tier3</option>
+                <option value="teamadmin">Assign For TeamAdmin</option>
                 {technicians.map((technician) => (
                   <option key={technician.service_number} value={technician.service_number}>
                     {technician.display_name || technician.user_name}
@@ -235,7 +265,13 @@ const UpdateStatus = forwardRef(({
       </Card.Body>
       {isCategoryPopupOpen && (
         <div ref={categoryPopupRef}>
-          <CategoryDropdown onSelect={handleCategorySelect} onClose={() => setIsCategoryPopupOpen(false)} categoryDataset={categoryDataset} />
+          <CategoryDropdown 
+            onSelect={handleCategorySelect} 
+            onClose={() => setIsCategoryPopupOpen(false)} 
+            categoryDataset={categoryDataset} 
+            showOnlyTier3={transferTo === 'tier3-auto'}
+            hideTier3={transferTo !== 'tier3-auto'}
+          />
         </div>
       )}
       {isLocationPopupOpen && (
