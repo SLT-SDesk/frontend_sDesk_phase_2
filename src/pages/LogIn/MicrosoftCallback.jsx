@@ -1,15 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginWithMicrosoftFailure, loginWithMicrosoftRequest } from '../../redux/auth';
-
 
 function MicrosoftCallback() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, loading, error } = useSelector((state) => state.auth);
 
+  const hasProcessed = useRef(false);
+
   useEffect(() => {
+    if (hasProcessed.current) return;
+
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     const state = urlParams.get('state');
@@ -17,8 +20,12 @@ function MicrosoftCallback() {
     if (!code) {
       dispatch(loginWithMicrosoftFailure('No authorization code found'));
       return;
-    }    const appUrl = (import.meta.env.VITE_APP_URL).replace(/\/$/, '');
-    
+    }
+
+    const appUrl = (import.meta.env.VITE_APP_URL).replace(/\/$/, '');
+
+    hasProcessed.current = true;
+
     dispatch(loginWithMicrosoftRequest({ 
       code, 
       state, 
@@ -34,8 +41,7 @@ function MicrosoftCallback() {
         navigate('/user');
       } else if (user.role === 'technician') {
         navigate('/technician');
-      }
-      else if (user.role === 'superAdmin') {
+      } else if (user.role === 'superAdmin') {
         navigate('/superAdmin');
       }
     }
