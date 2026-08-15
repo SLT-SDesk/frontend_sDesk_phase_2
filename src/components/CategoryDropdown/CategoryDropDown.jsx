@@ -9,7 +9,7 @@ const CategoryDropdown = ({ onSelect, onClose, hideTier3 = false, showOnlyTier3 
     const [expanded, setExpanded] = useState({});
     const [searchTerm, setSearchTerm] = useState('');
     const dispatch = useDispatch();
-    
+
     // Get data from Redux store
     const { list: mainCategories, loading: isLoading, error } = useSelector((state) => state.categories);
     const loggedInUser = useSelector((state) => state.auth?.user);
@@ -37,13 +37,15 @@ const CategoryDropdown = ({ onSelect, onClose, hideTier3 = false, showOnlyTier3 
 
         // Filter categories
         if (showOnlyTier3) {
-            filtered = filtered.filter(mainCategory =>
-                mainCategory.name.toLowerCase().trim() === 'tier 3 support'
-            );
+            filtered = filtered.filter(mainCategory => {
+                const name = mainCategory.name?.toLowerCase().trim();
+                return name === 'tier 3 support' || name === 'tier 3';
+            });
         } else if (hideTier3 || loggedInUser?.role === 'user') {
-            filtered = filtered.filter(mainCategory =>
-                mainCategory.name.toLowerCase().trim() !== 'tier 3 support'
-            );
+            filtered = filtered.filter(mainCategory => {
+                const name = mainCategory.name?.toLowerCase().trim();
+                return name !== 'tier 3 support' && name !== 'tier 3';
+            });
         }
 
         if (!searchTerm.trim()) return filtered;
@@ -55,7 +57,7 @@ const CategoryDropdown = ({ onSelect, onClose, hideTier3 = false, showOnlyTier3 
                 const filteredItems = subCategory.categoryItems.filter(item =>
                     item.name.toLowerCase().includes(searchLower)
                 );
-                
+
                 // Include subcategory if it has matching items or if subcategory name matches
                 if (filteredItems.length > 0 || subCategory.name.toLowerCase().includes(searchLower)) {
                     return {
@@ -129,52 +131,52 @@ const CategoryDropdown = ({ onSelect, onClose, hideTier3 = false, showOnlyTier3 
                         </div>
                     ) : (
                         filteredCategories.map((mainCategory) => (
-                        <div key={mainCategory.id} className="AdminCategoryTree-node">
-                            <div
-                                className="AdminCategoryTree-content-TreePopup-Body-Label"
-                                onClick={() => toggleExpand(`main-${mainCategory.id}`)}
-                            >
-                                {expanded[`main-${mainCategory.id}`] ? (
-                                    <IoMdArrowDropdown className="arrow-icon" />
-                                ) : (
-                                    <IoMdArrowDropright className="arrow-icon" />
-                                )}
-                                {mainCategory.name}
-                            </div>
-                            {expanded[`main-${mainCategory.id}`] && (
-                                <div className="AdminCategoryTree-content-TreePopup-Body-SubNodes">
-                                    {mainCategory.subCategories.map((subcategory) => (
-                                        <div key={subcategory.id} className="AdminCategoryTree-subnode">
-                                            <div
-                                                className="AdminCategoryTree-content-TreePopup-Body-SubNodes-Label"
-                                                onClick={() => toggleExpand(`sub-${subcategory.id}`)}
-                                            >
-                                                {expanded[`sub-${subcategory.id}`] ? (
-                                                    <IoMdArrowDropdown className="arrow-icon" />
-                                                ) : (
-                                                    <IoMdArrowDropright className="arrow-icon" />
-                                                )}
-                                                {subcategory.name}
-                                            </div>
-                                            {expanded[`sub-${subcategory.id}`] && (
-                                                <div className="AdminCategoryTree-items">
-                                                    {subcategory.categoryItems.map((item) => (
-                                                        <div
-                                                            key={item.id}
-                                                            className="AdminCategoryTree-item"
-                                                            onClick={() => handleSelect(item)}
-                                                        >
-                                                            {item.name}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
+                            <div key={mainCategory.id} className="AdminCategoryTree-node">
+                                <div
+                                    className="AdminCategoryTree-content-TreePopup-Body-Label"
+                                    onClick={() => toggleExpand(`main-${mainCategory.id}`)}
+                                >
+                                    {expanded[`main-${mainCategory.id}`] ? (
+                                        <IoMdArrowDropdown className="arrow-icon" />
+                                    ) : (
+                                        <IoMdArrowDropright className="arrow-icon" />
+                                    )}
+                                    {mainCategory.name}
                                 </div>
-                            )}
-                        </div>
-                    ))
+                                {expanded[`main-${mainCategory.id}`] && (
+                                    <div className="AdminCategoryTree-content-TreePopup-Body-SubNodes">
+                                        {mainCategory.subCategories.map((subcategory) => (
+                                            <div key={subcategory.id} className="AdminCategoryTree-subnode">
+                                                <div
+                                                    className="AdminCategoryTree-content-TreePopup-Body-SubNodes-Label"
+                                                    onClick={() => toggleExpand(`sub-${subcategory.id}`)}
+                                                >
+                                                    {expanded[`sub-${subcategory.id}`] ? (
+                                                        <IoMdArrowDropdown className="arrow-icon" />
+                                                    ) : (
+                                                        <IoMdArrowDropright className="arrow-icon" />
+                                                    )}
+                                                    {subcategory.name}
+                                                </div>
+                                                {expanded[`sub-${subcategory.id}`] && (
+                                                    <div className="AdminCategoryTree-items">
+                                                        {subcategory.categoryItems.map((item) => (
+                                                            <div
+                                                                key={item.id}
+                                                                className="AdminCategoryTree-item"
+                                                                onClick={() => handleSelect(item)}
+                                                            >
+                                                                {item.name}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ))
                     )}
                 </div>
             </div>

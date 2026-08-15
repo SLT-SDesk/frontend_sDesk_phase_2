@@ -116,10 +116,11 @@ const AdminUpdateIncident = () => {
     // Validate Tier 3 category selection
     if (updateStatusData.transferTo === 'tier3-auto') {
       const isTier3 = (categoryItems || []).some(item => {
-        return item.name === updateStatusData.category && 
-          item.subCategory?.mainCategory?.name?.toLowerCase().trim() === 'tier 3 support';
+        const parentName = item.subCategory?.mainCategory?.name?.toLowerCase().trim();
+        return item.name === updateStatusData.category &&
+          (parentName === 'tier 3 support' || parentName === 'tier 3');
       });
-      
+
       if (!isTier3) {
         alert("Please select a Tier 3 category when transferring to Automatically Assign For Tier 3.");
         return;
@@ -136,7 +137,7 @@ const AdminUpdateIncident = () => {
       update_by: updateStatusData.updatedBy || currentIncident.update_by,
       description: updateStatusData.description || currentIncident.description,
     };
-    
+
     dispatch(updateIncidentRequest(updatedIncidentData));
   };
 
@@ -154,7 +155,7 @@ const AdminUpdateIncident = () => {
 
   return (
     <div className="AdminUpdateIncident-main-content">
-   
+
 
       <div className="AdminUpdateIncident-content2">
         <AffectedUserDetail formData={formData} />
@@ -171,7 +172,7 @@ const AdminUpdateIncident = () => {
           historyData={incidentHistory}
           users={allUsers}
         />
-        
+
         {currentIncident && (
           <UpdateStatus
             ref={updateStatusRef}

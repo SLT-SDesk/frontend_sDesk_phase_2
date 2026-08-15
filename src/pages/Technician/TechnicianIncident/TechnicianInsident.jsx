@@ -269,10 +269,11 @@ const TechnicianInsident = ({
     // Validate Tier 3 category selection
     if (updateStatusData.transferTo === 'tier3-auto') {
       const isTier3 = (categoryState.categoryItems || []).some(item => {
-        return item.name === updateStatusData.category && 
-          item.subCategory?.mainCategory?.name?.toLowerCase().trim() === 'tier 3 support';
+        const parentName = item.subCategory?.mainCategory?.name?.toLowerCase().trim();
+        return item.name === updateStatusData.category &&
+          (parentName === 'tier 3 support' || parentName === 'tier 3');
       });
-      
+
       if (!isTier3) {
         alert("Please select a Tier 3 category when transferring to Automatically Assign For Tier 3.");
         return;
@@ -281,13 +282,13 @@ const TechnicianInsident = ({
 
     // Create FormData for multipart form submission
     const formData = new FormData();
-    
+
     // Add incident data
     if (updateStatusData.category) formData.append('category', updateStatusData.category);
     if (updateStatusData.location) formData.append('location', updateStatusData.location);
     if (updateStatusData.priority) formData.append('priority', updateStatusData.priority);
     if (updateStatusData.status) formData.append('status', updateStatusData.status);
-    
+
     // Handle transfer logics
     if (updateStatusData.transferTo) {
       if (updateStatusData.transferTo === 'tier2-auto') {
@@ -304,10 +305,10 @@ const TechnicianInsident = ({
         formData.append('handler', updateStatusData.transferTo);
       }
     }
-    
+
     if (updateStatusData.description) formData.append('description', updateStatusData.description);
     if (updateStatusData.updatedBy) formData.append('update_by', updateStatusData.updatedBy);
-    
+
     // Add attachment if present
     if (updateStatusData.selectedFile) {
       formData.append('file', updateStatusData.selectedFile);
@@ -316,7 +317,7 @@ const TechnicianInsident = ({
     console.log("TechnicianInsident: Dispatching update for incident_number:", currentIncident.incident_number);
     // Log formData contents
     for (let pair of formData.entries()) {
-        console.log(pair[0]+ ', ' + pair[1]); 
+      console.log(pair[0] + ', ' + pair[1]);
     }
 
     // Dispatch Redux action to update incident with attachment
@@ -497,7 +498,7 @@ const TechnicianInsident = ({
       {/* Debug panel removed for production UI */}
       <div className="technician-dashboard container-fluid p-0">
         <div className="technician-dashboard-main row m-0">
-         
+
 
           <div className="technician-main-content col-12">
             <div className="row">
@@ -522,7 +523,7 @@ const TechnicianInsident = ({
                   historyData={historyDataWithNames}
                   users={usersState.users || []}
                 />
-                <br/>
+                <br />
               </div>
               {currentIncident && showUpdateStatus && (
                 <div className="col-12 section-gap">
