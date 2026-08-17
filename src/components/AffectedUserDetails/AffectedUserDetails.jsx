@@ -111,7 +111,6 @@ const AffectedUserDetails = ({ formData, setFormData, handleInputChange }) => {
             ) : !loading &&
               !user &&
               error &&
-              error.includes("User not found") &&
               formData.serviceNo &&
               formData.serviceNo.trim().length >= 3 ? (
               <div className="lookup-status error">❌ User Not Found</div>

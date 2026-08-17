@@ -15,6 +15,7 @@ const AdminAddIncident = () => {
   const dispatch = useDispatch();
   // Redux state
   const { loading, error, uploadedAttachment } = useSelector((state) => state.incident);
+  const [createError, setCreateError] = React.useState(null);
   const { user } = useSelector((state) => state.auth);
 
   // Get admin user data
@@ -44,6 +45,20 @@ const AdminAddIncident = () => {
   const locationPopupRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const submittedRef = useRef(false); // Track if we just submitted
+
+  // Clear any stale incident errors on mount
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
+
+  // Only show error if it happened after a submit
+  useEffect(() => {
+    if (error && submittedRef.current) {
+      setCreateError(error);
+      submittedRef.current = false;
+    }
+  }, [error]);
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -98,13 +113,13 @@ const AdminAddIncident = () => {
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    
+
     if (!file) return;
 
     // File type validation
     const allowedTypes = ['pdf', 'png', 'jpg', 'jpeg'];
     const fileExtension = file.name.split('.').pop().toLowerCase();
-    
+
     if (!allowedTypes.includes(fileExtension)) {
       alert('Only PDF, PNG, JPG, and JPEG files are allowed.');
       e.target.value = '';
@@ -197,6 +212,8 @@ const AdminAddIncident = () => {
       return;
     }
 
+    setCreateError(null);
+    submittedRef.current = true;
     dispatch(createIncidentRequest(incidentData));
 
     // Reset form
@@ -245,12 +262,12 @@ const AdminAddIncident = () => {
       );
     }
 
-    if (error) {
+    if (createError) {
       return (
         <div className="status-message error-message">
           <h3> Error Creating Incident</h3>
-          <p>{error}</p>
-          <button onClick={() => dispatch(clearError())}>Dismiss</button>
+          <p>{createError}</p>
+          <button onClick={() => { setCreateError(null); dispatch(clearError()); }}>Dismiss</button>
         </div>
       );
     }

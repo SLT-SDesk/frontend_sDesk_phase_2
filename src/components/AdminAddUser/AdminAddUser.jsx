@@ -53,6 +53,11 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
 
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
+  // Track whether we've already initialized the form for the current editUser.
+  // This prevents subCategories updates (triggered by tier changes) from
+  // re-firing the edit pre-fill effect and resetting the tier back.
+  const editInitializedRef = React.useRef(false);
+
   // Tier3 allowed sub-categories — sourced directly from the flat subCategories state
   // and filtered by matching the "Tier 3 Support" main category.
   const tier3AllowedSubCategories = React.useMemo(() => {
@@ -184,8 +189,18 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
     }
   }, [user, lookupError]);
 
+  // Pre-fill form when opening in edit mode.
+  // We use a ref to ensure this only runs ONCE per editUser open — NOT every time
+  // subCategories updates (which happens when the tier changes and triggers a fetch).
   useEffect(() => {
-    if (!isEdit || !editUser) return;
+    if (!isEdit || !editUser) {
+      editInitializedRef.current = false;
+      return;
+    }
+
+    // Already initialized for this editUser — skip to avoid resetting tier on category refetch
+    if (editInitializedRef.current) return;
+    editInitializedRef.current = true;
 
     const editCategories = [
       editUser.cat1,
@@ -195,7 +210,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
     ]
       .filter(Boolean)
       .map(name => {
-        const sub = filteredSubCategories.find(s => s.name === name);
+        const sub = subCategories.find(s => s.name === name);
         return sub ? sub.id : name;
       });
 
@@ -211,7 +226,8 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
       teamId: loggedInUser?.teamId || '',
       categories: editCategories,
     });
-  }, [isEdit, editUser, loggedInUser?.teamName, loggedInUser?.teamId, filteredSubCategories]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEdit, editUser, loggedInUser?.teamName, loggedInUser?.teamId]);
 
   // Reset formData to initial state (with teamName) every time the modal is opened in add mode
   useEffect(() => {
@@ -241,20 +257,21 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
   }, [loggedInUser]);
 
   // Auto-reset tier to 'tier1' if 'tier3' is selected but the team is not IT Help Desk.
-  // This guards both the Edit pre-fill case and any runtime team change.
+  // Skip this restriction in edit mode — admins should be able to freely change the tier.
   // Also clears selected categories when the tier changes to prevent invalid carry-over.
   useEffect(() => {
-    if (formData.tier === 'tier3' && !isITHelpDeskTeam(formData.teamName)) {
+    if (!isEdit && formData.tier === 'tier3' && !isITHelpDeskTeam(formData.teamName)) {
       setFormData(prev => ({ ...prev, tier: 'tier1', categories: [] }));
     }
-  }, [formData.teamName, formData.tier]);
+  }, [formData.teamName, formData.tier, isEdit]);
 
-  // Derived: which tiers are available based on the current team
-  const availableTiers = isITHelpDeskTeam(
-    formData.tier === 'tier3' ? 'IT Help Desk' : formData.teamName
-  )
+  // Derived: which tiers are available based on the current team.
+  // In edit mode, always show all 3 tiers so the admin can change it freely.
+  const availableTiers = isEdit
     ? ['tier1', 'tier2', 'tier3']
-    : ['tier1', 'tier2'];
+    : isITHelpDeskTeam(formData.teamName)
+      ? ['tier1', 'tier2', 'tier3']
+      : ['tier1', 'tier2'];
 
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
@@ -268,13 +285,16 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
   };
 
   // Tier-specific change handler: guards tier3 selection for non-IT-Help-Desk teams
+  // In edit mode, allow any tier to be selected freely.
   // Also clears selected categories when the tier changes to prevent invalid carry-over.
   const handleTierChange = e => {
     const newTier = e.target.value;
-    const effectiveTeam = isITHelpDeskTeam(formData.teamName) ? formData.teamName : (formData.teamName || '');
-    if (newTier === 'tier3' && !isITHelpDeskTeam(effectiveTeam)) {
-      // Prevent selecting tier3 for non-IT Help Desk teams — silently ignore
-      return;
+    if (!isEdit) {
+      const effectiveTeam = isITHelpDeskTeam(formData.teamName) ? formData.teamName : (formData.teamName || '');
+      if (newTier === 'tier3' && !isITHelpDeskTeam(effectiveTeam)) {
+        // Prevent selecting tier3 for non-IT Help Desk teams — silently ignore
+        return;
+      }
     }
     // Clear categories when tier changes to avoid carrying over invalid selections
     setFormData(prev => ({ ...prev, tier: newTier, categories: [] }));
