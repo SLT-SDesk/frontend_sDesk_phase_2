@@ -480,17 +480,21 @@ const TechnicianInsident = ({
   };
   // Get history data from Redux state
   const historyDataWithNames =
-    incidentState.incidentHistory?.map((h) => ({
-      assignedTo: h.assignedTo,
-      updatedBy: h.updatedBy,
-      updatedOn: new Date(h.updatedOn).toLocaleString(),
-      status: h.status,
-      comments: h.comments,
-      category: getCategoryName(h.category),
-      location: getLocationName(h.location),
-      attachment: h.attachment,
-      attachmentOriginalName: h.attachmentOriginalName,
-    })) || [];
+    incidentState.incidentHistory?.map((h) => {
+      const parsedDate = h.updatedOn ? new Date(h.updatedOn) : null;
+      const validDate = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate : new Date();
+      return {
+        assignedTo: h.assignedTo,
+        updatedBy: h.updatedBy,
+        updatedOn: validDate.toISOString(),
+        status: h.status,
+        comments: h.comments,
+        category: getCategoryName(h.category),
+        location: getLocationName(h.location),
+        attachment: h.attachment,
+        attachmentOriginalName: h.attachmentOriginalName,
+      };
+    }) || [];
 
   // DEBUG PANEL: Show state at the top for troubleshooting
   return (
