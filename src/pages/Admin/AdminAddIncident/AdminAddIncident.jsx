@@ -10,6 +10,7 @@ import {
   clearError,
   uploadAttachmentRequest,
 } from "../../../redux/incident/incidentSlice";
+import { clearLookupUser } from "../../../redux/userLookup/userLookupSlice";
 
 const AdminAddIncident = () => {
   const dispatch = useDispatch();
@@ -35,7 +36,7 @@ const AdminAddIncident = () => {
     email: "",
     category: { name: "", number: "" },
     location: { name: "", number: "" },
-    priority: "",
+    priority: "Medium",
     description: "",
   });
 
@@ -167,12 +168,13 @@ const AdminAddIncident = () => {
       })
       .map((field) => field.label);
     if (missingFields.length > 0) {
-      alert(`Please fill in all required fields: ${missingFields.join(", ")}`);
+      setCreateError(`Please fill in all required fields: ${missingFields.join(", ")}`);
       return;
-    } // Validate priority values
+    }
+    // Validate priority values
     const validPriorities = ["Medium", "High", "Critical"];
     if (!validPriorities.includes(formData.priority)) {
-      alert("Please select a valid priority: Medium, High, or Critical");
+      setCreateError("Please select a valid priority: Medium, High, or Critical");
       return;
     }
 
@@ -200,15 +202,15 @@ const AdminAddIncident = () => {
 
     // Validate data before sending
     if (!incidentData.informant) {
-      alert("User serviceNum missing. Please log in again.");
+      setCreateError("User serviceNum missing. Please log in again.");
       return;
     }
     if (!incidentData.category) {
-      alert("Category is required. Please select a category.");
+      setCreateError("Category is required. Please select a category.");
       return;
     }
     if (!incidentData.location) {
-      alert("Location is required. Please select a location.");
+      setCreateError("Location is required. Please select a location.");
       return;
     }
 
@@ -225,13 +227,14 @@ const AdminAddIncident = () => {
       email: "",
       category: { name: "", number: "" },
       location: { name: "", number: "" },
-      priority: "",
+      priority: "Medium",
       description: "",
     });
     setSelectedFile(null);
     if (document.getElementById("file-upload")) {
       document.getElementById("file-upload").value = "";
     }
+
     setSubmitSuccess(true);
 
     // Clear success message after 5 seconds
@@ -265,8 +268,7 @@ const AdminAddIncident = () => {
     if (createError) {
       return (
         <div className="status-message error-message">
-          <h3> Error Creating Incident</h3>
-          <p>{createError}</p>
+          <h3>⚠️ {createError}</h3>
           <button onClick={() => { setCreateError(null); dispatch(clearError()); }}>Dismiss</button>
         </div>
       );
@@ -303,6 +305,7 @@ const AdminAddIncident = () => {
           setIsCategoryPopupOpen={setIsCategoryPopupOpen}
           setIsLocationPopupOpen={setIsLocationPopupOpen}
           setFormData={setFormData}
+          onIncidentDetailsInteraction={() => dispatch(clearLookupUser())}
         />
         <div className="AdminAddInicident-submit-button-container">
           <button

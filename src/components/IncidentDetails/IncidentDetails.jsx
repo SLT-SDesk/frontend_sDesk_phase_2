@@ -23,6 +23,7 @@ const IncidentDetails = ({
   setIsCategoryPopupOpen,
   setIsLocationPopupOpen,
   setFormData,
+  onIncidentDetailsInteraction,
 }) => {
   const [selectedPriority, setSelectedPriority] = useState(
     formData.priority || ""
@@ -124,7 +125,7 @@ const IncidentDetails = ({
               });
               return;
             }
-            
+
             if (!mainCat.subCategories) continue;
             for (const subCat of mainCat.subCategories) {
               const subName = subCat.name?.trim().toLowerCase() || '';
@@ -181,9 +182,9 @@ const IncidentDetails = ({
     }
 
     // Determine which user to use for priority (prefer affected/lookup user if available, else login user)
-    const activeUser = (lookupUser && lookupUser.serviceNumber) ? { 
-      designation: lookupUser.designation, 
-      gradeName: lookupUser.gradeName 
+    const activeUser = (lookupUser && lookupUser.serviceNumber) ? {
+      designation: lookupUser.designation,
+      gradeName: lookupUser.gradeName
     } : loginUser;
 
     if (activeUser) {
@@ -192,7 +193,7 @@ const IncidentDetails = ({
         ...formData,
         description: debouncedDescription
       });
-      
+
       // Update local state and parent form data if priority changed
       if (autoPriority !== selectedPriority) {
         setSelectedPriority(autoPriority);
@@ -214,6 +215,7 @@ const IncidentDetails = ({
       ...prevFormData,
       priority: newPriority,
     }));
+    if (onIncidentDetailsInteraction) onIncidentDetailsInteraction();
   };
 
   const handleDescriptionChange = (e) => {
@@ -222,6 +224,7 @@ const IncidentDetails = ({
       ...prevFormData,
       description,
     }));
+    if (onIncidentDetailsInteraction) onIncidentDetailsInteraction();
   };
 
   const handleDescriptionBlur = () => {
@@ -378,6 +381,7 @@ const IncidentDetails = ({
               category,
             }));
             setLocalIsCategoryPopupOpen(false);
+            if (onIncidentDetailsInteraction) onIncidentDetailsInteraction();
           }}
           onClose={() => setLocalIsCategoryPopupOpen(false)}
         />
@@ -391,6 +395,7 @@ const IncidentDetails = ({
               location,
             }));
             setLocalIsLocationPopupOpen(false);
+            if (onIncidentDetailsInteraction) onIncidentDetailsInteraction();
           }}
           onClose={() => setLocalIsLocationPopupOpen(false)}
         />
