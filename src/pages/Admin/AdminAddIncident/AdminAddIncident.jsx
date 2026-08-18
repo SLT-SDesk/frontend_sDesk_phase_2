@@ -10,11 +10,13 @@ import {
   clearError,
   uploadAttachmentRequest,
 } from "../../../redux/incident/incidentSlice";
+import { clearLookupUser } from "../../../redux/userLookup/userLookupSlice";
 
 const AdminAddIncident = () => {
   const dispatch = useDispatch();
   // Redux state
   const { loading, error, uploadedAttachment } = useSelector((state) => state.incident);
+  const [createError, setCreateError] = React.useState(null);
   const { user } = useSelector((state) => state.auth);
 
   // Get admin user data
@@ -34,7 +36,7 @@ const AdminAddIncident = () => {
     email: "",
     category: { name: "", number: "" },
     location: { name: "", number: "" },
-    priority: "",
+    priority: "Medium",
     description: "",
   });
 
@@ -44,6 +46,20 @@ const AdminAddIncident = () => {
   const locationPopupRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const submittedRef = useRef(false); // Track if we just submitted
+
+  // Clear any stale incident errors on mount
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
+
+  // Only show error if it happened after a submit
+  useEffect(() => {
+    if (error && submittedRef.current) {
+      setCreateError(error);
+      submittedRef.current = false;
+    }
+  }, [error]);
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -98,13 +114,13 @@ const AdminAddIncident = () => {
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    
+
     if (!file) return;
 
     // File type validation
     const allowedTypes = ['pdf', 'png', 'jpg', 'jpeg'];
     const fileExtension = file.name.split('.').pop().toLowerCase();
-    
+
     if (!allowedTypes.includes(fileExtension)) {
       alert('Only PDF, PNG, JPG, and JPEG files are allowed.');
       e.target.value = '';
@@ -152,12 +168,13 @@ const AdminAddIncident = () => {
       })
       .map((field) => field.label);
     if (missingFields.length > 0) {
-      alert(`Please fill in all required fields: ${missingFields.join(", ")}`);
+      setCreateError(`Please fill in all required fields: ${missingFields.join(", ")}`);
       return;
-    } // Validate priority values
+    }
+    // Validate priority values
     const validPriorities = ["Medium", "High", "Critical"];
     if (!validPriorities.includes(formData.priority)) {
-      alert("Please select a valid priority: Medium, High, or Critical");
+      setCreateError("Please select a valid priority: Medium, High, or Critical");
       return;
     }
 
@@ -185,18 +202,20 @@ const AdminAddIncident = () => {
 
     // Validate data before sending
     if (!incidentData.informant) {
-      alert("User serviceNum missing. Please log in again.");
+      setCreateError("User serviceNum missing. Please log in again.");
       return;
     }
     if (!incidentData.category) {
-      alert("Category is required. Please select a category.");
+      setCreateError("Category is required. Please select a category.");
       return;
     }
     if (!incidentData.location) {
-      alert("Location is required. Please select a location.");
+      setCreateError("Location is required. Please select a location.");
       return;
     }
 
+    setCreateError(null);
+    submittedRef.current = true;
     dispatch(createIncidentRequest(incidentData));
 
     // Reset form
@@ -208,13 +227,14 @@ const AdminAddIncident = () => {
       email: "",
       category: { name: "", number: "" },
       location: { name: "", number: "" },
-      priority: "",
+      priority: "Medium",
       description: "",
     });
     setSelectedFile(null);
     if (document.getElementById("file-upload")) {
       document.getElementById("file-upload").value = "";
     }
+
     setSubmitSuccess(true);
 
     // Clear success message after 5 seconds
@@ -245,12 +265,11 @@ const AdminAddIncident = () => {
       );
     }
 
-    if (error) {
+    if (createError) {
       return (
         <div className="status-message error-message">
-          <h3> Error Creating Incident</h3>
-          <p>{error}</p>
-          <button onClick={() => dispatch(clearError())}>Dismiss</button>
+          <h3>⚠️ {createError}</h3>
+          <button onClick={() => { setCreateError(null); dispatch(clearError()); }}>Dismiss</button>
         </div>
       );
     }
@@ -286,6 +305,7 @@ const AdminAddIncident = () => {
           setIsCategoryPopupOpen={setIsCategoryPopupOpen}
           setIsLocationPopupOpen={setIsLocationPopupOpen}
           setFormData={setFormData}
+          onIncidentDetailsInteraction={() => dispatch(clearLookupUser())}
         />
         <div className="AdminAddInicident-submit-button-container">
           <button

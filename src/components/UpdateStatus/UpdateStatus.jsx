@@ -46,17 +46,18 @@ const UpdateStatus = forwardRef(({
   useEffect(() => {
     if (transferTo !== 'tier3-auto') {
       const isCurrentTier3 = mainCategories.some(mainCat => {
-        if (mainCat.name?.toLowerCase().trim() !== 'tier 3 support') return false;
-        return mainCat.subCategories?.some(subCat => 
+        const name = mainCat.name?.toLowerCase().trim();
+        if (name !== 'tier 3 support' && name !== 'tier 3') return false;
+        return mainCat.subCategories?.some(subCat =>
           subCat.categoryItems?.some(item => item.name === selectedCategory.name)
         );
       });
-      
+
       if (isCurrentTier3 && incident && categoryDataset) {
         const categoryItem = categoryDataset.find((item) => item.grandchild_category_number === incident.category);
-        setSelectedCategory({ 
-          name: categoryItem ? categoryItem.grandchild_category_name : incidentData.category || "", 
-          number: categoryItem ? categoryItem.grandchild_category_number : "" 
+        setSelectedCategory({
+          name: categoryItem ? categoryItem.grandchild_category_name : incidentData.category || "",
+          number: categoryItem ? categoryItem.grandchild_category_number : ""
         });
       }
     }
@@ -124,7 +125,7 @@ const UpdateStatus = forwardRef(({
     setSelectedFile(null);
     setFileName("No file chosen");
     setNotifyUser(false);
-    
+
     // Clear file input
     const fileInput = document.querySelector('input[type="file"]');
     if (fileInput) {
@@ -224,8 +225,8 @@ const UpdateStatus = forwardRef(({
 
           <Form.Group controlId="formFile" className="mb-3">
             <Form.Label>Attachment</Form.Label>
-            <Form.Control 
-              type="file" 
+            <Form.Control
+              type="file"
               accept=".pdf,.png,.jpg,.jpeg"
               onChange={(e) => {
                 const file = e.target.files[0];
@@ -238,7 +239,7 @@ const UpdateStatus = forwardRef(({
                     setSelectedFile(null);
                     return;
                   }
-                  
+
                   // Validate file type
                   const allowedTypes = ['application/pdf', 'image/png', 'image/jpg', 'image/jpeg'];
                   if (!allowedTypes.includes(file.type)) {
@@ -248,7 +249,7 @@ const UpdateStatus = forwardRef(({
                     setSelectedFile(null);
                     return;
                   }
-                  
+
                   setFileName(file.name);
                   setSelectedFile(file);
                 } else {
@@ -265,10 +266,10 @@ const UpdateStatus = forwardRef(({
       </Card.Body>
       {isCategoryPopupOpen && (
         <div ref={categoryPopupRef}>
-          <CategoryDropdown 
-            onSelect={handleCategorySelect} 
-            onClose={() => setIsCategoryPopupOpen(false)} 
-            categoryDataset={categoryDataset} 
+          <CategoryDropdown
+            onSelect={handleCategorySelect}
+            onClose={() => setIsCategoryPopupOpen(false)}
+            categoryDataset={categoryDataset}
             showOnlyTier3={transferTo === 'tier3-auto'}
             hideTier3={transferTo !== 'tier3-auto'}
           />

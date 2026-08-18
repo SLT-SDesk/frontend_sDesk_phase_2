@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "./AffectedUserDetails.css";
 import {
@@ -31,6 +31,7 @@ const useDebounce = (callback, delay) => {
 const AffectedUserDetails = ({ formData, setFormData, handleInputChange }) => {
   const dispatch = useDispatch();
   const { loading, user, error } = useSelector((state) => state.userLookup);
+  const [showLookupStatus, setShowLookupStatus] = useState(false);
 
   // Debounced lookup function
   const debouncedLookup = useDebounce((serviceNum) => {
@@ -46,24 +47,37 @@ const AffectedUserDetails = ({ formData, setFormData, handleInputChange }) => {
     if (
       serviceNum &&
       serviceNum.trim() !== "" &&
-      serviceNum.trim().length >= 3
+      serviceNum.trim().length >= 6
     ) {
       debouncedLookup(serviceNum.trim());
-    } else {
-      // Clear previous lookup results if service number is too short
-      dispatch(clearLookupUser());
-      // Clear user-related fields
-      setFormData((prevData) => ({
-        ...prevData,
-        name: "",
-        email: "",
-        designation: "",
-        tpNumber: "",
-      }));
     }
   };
 
-  // Auto-fill form when user data is found, butonly fill empty fields (do not overwrite manual edits)
+  // Clear fields and user lookup when service no is too short or empty
+  useEffect(() => {
+    if (!formData.serviceNo || formData.serviceNo.trim().length < 6) {
+      dispatch(clearLookupUser());
+      setFormData((prevData) => {
+        if (
+          prevData.name ||
+          prevData.email ||
+          prevData.designation ||
+          prevData.tpNumber
+        ) {
+          return {
+            ...prevData,
+            name: "",
+            email: "",
+            designation: "",
+            tpNumber: "",
+          };
+        }
+        return prevData;
+      });
+    }
+  }, [formData.serviceNo, dispatch, setFormData]);
+
+  // Auto-fill form when user data is found
   useEffect(() => {
     if (user) {
       console.log("LOOKUP USER:", user);
@@ -77,6 +91,17 @@ const AffectedUserDetails = ({ formData, setFormData, handleInputChange }) => {
       }));
     }
   }, [user, setFormData]);
+
+  // Handle visibility of lookup status notifications (auto-dismiss after 3s)
+  useEffect(() => {
+    if (user || error) {
+      setShowLookupStatus(true);
+      const timer = setTimeout(() => {
+        setShowLookupStatus(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [user, error]);
 
 
   // Clear lookup user data on component unmount
@@ -106,14 +131,14 @@ const AffectedUserDetails = ({ formData, setFormData, handleInputChange }) => {
               onChange={handleServiceNoChange}
               required
             />
-            {user ? (
+            {showLookupStatus && user ? (
               <div className="lookup-status success">✅ User Found</div>
-            ) : !loading &&
+            ) : showLookupStatus &&
+              !loading &&
               !user &&
               error &&
-              error.includes("User not found") &&
               formData.serviceNo &&
-              formData.serviceNo.trim().length >= 3 ? (
+              formData.serviceNo.trim().length >= 6 ? (
               <div className="lookup-status error">❌ User Not Found</div>
             ) : null}
           </div>

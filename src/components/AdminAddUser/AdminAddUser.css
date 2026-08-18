@@ -124,26 +124,33 @@
   cursor: pointer;
   font-weight: 600;
 }
+
 .form-left-ActiveCheckBox {
   display: flex;
-  flex-grow: 1;
+  align-items: center;
+  gap: 4px;
 }
+
 .form-left-ActiveCheckBox input[type="checkbox"] {
-  margin-left: -150px;
-  transform: scale(0.65);
+  width: auto;
+  transform: scale(1.4);
+  cursor: pointer;
+  margin: 0;
 }
 
 .AdminAddUser-form-submit button:hover {
   background: #8b0b0b;
 }
+
 .checkbox-item input[type="checkbox"] {
   width: auto;
   margin-right: 8px;
 }
 
-.checkbox-item input[type="checkbox"]:disabled + span {
+.checkbox-item input[type="checkbox"]:disabled+span {
   color: #9ca3af;
 }
+
 .error-message {
   color: red;
   font-size: 12px;

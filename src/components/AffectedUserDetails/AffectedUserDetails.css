@@ -1,133 +1,146 @@
 .AddInicident-content2-UserDetails {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    margin: 10px 10px 0px 0px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    padding-bottom: 2px;
-  }
-  /* Increase height of the Affected User Details section */
-  .AddInicident-content2-UserDetails {
-    min-height: 130px;
-  }
-  .AddInicident-content2-UserDetails-TitleBar {
-    font-size: 18px;
-    font-weight: bold;
-    padding: 3px 0px 3px 10px;
-  }
-  
-  .AddInicident-content2-UserDetails-UserInfo {
-    background-color: white;
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    margin-top: 1%;
-  }
-    .AddInicident-content2-UserDetails-UserInfo-Cube1 {
-    display: flex;
-    width: 15%;
-    flex-direction: column;
-  }
-    .AddInicident-content2-UserDetails-UserInfo-Cube1-title {
-    font-size: 11px;
-    font-weight: bold;
-    padding: 2px 0px 2px 10px;
-  }  .AddInicident-content2-UserDetails-UserInfo-Cube1-input {
-    max-width: 100%;
-    padding: 0px 8px 2px 8px;
-    display: flex;
-    flex-direction: column;
-  }    .AddInicident-content2-UserDetails-UserInfo-Cube1-input input {
-    width: 100%;
-    padding: 6px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 11px;
-    height: 28px;
-    flex-shrink: 0;
-  }
-    .AddInicident-content2-UserDetails-UserInfo-Cube2 {
-    display: flex;
-    width: 20%;
-    flex-direction: column;
-  }
-  .AddInicident-content2-UserDetails-UserInfo-Cube2 .AddInicident-content2-UserDetails-UserInfo-Cube1-title {
-    font-size: 11px;
-    font-weight: bold;
-    padding: 2px 0px 2px 10px;
-  }
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  margin: 10px 10px 0px 0px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding-bottom: 2px;
+}
 
-  .AddInicident-content2-UserDetails-UserInfo-Cube2 .AddInicident-content2-UserDetails-UserInfo-Cube1-input {
-    max-width: 100%;
-    padding: 0px 8px 2px 8px;
-  }
+/* Increase height of the Affected User Details section */
+.AddInicident-content2-UserDetails {
+  min-height: 130px;
+}
 
-  .AddInicident-content2-UserDetails-UserInfo-Cube2 .AddInicident-content2-UserDetails-UserInfo-Cube1-input input {
-    width: 100%;
-    padding: 6px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 11px;
-    height: 28px;
-  }
+.AddInicident-content2-UserDetails-TitleBar {
+  font-size: 18px;
+  font-weight: bold;
+  padding: 3px 0px 3px 10px;
+}
 
-  .AddInicident-content2-UserDetails-UserInfo-Cube3 {
-    display: flex;
-    width: 20%;
-    flex-direction: column;
-  }
-  .AddInicident-content2-UserDetails-UserInfo-Cube3 .AddInicident-content2-UserDetails-UserInfo-Cube1-title {
-    font-size: 11px;
-    font-weight: bold;
-    padding: 2px 0px 2px 10px;
-  }
+.AddInicident-content2-UserDetails-UserInfo {
+  background-color: white;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 1%;
+}
 
-  .AddInicident-content2-UserDetails-UserInfo-Cube3 .AddInicident-content2-UserDetails-UserInfo-Cube1-input {
-    max-width: 100%;
-    padding: 0px 8px 2px 8px;
-  }
+.AddInicident-content2-UserDetails-UserInfo-Cube1 {
+  display: flex;
+  width: 15%;
+  flex-direction: column;
+}
 
-  .AddInicident-content2-UserDetails-UserInfo-Cube3 .AddInicident-content2-UserDetails-UserInfo-Cube1-input input {
-    width: 100%;
-    padding: 6px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 11px;
-    height: 28px;
-  }/* Lookup status messages styling */
-  .lookup-status {
-    font-size: 9px;
-    padding: 1px 3px;
-    margin-top: 1px;
-    border-radius: 3px;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
+.AddInicident-content2-UserDetails-UserInfo-Cube1-title {
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 0px 2px 10px;
+}
 
-  .lookup-status.loading {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeaa7;
-  }
+.AddInicident-content2-UserDetails-UserInfo-Cube1-input {
+  max-width: 100%;
+  padding: 0px 8px 2px 8px;
+  display: flex;
+  flex-direction: column;
+}
 
-  .lookup-status.success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-  }
+.AddInicident-content2-UserDetails-UserInfo-Cube1-input input {
+  width: 100%;
+  padding: 6px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 11px;
+  height: 28px;
+  flex-shrink: 0;
+}
 
-  .lookup-status.error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-  }
+.AddInicident-content2-UserDetails-UserInfo-Cube2 {
+  display: flex;
+  width: 20%;
+  flex-direction: column;
+}
+
+.AddInicident-content2-UserDetails-UserInfo-Cube2 .AddInicident-content2-UserDetails-UserInfo-Cube1-title {
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 0px 2px 10px;
+}
+
+.AddInicident-content2-UserDetails-UserInfo-Cube2 .AddInicident-content2-UserDetails-UserInfo-Cube1-input {
+  max-width: 100%;
+  padding: 0px 8px 2px 8px;
+}
+
+.AddInicident-content2-UserDetails-UserInfo-Cube2 .AddInicident-content2-UserDetails-UserInfo-Cube1-input input {
+  width: 100%;
+  padding: 6px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 11px;
+  height: 28px;
+}
+
+.AddInicident-content2-UserDetails-UserInfo-Cube3 {
+  display: flex;
+  width: 20%;
+  flex-direction: column;
+}
+
+.AddInicident-content2-UserDetails-UserInfo-Cube3 .AddInicident-content2-UserDetails-UserInfo-Cube1-title {
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 0px 2px 10px;
+}
+
+.AddInicident-content2-UserDetails-UserInfo-Cube3 .AddInicident-content2-UserDetails-UserInfo-Cube1-input {
+  max-width: 100%;
+  padding: 0px 8px 2px 8px;
+}
+
+.AddInicident-content2-UserDetails-UserInfo-Cube3 .AddInicident-content2-UserDetails-UserInfo-Cube1-input input {
+  width: 100%;
+  padding: 6px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 11px;
+  height: 28px;
+}
+
+/* Lookup status messages styling */
+.lookup-status {
+  font-size: 9px;
+  padding: 1px 3px;
+  margin-top: 1px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.lookup-status.loading {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.lookup-status.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.lookup-status.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
