@@ -10,6 +10,15 @@ import {
 } from "../../redux/userLookup/userLookupSlice";
 
 
+// Helper: returns true if the given team name is "IT Help Desk" (case-insensitive)
+const isITHelpDeskTeam = (teamName) =>
+  typeof teamName === 'string' && teamName.toLowerCase().trim() === 'it help desk';
+
+// Helper: returns true if the given main category name represents Tier 3 (case-insensitive)
+const isTier3CategoryName = (name) =>
+  typeof name === 'string' && (name.toLowerCase().trim() === 'tier 3 support' || name.toLowerCase().trim() === 'tier 3');
+
+
 const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addTechnicianError, allTechnicians = [] }) => {
   // Show error if technician already exists (on submit)
   const showSubmitUserExists =
@@ -25,6 +34,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
   const subCategories = useSelector(state => state.categories?.subCategories || []);
   const { user, loading: lookupLoading, error: lookupError } =
     useSelector(state => state.userLookup);
+
 
   const [formData, setFormData] = useState({
     id: '',
@@ -43,46 +53,66 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
 
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
+  // Track whether we've already initialized the form for the current editUser.
+  // This prevents subCategories updates (triggered by tier changes) from
+  // re-firing the edit pre-fill effect and resetting the tier back.
+  const editInitializedRef = React.useRef(false);
+
+  // Tier3 allowed sub-categories — sourced directly from the flat subCategories state
+  // and filtered by matching the "Tier 3 Support" main category.
+  const tier3AllowedSubCategories = React.useMemo(() => {
+    const tier3MainCat = mainCategories.find(mainCat =>
+      isTier3CategoryName(mainCat.name)
+    );
+    const tier3MainCatId = tier3MainCat?.id;
+
+    return subCategories.filter(subCat => {
+      const matchId = tier3MainCatId && (
+        subCat.mainCategoryId === tier3MainCatId ||
+        subCat.main_category_id === tier3MainCatId ||
+        subCat.mainCategory?.id === tier3MainCatId
+      );
+      const matchName = isTier3CategoryName(subCat.mainCategory?.name);
+      const hasItems = subCat.categoryItems && subCat.categoryItems.length > 0;
+
+      return (matchId || matchName) && hasItems;
+    });
+  }, [mainCategories, subCategories]);
+
   // Memoize filtered subcategories to prevent recalculation on every render
   // For admins, show all subcategories based on teamName match instead of teamId
   const filteredSubCategories = React.useMemo(() => {
     if (!loggedInUser) return subCategories;
-    
+
+    // When Tier3 is selected, show only the Super Admin's Tier3 categories
+    // (sub-categories belonging to the "Tier 3 Support" main category)
     if (formData.tier === 'tier3') {
-      const tier3Category = mainCategories.find(mainCat =>
-        mainCat.name.toLowerCase().trim() === 'tier 3 support'
-      );
-      if (tier3Category) {
-        return subCategories.filter(subCat =>
-          subCat.mainCategory?.id === tier3Category.id ||
-          subCat.mainCategory?.name === tier3Category.name
-        );
-      }
+      return tier3AllowedSubCategories;
     }
 
     // First try to find matching main category by teamId
     let userMainCategory = mainCategories.find(mainCat =>
       mainCat.id === loggedInUser?.teamId
     );
-    
+
     // If not found by teamId, try by teamName
     if (!userMainCategory && loggedInUser?.teamName) {
       userMainCategory = mainCategories.find(mainCat =>
         mainCat.name === loggedInUser.teamName
       );
     }
-    
+
     // If we found a matching main category, filter subcategories by it
     if (userMainCategory) {
-      return subCategories.filter(subCat => 
+      return subCategories.filter(subCat =>
         subCat.mainCategory?.id === userMainCategory.id ||
         subCat.mainCategory?.name === userMainCategory.name
       );
     }
-    
+
     // If no match found, return all subcategories as fallback
     return subCategories;
-  }, [subCategories, mainCategories, loggedInUser?.teamId, loggedInUser?.teamName, formData.tier]);
+  }, [subCategories, mainCategories, loggedInUser?.teamId, loggedInUser?.teamName, formData.tier, tier3AllowedSubCategories]);
 
 
   useEffect(() => {
@@ -105,14 +135,11 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
   // Fetch subcategories when mainCategories are loaded, when loggedInUser changes, or when the selected tier changes
   useEffect(() => {
     if (mainCategories.length === 0) return;
-    
+
     if (formData.tier === 'tier3') {
-      const tier3Category = mainCategories.find(mainCat =>
-        mainCat.name.toLowerCase().trim() === 'tier 3 support'
-      );
-      if (tier3Category) {
-        dispatch(fetchSubCategoriesByMainCategoryIdRequest(tier3Category.id));
-      }
+      // For Tier3, we fetch all sub categories using the general endpoint so that
+      // the nested categoryItems relations are correctly populated.
+      dispatch({ type: 'categories/fetchSubCategoriesRequest' });
     } else if (loggedInUser?.teamId || loggedInUser?.teamName) {
       // Find the main category that matches the logged-in user's team
       const userMainCategory = mainCategories.find(mainCat =>
@@ -126,6 +153,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
       }
     }
   }, [dispatch, loggedInUser, mainCategories, formData.tier]);
+
 
   useEffect(() => {
     if (isEdit) return;
@@ -161,8 +189,18 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
     }
   }, [user, lookupError]);
 
+  // Pre-fill form when opening in edit mode.
+  // We use a ref to ensure this only runs ONCE per editUser open — NOT every time
+  // subCategories updates (which happens when the tier changes and triggers a fetch).
   useEffect(() => {
-    if (!isEdit || !editUser) return;
+    if (!isEdit || !editUser) {
+      editInitializedRef.current = false;
+      return;
+    }
+
+    // Already initialized for this editUser — skip to avoid resetting tier on category refetch
+    if (editInitializedRef.current) return;
+    editInitializedRef.current = true;
 
     const editCategories = [
       editUser.cat1,
@@ -172,7 +210,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
     ]
       .filter(Boolean)
       .map(name => {
-        const sub = filteredSubCategories.find(s => s.name === name);
+        const sub = subCategories.find(s => s.name === name);
         return sub ? sub.id : name;
       });
 
@@ -188,7 +226,8 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
       teamId: loggedInUser?.teamId || '',
       categories: editCategories,
     });
-  }, [isEdit, editUser, loggedInUser?.teamName, loggedInUser?.teamId, filteredSubCategories]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEdit, editUser, loggedInUser?.teamName, loggedInUser?.teamId]);
 
   // Reset formData to initial state (with teamName) every time the modal is opened in add mode
   useEffect(() => {
@@ -217,6 +256,23 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
     }
   }, [loggedInUser]);
 
+  // Auto-reset tier to 'tier1' if 'tier3' is selected but the team is not IT Help Desk.
+  // Skip this restriction in edit mode — admins should be able to freely change the tier.
+  // Also clears selected categories when the tier changes to prevent invalid carry-over.
+  useEffect(() => {
+    if (!isEdit && formData.tier === 'tier3' && !isITHelpDeskTeam(formData.teamName)) {
+      setFormData(prev => ({ ...prev, tier: 'tier1', categories: [] }));
+    }
+  }, [formData.teamName, formData.tier, isEdit]);
+
+  // Derived: which tiers are available based on the current team.
+  // In edit mode, always show all 3 tiers so the admin can change it freely.
+  const availableTiers = isEdit
+    ? ['tier1', 'tier2', 'tier3']
+    : isITHelpDeskTeam(formData.teamName)
+      ? ['tier1', 'tier2', 'tier3']
+      : ['tier1', 'tier2'];
+
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -225,6 +281,25 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
     }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: undefined }));
+    }
+  };
+
+  // Tier-specific change handler: guards tier3 selection for non-IT-Help-Desk teams
+  // In edit mode, allow any tier to be selected freely.
+  // Also clears selected categories when the tier changes to prevent invalid carry-over.
+  const handleTierChange = e => {
+    const newTier = e.target.value;
+    if (!isEdit) {
+      const effectiveTeam = isITHelpDeskTeam(formData.teamName) ? formData.teamName : (formData.teamName || '');
+      if (newTier === 'tier3' && !isITHelpDeskTeam(effectiveTeam)) {
+        // Prevent selecting tier3 for non-IT Help Desk teams — silently ignore
+        return;
+      }
+    }
+    // Clear categories when tier changes to avoid carrying over invalid selections
+    setFormData(prev => ({ ...prev, tier: newTier, categories: [] }));
+    if (errors.tier) {
+      setErrors(prev => ({ ...prev, tier: undefined }));
     }
   };
 
@@ -271,6 +346,21 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
       newErrors.categories = 'Can assign only up to 4 categories';
     }
 
+    // Validate: Tier3 is only allowed for IT Help Desk team
+    const effectiveTeamForValidation = formData.tier === 'tier3' ? 'IT Help Desk' : formData.teamName;
+    if (formData.tier === 'tier3' && !isITHelpDeskTeam(effectiveTeamForValidation)) {
+      newErrors.tier = 'Tier3 is only available for the IT Help Desk team';
+    }
+
+    // Validate: for Tier3, selected categories must all be from the Tier3 allowed list
+    if (formData.tier === 'tier3' && tier3AllowedSubCategories.length > 0) {
+      const allowedIds = new Set(tier3AllowedSubCategories.map(s => s.id));
+      const hasInvalidCategory = formData.categories.some(catId => !allowedIds.has(catId));
+      if (hasInvalidCategory) {
+        newErrors.categories = 'Selected categories are not allowed for Tier3';
+      }
+    }
+
     // Team Leader validation
     if (formData.position === 'teamLeader') {
       const teamLeadersInTeam = allTechnicians.filter(
@@ -304,7 +394,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
 
     if (formData.tier === 'tier3') {
       const tier3Category = mainCategories.find(mainCat =>
-        mainCat.name.toLowerCase().trim() === 'tier 3 support'
+        mainCat.name.toLowerCase().trim() === 'it help desk'
       );
       if (tier3Category) {
         finalTeamId = tier3Category.id;
@@ -403,7 +493,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
                 <input
                   type="text"
                   name="teamName"
-                  value={formData.tier === 'tier3' ? 'Tier 3 Support' : formData.teamName}
+                  value={formData.tier === 'tier3' ? 'IT Help Desk' : formData.teamName}
                   readOnly
                   className="readonly-input"
                 />
@@ -418,11 +508,14 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
               </div>
               <div>
                 <label>Tier:</label>
-                <select name="tier" value={formData.tier} onChange={handleChange}>
-                  <option value="tier1">Tier1</option>
-                  <option value="tier2">Tier2</option>
-                  <option value="tier3">Tier3</option>
+                <select name="tier" value={formData.tier} onChange={handleTierChange}>
+                  {availableTiers.map(tier => (
+                    <option key={tier} value={tier}>
+                      {tier.charAt(0).toUpperCase() + tier.slice(1)}
+                    </option>
+                  ))}
                 </select>
+                {errors.tier && <span className="error-message">{errors.tier}</span>}
               </div>
               <div className="form-left-ActiveCheckBox">
                 <label>Active:</label>

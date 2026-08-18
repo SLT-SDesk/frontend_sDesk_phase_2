@@ -59,9 +59,16 @@ apiClient.interceptors.response.use(
     const status = error.response?.status;
     const backendMessage: string | undefined =
       error.response?.data?.message || error.response?.data?.error;
+
+    // Don't intercept token refresh for these endpoints — let sagas handle errors directly
+    const requestUrl = originalRequest?.url || '';
+    const skipRefreshUrls = ['/users/lookup/'];
+    const shouldSkipRefresh = skipRefreshUrls.some((url) => requestUrl.includes(url));
+
     const shouldAttemptRefresh =
-      status === 401 ||
-      (backendMessage && /token|expired|invalid/i.test(backendMessage));
+      !shouldSkipRefresh &&
+      (status === 401 ||
+        (backendMessage && /token|expired|invalid/i.test(backendMessage)));
     if (!shouldAttemptRefresh) {
       return Promise.reject(error);
     }
@@ -99,7 +106,7 @@ apiClient.interceptors.response.use(
     return new Promise<AxiosResponse>((resolve, reject) => {
       pendingRequests.push({ resolve, reject, config: originalRequest });
       if (refreshPromise) {
-        refreshPromise.catch(() => {});
+        refreshPromise.catch(() => { });
       }
     });
   }

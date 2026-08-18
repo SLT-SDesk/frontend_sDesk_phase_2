@@ -9,9 +9,9 @@ import * as userLookupService from './userLookupService';
 function* lookupUserSaga(action: any) {
   const maxRetries = 2;
   let retryCount = 0;
-  
+
   // ...existing code...
-  
+
   while (retryCount <= maxRetries) {
     try {
       const response = yield call(userLookupService.lookupUserByServiceNum, action.payload);
@@ -26,11 +26,11 @@ function* lookupUserSaga(action: any) {
         retryCount = maxRetries + 1;
       }
       // If this is not the last attempt and it's a retryable error, retry
-      if (retryCount <= maxRetries && 
-          (error.code === 'ECONNREFUSED' || 
-           error.code === 'ERR_NETWORK' || 
-           error.code === 'ECONNABORTED' ||
-           (!error.response && !status))) {
+      if (retryCount <= maxRetries &&
+        (error.code === 'ECONNREFUSED' ||
+          error.code === 'ERR_NETWORK' ||
+          error.code === 'ECONNABORTED' ||
+          (!error.response && !status))) {
         yield delay(1000); // Wait 1 second before retry
         continue;
       }
@@ -43,7 +43,9 @@ function* lookupUserSaga(action: any) {
         errorMessage = 'Request timeout. Please try again.';
       } else if (error.response) {
         if (status === 404) {
-          errorMessage = `User not found with service number: ${action.payload}`;
+          errorMessage = `No user found with service number: ${action.payload}`;
+        } else if (status === 401) {
+          errorMessage = 'Session expired. Please refresh the page and try again.';
         } else if (status === 500) {
           errorMessage = 'Server error occurred while looking up user';
         } else if (status === 403) {

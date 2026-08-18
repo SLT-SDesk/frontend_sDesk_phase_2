@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { createCategoryRequest, fetchMainCategoriesRequest, fetchSubCategoriesRequest, fetchSubCategoriesByMainCategoryIdRequest, createCategoryItemRequest, updateCategoryItemRequest } from '../../redux/categories/categorySlice';
+import { 
+    createCategoryRequest, 
+    fetchMainCategoriesRequest, 
+    fetchSubCategoriesRequest, 
+    fetchSubCategoriesByMainCategoryIdRequest, 
+    createCategoryItemRequest, 
+    updateCategoryItemRequest,
+    fetchCategoryItemsRequest 
+} from '../../redux/categories/categorySlice';
 import './AdminAddCategory.css';
 
 const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = null }) => {
@@ -73,7 +81,6 @@ const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = nu
             if (!formData.sub || !uuidRegex.test(formData.sub)) {
                 newErrors.sub = 'Sub Category is invalid (not a valid ID)';
             }
-
         }
 
         setErrors(newErrors);
@@ -142,6 +149,7 @@ const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = nu
                     subCategoryId: formData.sub
                 };
                 dispatch(updateCategoryItemRequest(payload));
+                dispatch(fetchCategoryItemsRequest());
                 setLocalSuccess('Category item updated successfully!✅');
                 setTimeout(() => {
                     setLocalSuccess('');
@@ -150,13 +158,13 @@ const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = nu
                 setTimeout(() => setIsSubmitting(false), 1000);
                 return;
             }
-            // Optionally handle other types if needed
         }
         if (Object.keys(newErrors).length > 0) {
             setIsSubmitting(false);
             return;
         }
     };
+
     const filteredSubCategories = categoryType === 'grandchild' && formData.parent
         ? subCategories.filter(sub => sub.mainCategory && sub.mainCategory.id === formData.parent)
         : [];
@@ -165,6 +173,7 @@ const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = nu
         if (categoryType === 'parent' && !isEdit) {
             if (mainCategorySuccess && !mainCategoryError && !errors.name && formData.name) {
                 setLocalSuccess('Parent category added successfully!✅');
+                dispatch(fetchMainCategoriesRequest());
                 setTimeout(() => {
                     setLocalSuccess('');
                     onSubmit && onSubmit({ name: formData.name });
@@ -175,22 +184,25 @@ const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = nu
         if (categoryType === 'sub' && !isEdit) {
             if (subCategorySuccess && !subCategoryError && !errors.name && formData.name && formData.parent) {
                 setLocalSuccess('Subcategory added successfully!✅');
+                dispatch(fetchSubCategoriesRequest());
+                dispatch(fetchCategoryItemsRequest());
                 setTimeout(() => {
                     setLocalSuccess('');
                     onClose();
-                }, 2000);
+                }, 1000);
             }
         }
         if (categoryType === 'grandchild' && !isEdit) {
             if (categoryItemSuccess && !categoryItemError && !errors.name && formData.name && formData.sub) {
                 setLocalSuccess('Category item added successfully!✅');
+                dispatch(fetchCategoryItemsRequest());
                 setTimeout(() => {
                     setLocalSuccess('');
                     onClose();
-                }, 2000);
+                }, 1000);
             }
         }
-    }, [mainCategoryError, mainCategorySuccess, categoryError, subCategorySuccess, subCategoryError, categoryItemSuccess, categoryItemError]);
+    }, [mainCategoryError, mainCategorySuccess, categoryError, subCategorySuccess, subCategoryError, categoryItemSuccess, categoryItemError, dispatch, formData, isEdit, onClose, onSubmit, categoryType, errors.name]);
 
 
     return (
@@ -242,7 +254,6 @@ const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = nu
                                     aria-describedby={errors.name || mainCategoryError === 'DUPLICATE_NAME' ? "parent-name-error" : undefined}
                                     aria-invalid={!!(errors.name || mainCategoryError === 'DUPLICATE_NAME')}
                                 />
-                                {/* Show required field error or duplicate name error */}
                                 {(errors.name || mainCategoryError === 'DUPLICATE_NAME') && (
                                     <div id="parent-name-error" className="AdminAddCategory-content1-error-message" role="alert">
                                         {mainCategoryError === 'DUPLICATE_NAME' && (
@@ -290,7 +301,6 @@ const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = nu
                                         aria-describedby={errors.name || subCategoryError === 'DUPLICATE_NAME' ? "sub-name-error" : undefined}
                                         aria-invalid={!!(errors.name || subCategoryError === 'DUPLICATE_NAME')}
                                     />
-                                    {/* Show required field error or duplicate name error under the input */}
                                     {(errors.name || subCategoryError === 'DUPLICATE_NAME') && (
                                         <div id="sub-name-error" className="AdminAddCategory-content1-error-message" role="alert">
                                             {subCategoryError === 'DUPLICATE_NAME' && (
@@ -365,7 +375,6 @@ const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = nu
                                         aria-describedby={errors.name || categoryItemError === 'DUPLICATE_NAME' ? "grandchild-name-error" : undefined}
                                         aria-invalid={!!(errors.name || categoryItemError === 'DUPLICATE_NAME')}
                                     />
-                                    {/* Show required field error or duplicate name error under the input */}
                                     {(errors.name || categoryItemError === 'DUPLICATE_NAME') && (
                                         <div id="grandchild-name-error" className="AdminAddCategory-content1-error-message" role="alert">
                                             {categoryItemError === 'DUPLICATE_NAME' && (

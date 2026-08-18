@@ -8,10 +8,11 @@ import { downloadAttachment } from '../../redux/incident/incidentService';
 
 // Helper function to format date as 'YYYY-MM-DD HH:mm:ss'
 const formatDateTime = (dateString) => {
-  if (!dateString) return 'N/A';
-  const date = new Date(dateString);
-  const pad = (n) => n.toString().padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'N/A';
+    const pad = (n) => n.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 };
 
 const IncidentHistory = ({ refNo, category, location, priority, historyData, users }) => {
@@ -51,7 +52,7 @@ const IncidentHistory = ({ refNo, category, location, priority, historyData, use
     const handleDownloadAttachment = async (filename, originalName) => {
         try {
             const response = await downloadAttachment(filename);
-            
+
             // Create blob link for download
             const blob = new Blob([response.data], { type: response.headers['content-type'] });
             const url = window.URL.createObjectURL(blob);
@@ -103,7 +104,7 @@ const IncidentHistory = ({ refNo, category, location, priority, historyData, use
                                                     onClick={() => handleDownloadAttachment(entry.attachment, entry.attachmentOriginalName)}
                                                     className="d-flex align-items-center"
                                                     style={{ backgroundColor: '#007bff', color: '#fff', border: 'none' }}
-                                                > 
+                                                >
                                                     <FaDownload className="me-1" />
                                                     {entry.attachmentOriginalName || entry.attachment}
                                                 </Button>
@@ -122,7 +123,7 @@ const IncidentHistory = ({ refNo, category, location, priority, historyData, use
                     </Table>
                 </div>
             </Card.Body>
-            <Card.Footer className="bg-light text-muted d-flex flex-row gap-2 justify-content-start flex-wrap" style={{gap: '0.75rem'}}>
+            <Card.Footer className="bg-light text-muted d-flex flex-row gap-2 justify-content-start flex-wrap" style={{ gap: '0.75rem' }}>
                 <div className="me-2"><strong>Category:</strong> {getCategoryName(category)}</div>
                 <div className="me-2"><strong>Location:</strong> {getLocationName(location)}</div>
                 <div><strong>Priority:</strong> {priority}</div>
