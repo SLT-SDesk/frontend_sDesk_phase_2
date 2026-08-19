@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchTeamAdminsRequest,
@@ -56,6 +56,7 @@ const ManageTeamAdmin = () => {
     (state) =>
       state.teamAdmin || { teamAdmins: [], loading: false, error: null }
   );
+  const lookupTimeoutRef = useRef(null);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(initialForm);
   const [submitError, setSubmitError] = useState("");
@@ -108,23 +109,29 @@ const ManageTeamAdmin = () => {
   const handleServiceNumberChange = (e) => {
     const value = e.target.value;
 
-    setForm((prev) => ({ ...prev, serviceNumber: value }));
+    setForm((prev) => ({
+      ...prev,
+      serviceNumber: value,
+      userName: "",
+      email: "",
+      contactNumber: "",
+      designation: "admin",
+    }));
     setHasCheckedUser(false);
     setSubmitError("");
 
-    if (!value.trim() || value.trim().length < 3) {
+    if (lookupTimeoutRef.current) {
+      clearTimeout(lookupTimeoutRef.current);
+    }
+
+    if (!value.trim() || value.trim().length < 6) {
       dispatch(clearLookupUser());
-      setForm((prev) => ({
-        ...prev,
-        userName: "",
-        email: "",
-        contactNumber: "",
-        designation: "admin",
-      }));
       return;
     }
 
-    dispatch(lookupUserRequest(value.trim()));
+    lookupTimeoutRef.current = setTimeout(() => {
+      dispatch(lookupUserRequest(value.trim()));
+    }, 500);
   };
 
   // --- Edit with Confirmation on Pencil Icon Click ---
@@ -179,21 +186,21 @@ const ManageTeamAdmin = () => {
       teamName: form.teamName,
     };
     dispatch(updateTeamAdminRequest({ id: editId, data: payload }));
-    setInfoMessage("Admin updated successfully!");
     setShowModal(false);
+    setInfoMessage("Admin updated successfully!");
     setTimeout(() => setInfoMessage(""), 2000);
   };
 
- const handleAddClick = () => {
-  setForm(initialForm);
-  setHasCheckedUser(false);
-  setShowModal(true);
-  setSubmitError("");
-  setSubmitSuccess(false);
-  setEditMode(false);
-  setEditId(null);
-  dispatch(clearLookupUser()); // 👈 add this
-};
+  const handleAddClick = () => {
+    setForm(initialForm);
+    setHasCheckedUser(false);
+    setShowModal(true);
+    setSubmitError("");
+    setSubmitSuccess(false);
+    setEditMode(false);
+    setEditId(null);
+    dispatch(clearLookupUser()); // 👈 add this
+  };
 
 
   const handleClose = () => {
@@ -205,15 +212,19 @@ const ManageTeamAdmin = () => {
 
   useEffect(() => {
     if (user) {
-      setForm((prev) => ({
-        ...prev,
-        userName: user.display_name || "",
-        email: user.email || "",
-        contactNumber: user.contactNumber
-          ? user.contactNumber.replace(/\D/g, "").slice(0, 10)
-          : "",
-        designation: "admin",
-      }));
+      setForm((prev) => {
+        let cleaned = user.contactNumber ? user.contactNumber.replace(/\D/g, "") : "";
+        if (cleaned.startsWith("94") && cleaned.length > 9) {
+          cleaned = "0" + cleaned.slice(2);
+        }
+        return {
+          ...prev,
+          userName: user.display_name || "",
+          email: user.email || "",
+          contactNumber: cleaned.slice(0, 10),
+          designation: "admin",
+        };
+      });
       setHasCheckedUser(true);
     }
 
@@ -222,6 +233,16 @@ const ManageTeamAdmin = () => {
       setSubmitError("User not found in ERP");
     }
   }, [user, lookupError]);
+
+  // Clean up lookup timeout and reset state on unmount
+  useEffect(() => {
+    return () => {
+      if (lookupTimeoutRef.current) {
+        clearTimeout(lookupTimeoutRef.current);
+      }
+      dispatch(clearLookupUser());
+    };
+  }, [dispatch]);
 
 
   // When teamName changes, update teamId and fetch subcategories from backend
@@ -323,10 +344,11 @@ const ManageTeamAdmin = () => {
       }
 
       setSubmitSuccess(true);
-      setInfoMessage(isEdit ? "Admin updated" : "Admin added");
       setShowModal(false);
       setEditMode(false);
       setEditId(null);
+      setInfoMessage(isEdit ? "Admin updated" : "Admin added");
+      setTimeout(() => setInfoMessage(""), 2000);
     } catch (err) {
       setSubmitError(err.message || "Operation failed");
     }
@@ -343,6 +365,7 @@ const ManageTeamAdmin = () => {
         updateUserRole(admin.serviceNumber, "user"),
       ]);
       setInfoMessage("Admin deleted");
+      setTimeout(() => setInfoMessage(""), 2000);
     });
   };
 
