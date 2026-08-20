@@ -139,6 +139,7 @@ const TechnicianInsident = ({
 
   // Remove local incident state; always use Redux state or prop
   const [isLoading, setIsLoading] = useState(false); // Start with false
+  const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState(null);
   const [updateStatusData, setUpdateStatusData] = useState({
     updatedBy: loggedInUser?.userName || loggedInUser?.name,
@@ -254,6 +255,13 @@ const TechnicianInsident = ({
     isPopup,
   ]);
 
+  // Reset isUpdating when loading finishes
+  useEffect(() => {
+    if (!incidentState.loading) {
+      setIsUpdating(false);
+    }
+  }, [incidentState.loading]);
+
   const handleUpdateStatusChange = (data) => {
     setUpdateStatusData(data);
   };
@@ -266,6 +274,8 @@ const TechnicianInsident = ({
       : incidentState.currentIncident;
     if (!currentIncident) return;
 
+    setIsUpdating(true);
+
     // Validate Tier 3 category selection
     if (updateStatusData.transferTo === 'tier3-auto') {
       const isTier3 = (categoryState.categoryItems || []).some(item => {
@@ -276,6 +286,7 @@ const TechnicianInsident = ({
 
       if (!isTier3) {
         alert("Please select a Tier 3 category when transferring to Automatically Assign For Tier 3.");
+        setIsUpdating(false);
         return;
       }
     }
@@ -566,8 +577,9 @@ const TechnicianInsident = ({
                   <button
                     className="technician-details-update-btn"
                     onClick={handleUpdateClick}
+                    disabled={isUpdating || incidentState.loading}
                   >
-                    Update
+                    {isUpdating || incidentState.loading ? "Updating..." : "Update"}
                   </button>
                 )}
               </div>
