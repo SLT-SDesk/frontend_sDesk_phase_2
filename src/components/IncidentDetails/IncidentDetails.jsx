@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import LocationDropdown from "../LocationDropdown/LocationDropdown";
 import CategoryDropdown from "../CategoryDropdown/CategoryDropDown";
@@ -6,6 +6,8 @@ import { IoMdAdd, IoMdRemove } from "react-icons/io";
 import "./IncidentDetails.css";
 import { fetchCategoriesRequest } from "../../redux/categories/categorySlice";
 import { uploadAttachmentRequest } from "../../redux/incident/incidentSlice";
+import useChatbot from "../../hooks/useChatbot";
+import ChatbotModal from "../Chatbot/ChatbotModal";
 
 const IncidentDetails = ({
   userData,
@@ -29,6 +31,20 @@ const IncidentDetails = ({
   const [localIsCategoryPopupOpen, setLocalIsCategoryPopupOpen] =
     useState(false);
 
+  // Chatbot Hook
+  const {
+    loading: chatbotLoading,
+    error: chatbotError,
+    clarification,
+    analysisResult,
+    isCompleted,
+    analyzeDescription,
+    respondToClarification,
+    resetChatbot,
+  } = useChatbot();
+
+  const lastAnalyzedRef = useRef("");
+
   // Fetch categories from backend using redux
   const dispatch = useDispatch();
   const categoryDataset = useSelector((state) => state.categories.list);
@@ -38,6 +54,150 @@ const IncidentDetails = ({
   useEffect(() => {
     dispatch(fetchCategoriesRequest());
   }, [dispatch]);
+
+  // Keep local selectedPriority synced with parent formData.priority
+  useEffect(() => {
+    if (formData.priority && formData.priority !== selectedPriority) {
+      setSelectedPriority(formData.priority);
+    }
+  }, [formData.priority]);
+
+  // Debounced description typing trigger for chatbot
+  useEffect(() => {
+    // If chatbot is already completed or category is already selected, do not trigger API calls
+    if (isCompleted) return;
+    if (formData.category && formData.category.name) return;
+
+    const trimmed = (formData.description || "").trim();
+    if (trimmed.length < 5) return;
+
+    const timer = setTimeout(() => {
+      if (trimmed && trimmed !== lastAnalyzedRef.current && !isCompleted) {
+        lastAnalyzedRef.current = trimmed;
+        analyzeDescription(trimmed);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [formData.description, formData.category, isCompleted, analyzeDescription]);
+
+  // Handle Chatbot Analysis Result
+  useEffect(() => {
+    if (!analysisResult) return;
+    console.log("[Chatbot] Analysis Result:", analysisResult);
+
+    // Keep lastAnalyzedRef synced with updated description to prevent re-triggering
+    if (analysisResult.description) {
+      lastAnalyzedRef.current = analysisResult.description.trim();
+    }
+
+    // 1. Auto-select Category
+    if (analysisResult.category) {
+      const resultCat = analysisResult.category.trim().toLowerCase();
+      let foundSelection = null;
+
+      if (categoryDataset && Array.isArray(categoryDataset) && categoryDataset.length > 0) {
+        // Level 1 search: leaf category items
+        for (const mainCat of categoryDataset) {
+          if (!mainCat.subCategories) continue;
+          for (const subCat of mainCat.subCategories) {
+            if (!subCat.categoryItems) continue;
+            for (const item of subCat.categoryItems) {
+              const itemName = (item.name || "").trim().toLowerCase();
+              if (itemName === resultCat || itemName.includes(resultCat) || resultCat.includes(itemName)) {
+                foundSelection = {
+                  name: item.name,
+                  number: item.category_code || item.id || "CAT-AUTO",
+                };
+                break;
+              }
+            }
+            if (foundSelection) break;
+          }
+          if (foundSelection) break;
+        }
+
+        // Level 2 search: subcategories
+        if (!foundSelection) {
+          for (const mainCat of categoryDataset) {
+            if (!mainCat.subCategories) continue;
+            for (const subCat of mainCat.subCategories) {
+              const subName = (subCat.name || "").trim().toLowerCase();
+              if (subName === resultCat || subName.includes(resultCat) || resultCat.includes(subName)) {
+                foundSelection = {
+                  name: subCat.name,
+                  number: subCat.category_code || subCat.id || "SUB-AUTO",
+                };
+                break;
+              }
+            }
+            if (foundSelection) break;
+          }
+        }
+
+        // Level 3 search: main categories
+        if (!foundSelection) {
+          for (const mainCat of categoryDataset) {
+            const mainName = (mainCat.name || "").trim().toLowerCase();
+            if (mainName === resultCat || mainName.includes(resultCat) || resultCat.includes(mainName)) {
+              foundSelection = {
+                name: mainCat.name,
+                number: mainCat.category_code || mainCat.id || "MAIN-AUTO",
+              };
+              break;
+            }
+          }
+        }
+      }
+
+      // Fallback: Use direct category name returned by chatbot
+      if (!foundSelection) {
+        foundSelection = {
+          name: analysisResult.category,
+          number: "AUTO",
+        };
+      }
+
+      console.log("[Chatbot] Auto-selecting category:", foundSelection);
+      if (typeof handleCategorySelect === "function") {
+        handleCategorySelect(foundSelection);
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          category: foundSelection,
+        }));
+      }
+    }
+
+    // 2. Auto-select Priority
+    if (analysisResult.priority) {
+      const pStr = String(analysisResult.priority).toLowerCase();
+      let mappedPriority = "Medium";
+      if (pStr.includes("critical") || pStr.includes("priority_1") || pStr.includes("priority 1")) {
+        mappedPriority = "Critical";
+      } else if (pStr.includes("high") || pStr.includes("priority_2") || pStr.includes("priority 2")) {
+        mappedPriority = "High";
+      } else if (pStr.includes("medium") || pStr.includes("priority_3") || pStr.includes("priority 3")) {
+        mappedPriority = "Medium";
+      }
+
+      console.log("[Chatbot] Auto-selecting priority:", mappedPriority);
+      setSelectedPriority(mappedPriority);
+      setFormData((prev) => ({
+        ...prev,
+        priority: mappedPriority,
+      }));
+    }
+
+    // 3. Update Description if modified (e.g. via troubleshooting)
+    if (analysisResult.description && analysisResult.description !== formData.description) {
+      console.log("[Chatbot] Updating description from chatbot result");
+      setFormData((prev) => ({
+        ...prev,
+        description: analysisResult.description,
+      }));
+    }
+  }, [analysisResult, categoryDataset, handleCategorySelect, setFormData, formData.description]);
 
   const handleChange = (event) => {
     const newPriority = event.target.value;
@@ -54,6 +214,38 @@ const IncidentDetails = ({
       ...prevFormData,
       description,
     }));
+  };
+
+  const handleDescriptionBlur = () => {
+    if (isCompleted) return;
+    if (formData.category && formData.category.name) return;
+
+    const trimmed = (formData.description || "").trim();
+    if (trimmed.length >= 5 && trimmed !== lastAnalyzedRef.current) {
+      lastAnalyzedRef.current = trimmed;
+      analyzeDescription(trimmed);
+    }
+  };
+
+  const handleChatbotSelection = (selection) => {
+    respondToClarification(selection, formData.description);
+  };
+
+  const handleCloseChatbot = () => {
+    resetChatbot();
+  };
+
+  const onClearCategory = () => {
+    resetChatbot();
+    lastAnalyzedRef.current = "";
+    if (typeof handleClearCategory === "function") {
+      handleClearCategory();
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        category: { name: "", number: "" },
+      }));
+    }
   };
 
   return (
@@ -77,7 +269,7 @@ const IncidentDetails = ({
               <>
                 Category: {formData.category.name}{" "}
                 <IoMdRemove
-                  onClick={handleClearCategory}
+                  onClick={onClearCategory}
                   className="category-icon"
                 />
               </>
@@ -119,8 +311,10 @@ const IncidentDetails = ({
             placeholder="Enter Description here..."
             value={formData.description}
             onChange={handleDescriptionChange}
+            onBlur={handleDescriptionBlur}
             required
           />
+          {chatbotLoading && <span className="chatbot-loading-text">Analyzing...</span>}
         </div>
         <div className="AddInicident-content2-IncidentDetails-Container3">
           <div className="AddInicident-content2-IncidentDetails-Container3-dropdown-container">
@@ -206,8 +400,17 @@ const IncidentDetails = ({
           onClose={() => setLocalIsLocationPopupOpen(false)}
         />
       )}
+      {/* Chatbot Modal */}
+      {clarification && (
+        <ChatbotModal
+          question={clarification.question}
+          options={clarification.options}
+          onSelect={handleChatbotSelection}
+          onClose={handleCloseChatbot}
+        />
+      )}
     </div>
   );
 };
 
-export default IncidentDetails;
+export default IncidentDetails;
