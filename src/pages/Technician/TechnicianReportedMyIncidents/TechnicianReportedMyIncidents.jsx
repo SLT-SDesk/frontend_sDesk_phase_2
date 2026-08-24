@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { FaHistory, FaSearch } from 'react-icons/fa';
 import { TiExportOutline } from 'react-icons/ti';
 import * as XLSX from 'xlsx';
@@ -13,6 +14,7 @@ import './TechnicianReportedMyIncidents.css';
 const TechnicianReportedMyIncidents = () => {
 
   const dispatch = useDispatch();
+  const location = useLocation(); // re-fetch whenever user navigates to this page
 
   // Redux state
   const { assignedByMe, loading, error, incidentHistory } = useSelector((state) => state.incident);
@@ -28,13 +30,13 @@ const TechnicianReportedMyIncidents = () => {
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
 
-  // Fetch incidents reported by the logged-in technician and all users
+  // Fetch on every navigation to this page
   useEffect(() => {
     if (user && (user.role === 'technician' || user.role === 'teamLeader') && user.serviceNum) {
       dispatch(fetchAssignedByMeRequest({ serviceNum: user.serviceNum }));
     }
     dispatch(fetchAllUsersRequest());
-  }, [dispatch, user]);
+  }, [dispatch, user, location.pathname]);
 
   if (loading) {
     return (
