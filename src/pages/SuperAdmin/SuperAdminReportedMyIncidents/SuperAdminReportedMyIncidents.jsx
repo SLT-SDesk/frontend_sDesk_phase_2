@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { FaHistory, FaSearch } from 'react-icons/fa';
 import { TiExportOutline } from 'react-icons/ti';
 import { IoIosArrowForward } from 'react-icons/io';
@@ -15,6 +16,7 @@ import { saveAs } from 'file-saver';
 
 const SuperAdminReportedMyIncidents = () => {
   const dispatch = useDispatch();
+  const location = useLocation(); // re-fetch on every navigation
   const { assignedByMe, loading, error, incidentHistory } = useSelector((state) => state.incident);
   const { user } = useSelector((state) => state.auth);
   const { allUsers } = useSelector((state) => state.sltusers);
@@ -27,13 +29,13 @@ const SuperAdminReportedMyIncidents = () => {
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
 
-  // ✅ Fetch incidents & users
+  // ✅ Fetch on every navigation to this page
   useEffect(() => {
-    if (user && (user.role === 'superadmin' || user.role === 'superAdmin') && user.serviceNum) {
+    if (user && user.serviceNum) {
       dispatch(fetchAssignedByMeRequest({ serviceNum: user.serviceNum }));
     }
     dispatch(fetchAllUsersRequest());
-  }, [dispatch, user]);
+  }, [dispatch, user, location.pathname]);
 
   if (loading) {
     return (

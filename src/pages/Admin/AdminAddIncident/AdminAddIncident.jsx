@@ -46,20 +46,43 @@ const AdminAddIncident = () => {
   const locationPopupRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const submittedRef = useRef(false); // Track if we just submitted
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Clear any stale incident errors on mount
   useEffect(() => {
     dispatch(clearError());
   }, [dispatch]);
 
-  // Only show error if it happened after a submit
+  // Handle success/failure transition after submit
   useEffect(() => {
-    if (error && submittedRef.current) {
-      setCreateError(error);
-      submittedRef.current = false;
+    if (isSubmitting && !loading) {
+      if (!error) {
+        setSubmitSuccess(true);
+        setFormData({
+          serviceNo: "",
+          tpNumber: "",
+          name: "",
+          designation: "",
+          email: "",
+          category: { name: "", number: "" },
+          location: { name: "", number: "" },
+          priority: "Medium",
+          description: "",
+        });
+        setSelectedFile(null);
+        if (document.getElementById("file-upload")) {
+          document.getElementById("file-upload").value = "";
+        }
+        dispatch(clearLookupUser());
+        setTimeout(() => {
+          setSubmitSuccess(false);
+        }, 5000);
+      } else {
+        setCreateError(error);
+      }
+      setIsSubmitting(false);
     }
-  }, [error]);
+  }, [loading, error, isSubmitting, dispatch]);
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -186,7 +209,7 @@ const AdminAddIncident = () => {
       informant: formData.serviceNo, // Affected User's service number
       location: formData.location.name, // Use location name, not number
       handler: formData.serviceNo, // Affected User's service number as handler
-      update_by: formData.serviceNo, // Affected User's service number
+      update_by: user.serviceNum, // Logged-in admin's service number (reporter)
       category: formData.category.name, // Use category name, not number
       update_on: new Date().toISOString().split("T")[0], // Date format: YYYY-MM-DD
       status: "Open", // Must be 'Open', 'In Progress', 'Hold', or 'Closed'
@@ -215,32 +238,8 @@ const AdminAddIncident = () => {
     }
 
     setCreateError(null);
-    submittedRef.current = true;
+    setIsSubmitting(true);
     dispatch(createIncidentRequest(incidentData));
-
-    // Reset form
-    setFormData({
-      serviceNo: "",
-      tpNumber: "",
-      name: "",
-      designation: "",
-      email: "",
-      category: { name: "", number: "" },
-      location: { name: "", number: "" },
-      priority: "Medium",
-      description: "",
-    });
-    setSelectedFile(null);
-    if (document.getElementById("file-upload")) {
-      document.getElementById("file-upload").value = "";
-    }
-
-    setSubmitSuccess(true);
-
-    // Clear success message after 5 seconds
-    setTimeout(() => {
-      setSubmitSuccess(false);
-    }, 5000);
   };
 
   // Success and error handling

@@ -173,6 +173,10 @@ function* handleCreateIncident(action) {
     const response = yield call(createIncident, action.payload);
     yield put(createIncidentSuccess(response.data));    // Refresh the assigned to me list for the handler
     yield put(getAssignedToMeRequest({ serviceNum: action.payload.handler }));
+    // Refresh the reporter's "My Reported Incidents" list
+    if (action.payload.update_by) {
+      yield put(getAssignedByMeRequest({ serviceNum: action.payload.update_by }));
+    }
     // Optionally refetch all incidents
     yield put(fetchAllIncidentsRequest());
   } catch (error) {
@@ -190,6 +194,10 @@ function* handleCreateIncidentWithAttachment(action) {
     yield put(createIncidentWithAttachmentSuccess(response.data));
     // Refresh the assigned to me list for the handler
     yield put(getAssignedToMeRequest({ serviceNum: response.data.handler }));
+    // Refresh the reporter's "My Reported Incidents" list
+    if (response.data.update_by) {
+      yield put(getAssignedByMeRequest({ serviceNum: response.data.update_by }));
+    }
     // Optionally refetch all incidents
     yield put(fetchAllIncidentsRequest());
   } catch (error) {
