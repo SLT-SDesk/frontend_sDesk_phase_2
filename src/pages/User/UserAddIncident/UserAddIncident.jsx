@@ -32,10 +32,45 @@ const UserAddIncident = () => {
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCategoryPopupOpen, setIsCategoryPopupOpen] = useState(false);
   const [isLocationPopupOpen, setIsLocationPopupOpen] = useState(false);
   const categoryPopupRef = useRef(null);
   const locationPopupRef = useRef(null);
+
+  // Clear any stale incident errors on mount
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
+
+  // Handle success/failure transition after submit
+  useEffect(() => {
+    if (isSubmitting && !loading) {
+      if (!error) {
+        setSubmitSuccess(true);
+        setFormData({
+          serviceNo: "",
+          tpNumber: "",
+          name: "",
+          designation: "",
+          email: "",
+          category: { name: "", number: "" },
+          location: { name: "", number: "" },
+          priority: "",
+          description: "",
+        });
+        setSelectedFile(null);
+        if (document.getElementById("file-upload")) {
+          document.getElementById("file-upload").value = "";
+        }
+        dispatch(clearLookupUser());
+        setTimeout(() => {
+          setSubmitSuccess(false);
+        }, 5000);
+      }
+      setIsSubmitting(false);
+    }
+  }, [loading, error, isSubmitting, dispatch]);
 
   // Update form data when user is loaded
   // Removed auto-population of serviceNo from user at mount
@@ -94,33 +129,33 @@ const UserAddIncident = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) {
-        return;
+      return;
     }
 
-  const allowedTypes = [
-    'image/jpeg',
-    'image/png',
-    'image/gif',
-    'application/pdf',
-    'application/msword', // .doc
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-    'application/vnd.ms-excel', // .xls
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-    'application/vnd.ms-powerpoint', // .ppt
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
-    'text/plain', // .txt
-  ];
+    const allowedTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'application/pdf',
+      'application/msword', // .doc
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+      'application/vnd.ms-excel', // .xls
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+      'application/vnd.ms-powerpoint', // .ppt
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
+      'text/plain', // .txt
+    ];
 
-  if (!allowedTypes.includes(file.type)) {
-    alert("Invalid file type. Only PDF , common document formats and image files are allowed.");
-    e.target.value = ""; 
-    return;
-  }
+    if (!allowedTypes.includes(file.type)) {
+      alert("Invalid file type. Only PDF , common document formats and image files are allowed.");
+      e.target.value = "";
+      return;
+    }
 
-    if (file.size > 50 * 1024 * 1024) { 
-        alert("File size exceeds 50MB. Please choose a smaller file.");
-        e.target.value = ""; 
-        return;
+    if (file.size > 50 * 1024 * 1024) {
+      alert("File size exceeds 50MB. Please choose a smaller file.");
+      e.target.value = "";
+      return;
     }
     setSelectedFile(file);
   };
@@ -179,33 +214,11 @@ const UserAddIncident = () => {
       Attachment: selectedFile ? selectedFile.name : null,
     };
 
+    setIsSubmitting(true);
     dispatch(createIncidentRequest(incidentData));
-
-    setFormData({
-      serviceNo: "",
-      tpNumber: "",
-      name: "",
-      designation: "",
-      email: "",
-      category: { name: "", number: "" },
-      location: { name: "", number: "" },
-      priority: "",
-      description: "",
-    });
-    setSelectedFile(null);
-    if (document.getElementById("file-upload")) {
-      document.getElementById("file-upload").value = "";
-    }
-    setSubmitSuccess(true);
-    // Clear user lookup status after submit
-    dispatch(clearLookupUser());
-
-    setTimeout(() => {
-      setSubmitSuccess(false);
-    }, 5000);
   };
 
-  
+
   const renderStatusMessage = () => {
     if (loading) {
       return (
@@ -227,7 +240,7 @@ const UserAddIncident = () => {
       );
     }
 
-   
+
     if (error) {
       return (
         <div className="status-message error-message">
