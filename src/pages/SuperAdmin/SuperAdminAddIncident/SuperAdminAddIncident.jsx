@@ -10,6 +10,7 @@ import {
   clearError,
   uploadAttachmentRequest,
 } from "../../../redux/incident/incidentSlice";
+import { clearLookupUser } from "../../../redux/userLookup/userLookupSlice";
 
 const SuperAdminAddIncident = () => {
   const dispatch = useDispatch();
@@ -204,7 +205,7 @@ const SuperAdminAddIncident = () => {
       informant: formData.serviceNo, // Affected User's service number
       location: formData.location.name, // Use location name, not number
       handler: formData.serviceNo, // Affected User's service number as handler
-      update_by: formData.serviceNo, // Affected User's service number
+      update_by: user.serviceNum, // Logged-in super admin's service number (reporter)
       category: formData.category.name, // Use category name, not number
       update_on: new Date().toISOString().split("T")[0], // Date format: YYYY-MM-DD
       status: "Open", // Must be 'Open', 'In Progress', 'Hold', or 'Closed'

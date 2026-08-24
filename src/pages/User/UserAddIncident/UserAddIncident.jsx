@@ -204,7 +204,7 @@ const UserAddIncident = () => {
       informant: formData.serviceNo, // Affected User's service number
       location: formData.location.name, // Use location name, not number
       handler: formData.serviceNo, // Affected User's service number as handler
-      update_by: formData.serviceNo, // Affected User's service number
+      update_by: user.serviceNum, // Logged-in user's service number (reporter)
       category: formData.category.name,
       update_on: new Date().toISOString().split("T")[0],
       status: "Open",
