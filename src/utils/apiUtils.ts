@@ -9,7 +9,7 @@ export const getApiBaseUrl = (): string => {
 
 // Get the Chatbot API base URL from environment variables
 export const getChatbotApiBaseUrl = (): string => {
-    return (import.meta as any).env?.VITE_CHATBOT_API_BASE_URL || "http://localhost:5000";
+    return (import.meta as any).env?.VITE_CHATBOT_API_BASE_URL || "http://127.0.0.1:5000";
 };
 
 /**
