@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { FaHistory, FaSearch } from 'react-icons/fa';
 import { TiExportOutline } from 'react-icons/ti';
 import * as XLSX from 'xlsx';
@@ -11,14 +12,15 @@ import IncidentHistory from '../../../components/IncidentHistory/IncidentHistory
 import './TechnicianReportedMyIncidents.css';
 
 const TechnicianReportedMyIncidents = () => {
-  
+
   const dispatch = useDispatch();
-  
+  const location = useLocation(); // re-fetch whenever user navigates to this page
+
   // Redux state
   const { assignedByMe, loading, error, incidentHistory } = useSelector((state) => state.incident);
   const { user } = useSelector((state) => state.auth); // Get logged-in user from auth slice
   const { allUsers } = useSelector((state) => state.sltusers);
-  
+
   // Local state
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -28,14 +30,14 @@ const TechnicianReportedMyIncidents = () => {
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
 
-  // Fetch incidents reported by the logged-in technician and all users
+  // Fetch on every navigation to this page
   useEffect(() => {
-    if (user && user.role === 'technician' && user.serviceNum) {
+    if (user && (user.role === 'technician' || user.role === 'teamLeader') && user.serviceNum) {
       dispatch(fetchAssignedByMeRequest({ serviceNum: user.serviceNum }));
     }
     dispatch(fetchAllUsersRequest());
-  }, [dispatch, user]);
-  
+  }, [dispatch, user, location.pathname]);
+
   if (loading) {
     return (
       <div className="TechnicianReportedMyIncidents-main-content">
@@ -95,9 +97,9 @@ const TechnicianReportedMyIncidents = () => {
   const handleRowClick = (refNo) => {
     const incident = assignedByMe.find(item => item.incident_number === refNo);
     if (incident) {
-        setSelectedIncident(incident);
-        setIsPopupVisible(true);
-        dispatch(fetchIncidentHistoryRequest({ incident_number: refNo }));
+      setSelectedIncident(incident);
+      setIsPopupVisible(true);
+      dispatch(fetchIncidentHistoryRequest({ incident_number: refNo }));
     }
   };
 
@@ -171,18 +173,18 @@ const TechnicianReportedMyIncidents = () => {
 
   const handleExport = () => {
     const dataToExport = filteredData.map(item => {
-        
-        // Assuming 'item' also contains information about the affected user's service number, if not, you might need to adjust how you get this.
-        // For now, let's assume the affected user is the same as the informant if not specified.
-         // Placeholder, adjust if affected user is different
 
-        return {
-            "Ref No": item.refNo,
-            "Category": item.category,
-            "Status": item.status,
-            "Priority": item.priority,
-           
-        };
+      // Assuming 'item' also contains information about the affected user's service number, if not, you might need to adjust how you get this.
+      // For now, let's assume the affected user is the same as the informant if not specified.
+      // Placeholder, adjust if affected user is different
+
+      return {
+        "Ref No": item.refNo,
+        "Category": item.category,
+        "Status": item.status,
+        "Priority": item.priority,
+
+      };
     });
 
     const wb = XLSX.utils.book_new();
@@ -230,48 +232,48 @@ const TechnicianReportedMyIncidents = () => {
 
   const renderPopup = () => {
     if (!isPopupVisible || !selectedIncident) {
-        return null;
+      return null;
     }
 
     const formData = {
-        serviceNo: user.serviceNum,
-        tpNumber: user.tp_number || user.tpNumber || user.contactNumber ||  '',
-        name: user.user_name || user.name || user.email,
-        designation: user.designation || user.role || '',
-        email: user.email,
+      serviceNo: user.serviceNum,
+      tpNumber: user.tp_number || user.tpNumber || user.contactNumber || '',
+      name: user.user_name || user.name || user.email,
+      designation: user.designation || user.role || '',
+      email: user.email,
     };
 
     const incidentDetails = {
-        refNo: selectedIncident.incident_number,
-        category: selectedIncident.category,
-        location: selectedIncident.location,
-        priority: selectedIncident.priority,
-        status: selectedIncident.status,
+      refNo: selectedIncident.incident_number,
+      category: selectedIncident.category,
+      location: selectedIncident.location,
+      priority: selectedIncident.priority,
+      status: selectedIncident.status,
     };
 
     return (
-        <div className="popup-overlay">
-            <div className="popup-content">
-                <button className="popup-close" onClick={() => setIsPopupVisible(false)}>X</button>
-                
-                <br/>
-                <br/>
-                <div className="TechnicianMyReportedUpdate-content2">
-                    <AffectedUserDetail formData={formData} />
-                    <IncidentHistory
-                        refNo={incidentDetails.refNo}
-                        category={incidentDetails.category}
-                        location={incidentDetails.location}
-                        priority={incidentDetails.priority}
-                        status={incidentDetails.status}
-                        historyData={incidentHistory}
-                        users={allUsers}
-                    />
-                </div>
-            </div>
+      <div className="popup-overlay">
+        <div className="popup-content">
+          <button className="popup-close" onClick={() => setIsPopupVisible(false)}>X</button>
+
+          <br />
+          <br />
+          <div className="TechnicianMyReportedUpdate-content2">
+            <AffectedUserDetail formData={formData} />
+            <IncidentHistory
+              refNo={incidentDetails.refNo}
+              category={incidentDetails.category}
+              location={incidentDetails.location}
+              priority={incidentDetails.priority}
+              status={incidentDetails.status}
+              historyData={incidentHistory}
+              users={allUsers}
+            />
+          </div>
         </div>
+      </div>
     );
-};
+  };
 
   if (!user) {
     return <div>Loading user data...</div>;
@@ -279,13 +281,13 @@ const TechnicianReportedMyIncidents = () => {
   if (!user.serviceNum) {
     return <div>User data missing serviceNum. Please contact admin.</div>;
   }
-  if (user.role !== 'technician') {
+  if (user.role !== 'technician' && user.role !== 'teamLeader') {
     return <div>Unauthorized: Only technical officers can view this page.</div>;
   }
 
   return (
     <div className="TechnicianReportedMyIncidents-main-content">
-        {renderPopup()}
+      {renderPopup()}
       <div className="TechnicianReportedMyIncidents-tickets-creator">
         <span className="TechnicianReportedMyIncidents-svr-desk">Incidents</span>
         <IoIosArrowForward />
@@ -305,7 +307,7 @@ const TechnicianReportedMyIncidents = () => {
             </button>
           </div>
         </div>
-        
+
         <div className="TechnicianReportedMyIncidents-showSearchBar container-fluid p-0">
           <div className="row m-0 w-100">
             <div className="col-md-7 col-lg-8 p-0">
@@ -365,7 +367,7 @@ const TechnicianReportedMyIncidents = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="TechnicianReportedMyIncidents-table">
           <table className="TechnicianReportedMyIncidents-table-table">
             <thead>

@@ -10,6 +10,7 @@ import {
   clearError,
   uploadAttachmentRequest,
 } from "../../../redux/incident/incidentSlice";
+import { clearLookupUser } from "../../../redux/userLookup/userLookupSlice";
 
 const SuperAdminAddIncident = () => {
   const dispatch = useDispatch();
@@ -44,6 +45,41 @@ const SuperAdminAddIncident = () => {
   const locationPopupRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Clear any stale incident errors on mount
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
+
+  // Handle success/failure transition after submit
+  useEffect(() => {
+    if (isSubmitting && !loading) {
+      if (!error) {
+        setSubmitSuccess(true);
+        setFormData({
+          serviceNo: "",
+          tpNumber: "",
+          name: "",
+          designation: "",
+          email: "",
+          category: { name: "", number: "" },
+          location: { name: "", number: "" },
+          priority: "",
+          description: "",
+        });
+        setSelectedFile(null);
+        if (document.getElementById("file-upload")) {
+          document.getElementById("file-upload").value = "";
+        }
+        dispatch(clearLookupUser());
+        setTimeout(() => {
+          setSubmitSuccess(false);
+        }, 5000);
+      }
+      setIsSubmitting(false);
+    }
+  }, [loading, error, isSubmitting, dispatch]);
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -98,13 +134,13 @@ const SuperAdminAddIncident = () => {
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    
+
     if (!file) return;
 
     // File type validation
     const allowedTypes = ['pdf', 'png', 'jpg', 'jpeg'];
     const fileExtension = file.name.split('.').pop().toLowerCase();
-    
+
     if (!allowedTypes.includes(fileExtension)) {
       alert('Only PDF, PNG, JPG, and JPEG files are allowed.');
       e.target.value = '';
@@ -169,7 +205,7 @@ const SuperAdminAddIncident = () => {
       informant: formData.serviceNo, // Affected User's service number
       location: formData.location.name, // Use location name, not number
       handler: formData.serviceNo, // Affected User's service number as handler
-      update_by: formData.serviceNo, // Affected User's service number
+      update_by: user.serviceNum, // Logged-in super admin's service number (reporter)
       category: formData.category.name, // Use category name, not number
       update_on: new Date().toISOString().split("T")[0], // Date format: YYYY-MM-DD
       status: "Open", // Must be 'Open', 'In Progress', 'Hold', or 'Closed'
@@ -196,30 +232,8 @@ const SuperAdminAddIncident = () => {
       return;
     }
 
+    setIsSubmitting(true);
     dispatch(createIncidentRequest(incidentData));
-
-    // Reset form
-    setFormData({
-      serviceNo: "",
-      tpNumber: "",
-      name: "",
-      designation: "",
-      email: "",
-      category: { name: "", number: "" },
-      location: { name: "", number: "" },
-      priority: "",
-      description: "",
-    });
-    setSelectedFile(null);
-    if (document.getElementById("file-upload")) {
-      document.getElementById("file-upload").value = "";
-    }
-    setSubmitSuccess(true);
-
-    // Clear success message after 5 seconds
-    setTimeout(() => {
-      setSubmitSuccess(false);
-    }, 5000);
   };
 
   // Success and error handling

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from "react";
-import { Card, Form, Row, Col, Button } from 'react-bootstrap';
+import { Card, Form, Row, Col } from 'react-bootstrap';
 import { FaPlusSquare } from "react-icons/fa";
 import CategoryDropdown from "../CategoryDropdown/CategoryDropDown";
 import LocationDropdown from "../LocationDropdown/LocationDropdown";
 import './UpdateStatus.css';
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategoriesRequest } from "../../redux/categories/categorySlice";
+import { fetchTechniciansRequest } from "../../redux/technicians/technicianSlice";
 
 const UpdateStatus = forwardRef(({
   incidentData,
@@ -18,6 +19,7 @@ const UpdateStatus = forwardRef(({
 }, ref) => {
   const dispatch = useDispatch();
   const mainCategories = useSelector((state) => state.categories?.list || []);
+  const techniciansList = useSelector((state) => state.technicians?.technicians || []);
 
   const [isCategoryPopupOpen, setIsCategoryPopupOpen] = useState(false);
   const [isLocationPopupOpen, setIsLocationPopupOpen] = useState(false);
@@ -38,8 +40,20 @@ const UpdateStatus = forwardRef(({
   const [priority, setPriority] = useState("");
   const [status, setStatus] = useState("");
 
+  // Determine current handler's tier and disabled state for transfer options
+  const handlerTech = techniciansList.find(
+    (tech) => String(tech.serviceNum) === String(incident?.handler)
+  );
+  const handlerTier = handlerTech ? String(handlerTech.tier).toLowerCase() : "";
+  const currentStatus = incident?.status;
+  const isTransferDisabled =
+    currentStatus === "Pending Tier2 Assignment" ||
+    currentStatus === "Pending Tier3 Assignment" ||
+    currentStatus === "Closed";
+
   useEffect(() => {
     dispatch(fetchCategoriesRequest());
+    dispatch(fetchTechniciansRequest());
   }, [dispatch]);
 
   // Revert category if transfer target is changed from Tier 3 while a Tier 3 category is selected
@@ -76,7 +90,7 @@ const UpdateStatus = forwardRef(({
   useEffect(() => {
     const data = {
       updatedBy,
-      category: selectedCategory.name, // Changed from .number to .name
+      category: selectedCategory.name,
       location: selectedLocation.number,
       transferTo,
       description,
@@ -178,10 +192,14 @@ const UpdateStatus = forwardRef(({
 
             <Form.Group as={Col} md="4" controlId="transferTo">
               <Form.Label>Transfer Incident</Form.Label>
-              <Form.Select value={transferTo} onChange={(e) => setTransferTo(e.target.value)}>
+              <Form.Select
+                value={transferTo}
+                onChange={(e) => setTransferTo(e.target.value)}
+                disabled={isTransferDisabled}
+              >
                 <option value="">Select One</option>
-                <option value="tier2-auto">Automatically Assign For Tier2</option>
-                <option value="tier3-auto">Automatically Assign For Tier3</option>
+                <option value="tier2-auto" disabled={handlerTier === "tier2" || handlerTier === "tier3"}>Automatically Assign For Tier2</option>
+                <option value="tier3-auto" disabled={handlerTier === "tier3"}>Automatically Assign For Tier3</option>
                 <option value="teamadmin">Assign For TeamAdmin</option>
                 {technicians.map((technician) => (
                   <option key={technician.service_number} value={technician.service_number}>
