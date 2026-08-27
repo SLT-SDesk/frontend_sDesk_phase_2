@@ -73,9 +73,8 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
         subCat.mainCategory?.id === tier3MainCatId
       );
       const matchName = isTier3CategoryName(subCat.mainCategory?.name);
-      const hasItems = subCat.categoryItems && subCat.categoryItems.length > 0;
 
-      return (matchId || matchName) && hasItems;
+      return (matchId || matchName);
     });
   }, [mainCategories, subCategories]);
 
