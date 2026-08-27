@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-    createCategoryRequest, 
-    fetchMainCategoriesRequest, 
-    fetchSubCategoriesRequest, 
-    fetchSubCategoriesByMainCategoryIdRequest, 
-    createCategoryItemRequest, 
+import {
+    createCategoryRequest,
+    fetchMainCategoriesRequest,
+    fetchSubCategoriesRequest,
+    fetchSubCategoriesByMainCategoryIdRequest,
+    createCategoryItemRequest,
     updateCategoryItemRequest,
-    fetchCategoryItemsRequest 
+    fetchCategoryItemsRequest
 } from '../../redux/categories/categorySlice';
 import './AdminAddCategory.css';
 
@@ -26,10 +26,10 @@ const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = nu
     const [formData, setFormData] = useState(
         isEdit && editCategory
             ? {
-                  name: editCategory.name || '',
-                  parent: editCategory.parent || '',
-                  sub: editCategory.sub || '',
-              }
+                name: editCategory.name || '',
+                parent: editCategory.parent || '',
+                sub: editCategory.sub || '',
+            }
             : { name: '', parent: '', sub: '' }
     );
     const [errors, setErrors] = useState({});
@@ -166,7 +166,7 @@ const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = nu
     };
 
     const filteredSubCategories = categoryType === 'grandchild' && formData.parent
-        ? subCategories.filter(sub => sub.mainCategory && sub.mainCategory.id === formData.parent)
+        ? subCategories.filter(sub => sub.mainCategory && sub.mainCategory.id === formData.parent && sub.category_code !== 'SUB021' && sub.name !== 'Tier 3 Support')
         : [];
 
     useEffect(() => {
@@ -387,15 +387,15 @@ const AdminAddCategory = ({ onSubmit, onClose, isEdit = false, editCategory = nu
                             </>
                         )}
                         <div className="AdminAddCategory-content1-formContainer-form-submit">
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 disabled={isSubmitting}
                                 aria-describedby="submit-button-help"
                             >
                                 {isEdit ? '💾 Save Changes' : '➕ Add Category'}
                             </button>
-                            <button 
-                                type="button" 
+                            <button
+                                type="button"
                                 onClick={onClose}
                                 aria-label="Cancel and close form"
                             >
