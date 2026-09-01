@@ -230,8 +230,9 @@ function* handleUpdateIncidentWithAttachment(action) {
     const { incident_number, formData } = action.payload;
     const response = yield call(updateIncidentWithAttachment, incident_number, formData);
     yield put(updateIncidentWithAttachmentSuccess(response.data));
-    // Optionally refetch all incidents
+    // Refetch all incidents and admin team data so tables update immediately
     yield put(fetchAllIncidentsRequest());
+    yield put(fetchAdminTeamDataRequest());
   } catch (error) {
     const errorMessage =
       error.response?.data?.message ||

@@ -31,6 +31,28 @@ const CategoryDropdown = ({ onSelect, onClose, hideTier3 = false, showOnlyTier3 
         onClose();
     };
 
+    // Called when clicking the NAME of a main category
+    const handleMainCategoryClick = (mainCategory) => {
+        if (!mainCategory.subCategories || mainCategory.subCategories.length === 0) {
+            // No children → select directly
+            handleSelect(mainCategory);
+        } else {
+            // Has children → toggle expand
+            toggleExpand(`main-${mainCategory.id}`);
+        }
+    };
+
+    // Called when clicking the NAME of a subcategory
+    const handleSubCategoryClick = (subcategory) => {
+        if (!subcategory.categoryItems || subcategory.categoryItems.length === 0) {
+            // No children → select directly
+            handleSelect(subcategory);
+        } else {
+            // Has children → toggle expand
+            toggleExpand(`sub-${subcategory.id}`);
+        }
+    };
+
     // Filter categories based on search term (case insensitive)
     const filterCategories = (categories) => {
         let filtered = categories;
@@ -132,33 +154,55 @@ const CategoryDropdown = ({ onSelect, onClose, hideTier3 = false, showOnlyTier3 
                     ) : (
                         filteredCategories.map((mainCategory) => (
                             <div key={mainCategory.id} className="AdminCategoryTree-node">
-                                <div
-                                    className="AdminCategoryTree-content-TreePopup-Body-Label"
-                                    onClick={() => toggleExpand(`main-${mainCategory.id}`)}
-                                >
-                                    {expanded[`main-${mainCategory.id}`] ? (
-                                        <IoMdArrowDropdown className="arrow-icon" />
-                                    ) : (
-                                        <IoMdArrowDropright className="arrow-icon" />
-                                    )}
-                                    {mainCategory.name}
+                                <div className="AdminCategoryTree-content-TreePopup-Body-Label">
+                                    {/* Arrow: always just toggles expand */}
+                                    <span
+                                        className="arrow-icon-wrapper"
+                                        onClick={(e) => { e.stopPropagation(); toggleExpand(`main-${mainCategory.id}`); }}
+                                    >
+                                        {mainCategory.subCategories && mainCategory.subCategories.length > 0 ? (
+                                            expanded[`main-${mainCategory.id}`]
+                                                ? <IoMdArrowDropdown className="arrow-icon" />
+                                                : <IoMdArrowDropright className="arrow-icon" />
+                                        ) : (
+                                            <span className="arrow-icon arrow-icon-placeholder" />
+                                        )}
+                                    </span>
+                                    {/* Name: select if leaf, expand if has children */}
+                                    <span
+                                        className="category-label-text"
+                                        onClick={() => handleMainCategoryClick(mainCategory)}
+                                    >
+                                        {mainCategory.name}
+                                    </span>
                                 </div>
-                                {expanded[`main-${mainCategory.id}`] && (
+                                {expanded[`main-${mainCategory.id}`] && mainCategory.subCategories && mainCategory.subCategories.length > 0 && (
                                     <div className="AdminCategoryTree-content-TreePopup-Body-SubNodes">
                                         {mainCategory.subCategories.map((subcategory) => (
                                             <div key={subcategory.id} className="AdminCategoryTree-subnode">
-                                                <div
-                                                    className="AdminCategoryTree-content-TreePopup-Body-SubNodes-Label"
-                                                    onClick={() => toggleExpand(`sub-${subcategory.id}`)}
-                                                >
-                                                    {expanded[`sub-${subcategory.id}`] ? (
-                                                        <IoMdArrowDropdown className="arrow-icon" />
-                                                    ) : (
-                                                        <IoMdArrowDropright className="arrow-icon" />
-                                                    )}
-                                                    {subcategory.name}
+                                                <div className="AdminCategoryTree-content-TreePopup-Body-SubNodes-Label">
+                                                    {/* Arrow: always just toggles expand */}
+                                                    <span
+                                                        className="arrow-icon-wrapper"
+                                                        onClick={(e) => { e.stopPropagation(); toggleExpand(`sub-${subcategory.id}`); }}
+                                                    >
+                                                        {subcategory.categoryItems && subcategory.categoryItems.length > 0 ? (
+                                                            expanded[`sub-${subcategory.id}`]
+                                                                ? <IoMdArrowDropdown className="arrow-icon" />
+                                                                : <IoMdArrowDropright className="arrow-icon" />
+                                                        ) : (
+                                                            <span className="arrow-icon arrow-icon-placeholder" />
+                                                        )}
+                                                    </span>
+                                                    {/* Name: select if leaf, expand if has items */}
+                                                    <span
+                                                        className="category-label-text"
+                                                        onClick={() => handleSubCategoryClick(subcategory)}
+                                                    >
+                                                        {subcategory.name}
+                                                    </span>
                                                 </div>
-                                                {expanded[`sub-${subcategory.id}`] && (
+                                                {expanded[`sub-${subcategory.id}`] && subcategory.categoryItems && subcategory.categoryItems.length > 0 && (
                                                     <div className="AdminCategoryTree-items">
                                                         {subcategory.categoryItems.map((item) => (
                                                             <div

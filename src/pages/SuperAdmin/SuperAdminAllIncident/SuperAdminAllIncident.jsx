@@ -47,6 +47,12 @@ const SuperAdminAllIncident = () => {
 
   useEffect(() => {
     dispatch(fetchAdminTeamDataRequest());
+
+    const intervalId = setInterval(() => {
+      dispatch(fetchAdminTeamDataRequest());
+    }, 30000);
+
+    return () => clearInterval(intervalId);
   }, [dispatch, user]);
 
   if (!user) return <div>Error: User not found. Please login again.</div>;
@@ -94,10 +100,12 @@ const SuperAdminAllIncident = () => {
   };
 
   const getUserName = (serviceNumber) => {
-    const foundUser = users?.find(
-      (user) => user.service_number === serviceNumber
+    if (!serviceNumber || String(serviceNumber).trim() === '') return 'Unassigned';
+    if (!Array.isArray((users || []))) return serviceNumber;
+    const foundUser = (users || []).find(
+      (user) => String(user.service_number) === String(serviceNumber) || String(user.serviceNum) === String(serviceNumber)
     );
-    return foundUser ? foundUser.user_name : serviceNumber;
+    return foundUser ? (foundUser.display_name || foundUser.user_name || foundUser.name || serviceNumber) : serviceNumber;
   };
 
   const getLocationName = (locationCode) => {
@@ -107,18 +115,20 @@ const SuperAdminAllIncident = () => {
 
   // ✅ Process incident data
   const tableData =
-    incidents?.map((incident) => ({
-      refNo: incident.incident_number,
-      assignedTo: incident.handler,
-      affectedUser: incident.informant,
-      category: getCategoryName(incident.category),
-      subcategory: getSubcategoryName(incident.category),
-      mainCategory: getMainCategoryNameFromDatabase(incident.category),
-      status: incident.status,
-      location: getLocationName(incident.location),
-      priority: incident.priority || "", //  use priority for SLA
-      rawCategory: incident.category,
-    })) || [];
+    [...(incidents || [])]
+      .sort((a, b) => String(b.incident_number).localeCompare(String(a.incident_number), undefined, { numeric: true }))
+      .map((incident) => ({
+        refNo: incident.incident_number,
+        assignedTo: incident.handler,
+        affectedUser: incident.informant,
+        category: getCategoryName(incident.category),
+        subcategory: getSubcategoryName(incident.category),
+        mainCategory: getMainCategoryNameFromDatabase(incident.category),
+        status: incident.status,
+        location: getLocationName(incident.location),
+        priority: incident.priority || "", //  use priority for SLA
+        rawCategory: incident.category,
+      })) || [];
 
   // ✅ Filtering logic
   const filteredData = tableData.filter((item) => {

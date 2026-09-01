@@ -79,7 +79,9 @@
 
 .checkbox-list {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
   max-height: 57vh;
   overflow-y: auto;
   border: 1px solid #d1d5db;
@@ -91,9 +93,17 @@
 .checkbox-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-size: 12px;
-  margin-bottom: 6px;
+  width: calc(50% - 8px);
+  min-width: 120px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.checkbox-item:hover {
+  background-color: #e8f0fe;
 }
 
 .AdminAddUser-content input:focus,

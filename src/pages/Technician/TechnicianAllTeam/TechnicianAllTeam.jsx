@@ -122,15 +122,12 @@ const TechnicianAllTeam = () => {
   };
 
   const getUserName = (serviceNumber) => {
+    if (!serviceNumber || String(serviceNumber).trim() === '') return 'Unassigned';
     if (!Array.isArray(allUsers)) return serviceNumber;
     const foundUser = allUsers.find(
-      (user) =>
-        user.serviceNum === serviceNumber ||
-        user.service_number === serviceNumber
+      (user) => String(user.service_number) === String(serviceNumber) || String(user.serviceNum) === String(serviceNumber)
     );
-    return foundUser
-      ? foundUser.display_name || foundUser.user_name || foundUser.name
-      : serviceNumber;
+    return foundUser ? (foundUser.display_name || foundUser.user_name || foundUser.name || serviceNumber) : serviceNumber;
   };
 
   const getLocationName = (locationId) => {
@@ -141,16 +138,18 @@ const TechnicianAllTeam = () => {
   };
 
   // Process incidents data for table display
-  const tableData = teamIncidents.map((incident) => ({
-    refNo: incident.incident_number,
-    assignedTo: getUserName(incident.handler),
-    affectedUser: getUserName(incident.informant),
-    category: getCategoryName(incident.category),
-    status: incident.status,
-    rawCategory: incident.category,
-    location: getLocationName(incident.location),
-    priority: incident.priority,
-  }));
+  const tableData = [...teamIncidents]
+    .sort((a, b) => String(b.incident_number).localeCompare(String(a.incident_number), undefined, { numeric: true }))
+    .map((incident) => ({
+      refNo: incident.incident_number,
+      assignedTo: getUserName(incident.handler),
+      affectedUser: getUserName(incident.informant),
+      category: getCategoryName(incident.category),
+      status: incident.status,
+      rawCategory: incident.category,
+      location: getLocationName(incident.location),
+      priority: incident.priority,
+    }));
 
   const filteredData = tableData.filter((item) => {
     const matchesSearch = Object.values(item).some((val) =>
@@ -285,9 +284,9 @@ const TechnicianAllTeam = () => {
       informantUser = allUsers.find(
         (u) =>
           String(u.serviceNum).trim() ===
-            String(selectedIncident.informant).trim() ||
+          String(selectedIncident.informant).trim() ||
           String(u.service_number).trim() ===
-            String(selectedIncident.informant).trim()
+          String(selectedIncident.informant).trim()
       );
     }
     let formData;
@@ -312,9 +311,9 @@ const TechnicianAllTeam = () => {
         fallbackUser = allUsers.find(
           (u) =>
             String(u.serviceNum).trim() ===
-              String(selectedIncident.informant).trim() ||
+            String(selectedIncident.informant).trim() ||
             String(u.service_number).trim() ===
-              String(selectedIncident.informant).trim()
+            String(selectedIncident.informant).trim()
         );
       }
       formData = {
@@ -361,8 +360,8 @@ const TechnicianAllTeam = () => {
           >
             X
           </button>
-         <br/>
-         <br/>
+          <br />
+          <br />
           <div className="TechnicianMyReportedUpdate-content2">
             <AffectedUserDetail formData={formData} />
             <IncidentHistory
@@ -528,7 +527,7 @@ const TechnicianAllTeam = () => {
         <div className="TechnicianAllTeam-TitleBar">
           <div className="TechnicianAllTeam-TitleBar-NameAndIcon">
             <FaHistory size={20} />
-            Incident History - {user?.team || "Team"} 
+            Incident History - {user?.team || "Team"}
           </div>
           <div className="TechnicianAllTeam-TitleBar-buttons">
             <button className="TechnicianAllTeam-TitleBar-buttons-ExportData" onClick={handleExport}>

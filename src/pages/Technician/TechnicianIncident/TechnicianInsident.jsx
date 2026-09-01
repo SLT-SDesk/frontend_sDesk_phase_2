@@ -276,20 +276,7 @@ const TechnicianInsident = ({
 
     setIsUpdating(true);
 
-    // Validate Tier 3 category selection
-    if (updateStatusData.transferTo === 'tier3-auto') {
-      const isTier3 = (categoryState.categoryItems || []).some(item => {
-        const parentName = item.subCategory?.mainCategory?.name?.toLowerCase().trim();
-        return item.name === updateStatusData.category &&
-          (parentName === 'tier 3 support' || parentName === 'tier 3');
-      });
 
-      if (!isTier3) {
-        alert("Please select a Tier 3 category when transferring to Automatically Assign For Tier 3.");
-        setIsUpdating(false);
-        return;
-      }
-    }
 
     // Create FormData for multipart form submission
     const formData = new FormData();
