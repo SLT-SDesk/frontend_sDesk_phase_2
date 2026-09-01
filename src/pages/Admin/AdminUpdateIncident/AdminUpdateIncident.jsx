@@ -58,7 +58,12 @@ const AdminUpdateIncident = () => {
   // Ref for UpdateStatus component to access its clearForm function
   const updateStatusRef = useRef(null);
 
-  const getUserName = (serviceNumber) => {
+  const getUserName = (serviceNumber, status = null) => {
+    if (!serviceNumber || String(serviceNumber).trim() === '') {
+      if (status === "Pending Tier2 Assignment") return "Tier 2 Support";
+      if (status === "Pending Tier3 Assignment") return "Tier 3 Support";
+      return 'Unassigned';
+    }
     const user = allUsers.find(u => u.service_number === serviceNumber || u.serviceNum === serviceNumber);
     return user ? (user.display_name || user.user_name || user.name) : serviceNumber;
   };
@@ -98,7 +103,7 @@ const AdminUpdateIncident = () => {
         location: getLocationName(currentIncident.location),
         priority: currentIncident.priority,
         status: currentIncident.status,
-        assignedTo: getUserName(currentIncident.handler),
+        assignedTo: getUserName(currentIncident.handler, currentIncident.status),
         updateBy: getUserName(currentIncident.update_by),
         updatedOn: currentIncident.update_on || new Date().toLocaleString(),
         comments: currentIncident.description || 'No comments'
@@ -126,7 +131,10 @@ const AdminUpdateIncident = () => {
       description: updateStatusData.description || currentIncident.description,
     };
 
-    dispatch(updateIncidentRequest(updatedIncidentData));
+    dispatch(updateIncidentRequest({
+      incident_number: currentIncident.incident_number,
+      data: updatedIncidentData
+    }));
   };
 
   const handleBackClick = () => {

@@ -121,8 +121,12 @@ const AdminMyTeamIncidentViewAll = () => {
     return "Unknown";
   };
 
-  const getUserName = (serviceNumber) => {
-    if (!serviceNumber || String(serviceNumber).trim() === '') return 'Unassigned';
+  const getUserName = (serviceNumber, status = null) => {
+    if (!serviceNumber || String(serviceNumber).trim() === '') {
+      if (status === "Pending Tier2 Assignment") return "Tier 2 Support";
+      if (status === "Pending Tier3 Assignment") return "Tier 3 Support";
+      return 'Unassigned';
+    }
     if (!Array.isArray(users)) return serviceNumber;
     const foundUser = users.find(
       (user) => String(user.service_number) === String(serviceNumber) || String(user.serviceNum) === String(serviceNumber)
@@ -164,7 +168,7 @@ const AdminMyTeamIncidentViewAll = () => {
     .sort((a, b) => String(b.incident_number).localeCompare(String(a.incident_number), undefined, { numeric: true }))
     .map((incident) => ({
       "Reference No": incident.incident_number,
-      "Assigned To": getUserName(incident.handler),
+      "Assigned To": getUserName(incident.handler, incident.status),
       "Affected User": getUserName(incident.informant),
       Category: incident.category,
       "Main Category": getMainCategoryNameFromDatabase(incident.category),

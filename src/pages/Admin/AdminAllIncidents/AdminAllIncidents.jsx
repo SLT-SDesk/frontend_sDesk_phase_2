@@ -104,8 +104,12 @@ const AdminAllIncidents = () => {
         return category ? category.child_category_name : 'Unknown';
     };
 
-    const getUserName = (serviceNumber) => {
-        if (!serviceNumber || String(serviceNumber).trim() === '') return 'Unassigned';
+    const getUserName = (serviceNumber, status = null) => {
+        if (!serviceNumber || String(serviceNumber).trim() === '') {
+            if (status === "Pending Tier2 Assignment") return "Tier 2 Support";
+            if (status === "Pending Tier3 Assignment") return "Tier 3 Support";
+            return 'Unassigned';
+        }
         if (!Array.isArray(allUsers)) return serviceNumber;
         const foundUser = allUsers.find(
             (u) => String(u.service_number) === String(serviceNumber) || String(u.serviceNum) === String(serviceNumber)
@@ -121,7 +125,7 @@ const AdminAllIncidents = () => {
         .sort((a, b) => String(b.incident_number).localeCompare(String(a.incident_number), undefined, { numeric: true }))
         .map(incident => ({
             refNo: incident.incident_number,
-            assignedTo: getUserName(incident.handler),
+            assignedTo: getUserName(incident.handler, incident.status),
             affectedUser: getUserName(incident.informant),
             category: getCategoryName(incident.category), // Grandchild category name for display
             subcategory: getSubcategoryName(incident.category), // Child category name for filtering
