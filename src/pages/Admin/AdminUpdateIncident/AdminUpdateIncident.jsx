@@ -1,4 +1,4 @@
- import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './AdminUpdateIncident.css';
 import { IoIosArrowForward } from 'react-icons/io';
@@ -22,7 +22,7 @@ const AdminUpdateIncident = () => {
 
   const { currentIncident, incidentHistory, loading, error } = useSelector((state) => state.incident);
   const { allUsers } = useSelector((state) => state.sltusers);
-  const { categoryItems } = useSelector((state) => state.categories);
+  const { categoryItems, list: mainCategories } = useSelector((state) => state.categories);
   const { locations } = useSelector((state) => state.location);
 
   const [formData, setFormData] = useState({
@@ -113,19 +113,7 @@ const AdminUpdateIncident = () => {
   const handleUpdateClick = () => {
     if (!currentIncident) return;
 
-    // Validate Tier 3 category selection
-    if (updateStatusData.transferTo === 'tier3-auto') {
-      const isTier3 = (categoryItems || []).some(item => {
-        const parentName = item.subCategory?.mainCategory?.name?.toLowerCase().trim();
-        return item.name === updateStatusData.category &&
-          (parentName === 'tier 3 support' || parentName === 'tier 3');
-      });
 
-      if (!isTier3) {
-        alert("Please select a Tier 3 category when transferring to Automatically Assign For Tier 3.");
-        return;
-      }
-    }
 
     const updatedIncidentData = {
       ...currentIncident,

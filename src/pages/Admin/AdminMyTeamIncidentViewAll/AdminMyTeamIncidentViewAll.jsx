@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TechnicianInsident from "../../Technician/TechnicianIncident/TechnicianInsident";
-import { FaHistory, FaSearch,FaRegClock } from "react-icons/fa";
+import { FaHistory, FaSearch, FaRegClock } from "react-icons/fa";
 import { TiExportOutline } from "react-icons/ti";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -46,6 +46,32 @@ const AdminMyTeamIncidentViewAll = () => {
 
   useEffect(() => {
     dispatch(fetchAdminTeamDataRequest());
+
+    const intervalId = setInterval(() => {
+      dispatch(fetchAdminTeamDataRequest());
+    }, 30000);
+
+    // Listen for incident-transferred event to immediately refresh table data
+    const handleTransferred = () => {
+      dispatch(fetchAdminTeamDataRequest());
+      setShowIncidentPopup(false);
+      setSelectedIncident(null);
+    };
+    window.addEventListener("incident-transferred", handleTransferred);
+
+    // Listen for incident-popup-close event
+    const handlePopupClose = () => {
+      dispatch(fetchAdminTeamDataRequest());
+      setShowIncidentPopup(false);
+      setSelectedIncident(null);
+    };
+    window.addEventListener("incident-popup-close", handlePopupClose);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener("incident-transferred", handleTransferred);
+      window.removeEventListener("incident-popup-close", handlePopupClose);
+    };
   }, [dispatch, user, currentAdmin]);
 
   if (!user) {
@@ -80,7 +106,7 @@ const AdminMyTeamIncidentViewAll = () => {
       (cat) =>
         cat.grandchild_category_name &&
         cat.grandchild_category_name.toLowerCase() ===
-          categoryItemCode.toLowerCase()
+        categoryItemCode.toLowerCase()
     );
     if (categoryByName) return categoryByName.parent_category_name;
 
@@ -96,10 +122,12 @@ const AdminMyTeamIncidentViewAll = () => {
   };
 
   const getUserName = (serviceNumber) => {
+    if (!serviceNumber || String(serviceNumber).trim() === '') return 'Unassigned';
+    if (!Array.isArray(users)) return serviceNumber;
     const foundUser = users.find(
-      (user) => user.service_number === serviceNumber
+      (user) => String(user.service_number) === String(serviceNumber) || String(user.serviceNum) === String(serviceNumber)
     );
-    return foundUser ? foundUser.user_name : serviceNumber;
+    return foundUser ? (foundUser.display_name || foundUser.user_name || foundUser.name || serviceNumber) : serviceNumber;
   };
 
   const getLocationName = (locationCode) => {
@@ -132,16 +160,18 @@ const AdminMyTeamIncidentViewAll = () => {
 
   const transformedTeamIncidents = processedIncidents;
 
-  const tableData = transformedTeamIncidents.map((incident) => ({
-    "Reference No": incident.incident_number,
-    "Assigned To": getUserName(incident.handler),
-    "Affected User": getUserName(incident.informant),
-    Category: incident.category,
-    "Main Category": getMainCategoryNameFromDatabase(incident.category),
-    Location: getLocationName(incident.location),
-    Status: incident.status,
-    Priority: incident.priority || "", // ⭐ used for SLA 
-  }));
+  const tableData = [...transformedTeamIncidents]
+    .sort((a, b) => String(b.incident_number).localeCompare(String(a.incident_number), undefined, { numeric: true }))
+    .map((incident) => ({
+      "Reference No": incident.incident_number,
+      "Assigned To": getUserName(incident.handler),
+      "Affected User": getUserName(incident.informant),
+      Category: incident.category,
+      "Main Category": getMainCategoryNameFromDatabase(incident.category),
+      Location: getLocationName(incident.location),
+      Status: incident.status,
+      Priority: incident.priority || "", // ⭐ used for SLA 
+    }));
 
   const filteredData = tableData.filter((item) => {
     const matchesSearch = Object.values(item).some((val) =>
@@ -319,14 +349,14 @@ const AdminMyTeamIncidentViewAll = () => {
         key={1}
         onClick={() => setCurrentPage(1)}
         className={currentPage === 1 ? "active" : ""}
-        >
+      >
         1
       </button>,
       <button
         key={2}
         onClick={() => setCurrentPage(2)}
         className={currentPage === 2 ? "active" : ""}
-        >
+      >
         2
       </button>
     );

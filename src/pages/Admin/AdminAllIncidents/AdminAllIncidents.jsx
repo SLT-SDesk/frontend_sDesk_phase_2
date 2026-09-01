@@ -12,13 +12,13 @@ import './AdminAllIncidents.css';
 const AdminAllIncidents = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    
+
     // Redux state
     const { incidents, loading, error } = useSelector((state) => state.incident);
-    const { allUsers } = useSelector((state) => state.sltusers);
+    const { users: allUsers } = useSelector((state) => state.sltusers);
     const { categoryItems } = useSelector((state) => state.categories);
     const { locations } = useSelector((state) => state.location);
-    
+
     // Local state
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
@@ -27,12 +27,28 @@ const AdminAllIncidents = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
-    // Fetch all data on component mount
+    // Fetch all data on component mount + polling every 30s for new incidents
     useEffect(() => {
         dispatch(fetchAllIncidentsRequest());
         dispatch(fetchAllUsersRequest());
         dispatch(fetchCategoryItemsRequest());
         dispatch(fetchLocationsRequest());
+
+        const intervalId = setInterval(() => {
+            dispatch(fetchAllIncidentsRequest());
+        }, 30000);
+
+        // Listen for incident-transferred event to immediately refresh
+        const handleTransferred = () => {
+            dispatch(fetchAllIncidentsRequest());
+            dispatch(fetchAllUsersRequest());
+        };
+        window.addEventListener("incident-transferred", handleTransferred);
+
+        return () => {
+            clearInterval(intervalId);
+            window.removeEventListener("incident-transferred", handleTransferred);
+        };
     }, [dispatch]);
 
     // Loading and error states
@@ -89,24 +105,30 @@ const AdminAllIncidents = () => {
     };
 
     const getUserName = (serviceNumber) => {
-        const user = allUsers.find(user => user.service_number === serviceNumber);
-        return user ? user.user_name : serviceNumber;
+        if (!serviceNumber || String(serviceNumber).trim() === '') return 'Unassigned';
+        if (!Array.isArray(allUsers)) return serviceNumber;
+        const foundUser = allUsers.find(
+            (u) => String(u.service_number) === String(serviceNumber) || String(u.serviceNum) === String(serviceNumber)
+        );
+        return foundUser ? (foundUser.display_name || foundUser.user_name || foundUser.name || serviceNumber) : serviceNumber;
     };
 
     const getLocationName = (locationNumber) => {
         const location = locations.find(loc => loc.loc_number === locationNumber);
         return location ? location.loc_name : locationNumber;
     };    // Prepare table data from Redux incidents
-    const tableData = incidents.map(incident => ({
-        refNo: incident.incident_number,
-        assignedTo: getUserName(incident.handler),
-        affectedUser: getUserName(incident.informant),
-        category: getCategoryName(incident.category), // Grandchild category name for display
-        subcategory: getSubcategoryName(incident.category), // Child category name for filtering
-        team: getTeamName(incident.category),
-        status: incident.status,
-        rawCategory: incident.category, // Keep raw category number for reference
-    }));
+    const tableData = [...incidents]
+        .sort((a, b) => String(b.incident_number).localeCompare(String(a.incident_number), undefined, { numeric: true }))
+        .map(incident => ({
+            refNo: incident.incident_number,
+            assignedTo: getUserName(incident.handler),
+            affectedUser: getUserName(incident.informant),
+            category: getCategoryName(incident.category), // Grandchild category name for display
+            subcategory: getSubcategoryName(incident.category), // Child category name for filtering
+            team: getTeamName(incident.category),
+            status: incident.status,
+            rawCategory: incident.category, // Keep raw category number for reference
+        }));
 
     // Filter data based on search, status, category (subcategory), and team
     const filteredData = tableData.filter(item => {
@@ -224,9 +246,9 @@ const AdminAllIncidents = () => {
         );
         return selectedTeam
             ? selectedTeam.subcategories.map(sub => ({
-                  number: sub.child_category_number,
-                  name: sub.child_category_name,
-              }))
+                number: sub.child_category_number,
+                name: sub.child_category_name,
+            }))
             : [];
     };
 

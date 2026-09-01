@@ -26,10 +26,13 @@ const IncidentHistory = ({ refNo, category, location, priority, historyData, use
     };
 
     const getUserName = (serviceNumber) => {
-        if (!Array.isArray(users) || !serviceNumber) return serviceNumber || 'N/A';
-        const user = users.find(u => u.service_number === serviceNumber || u.serviceNum === serviceNumber);
-        return user ? user.display_name || user.user_name || user.name : serviceNumber;
-    };
+    if (!serviceNumber || String(serviceNumber).trim() === '') return 'Unassigned';
+    if (!Array.isArray(users)) return serviceNumber;
+    const foundUser = users.find(
+      (user) => String(user.service_number) === String(serviceNumber) || String(user.serviceNum) === String(serviceNumber)
+    );
+    return foundUser ? (foundUser.display_name || foundUser.user_name || foundUser.name || serviceNumber) : serviceNumber;
+  };
 
     const getStatusBadge = (status) => {
         let variant;
