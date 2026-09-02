@@ -1,4 +1,4 @@
- import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './AdminUpdateIncident.css';
 import { IoIosArrowForward } from 'react-icons/io';
@@ -22,7 +22,7 @@ const AdminUpdateIncident = () => {
 
   const { currentIncident, incidentHistory, loading, error } = useSelector((state) => state.incident);
   const { allUsers } = useSelector((state) => state.sltusers);
-  const { categoryItems } = useSelector((state) => state.categories);
+  const { categoryItems, list: mainCategories } = useSelector((state) => state.categories);
   const { locations } = useSelector((state) => state.location);
 
   const [formData, setFormData] = useState({
@@ -58,7 +58,12 @@ const AdminUpdateIncident = () => {
   // Ref for UpdateStatus component to access its clearForm function
   const updateStatusRef = useRef(null);
 
-  const getUserName = (serviceNumber) => {
+  const getUserName = (serviceNumber, status = null) => {
+    if (!serviceNumber || String(serviceNumber).trim() === '') {
+      if (status === "Pending Tier2 Assignment") return "Tier 2 Support";
+      if (status === "Pending Tier3 Assignment") return "Tier 3 Support";
+      return 'Unassigned';
+    }
     const user = allUsers.find(u => u.service_number === serviceNumber || u.serviceNum === serviceNumber);
     return user ? (user.display_name || user.user_name || user.name) : serviceNumber;
   };
@@ -98,7 +103,7 @@ const AdminUpdateIncident = () => {
         location: getLocationName(currentIncident.location),
         priority: currentIncident.priority,
         status: currentIncident.status,
-        assignedTo: getUserName(currentIncident.handler),
+        assignedTo: getUserName(currentIncident.handler, currentIncident.status),
         updateBy: getUserName(currentIncident.update_by),
         updatedOn: currentIncident.update_on || new Date().toLocaleString(),
         comments: currentIncident.description || 'No comments'
@@ -113,19 +118,7 @@ const AdminUpdateIncident = () => {
   const handleUpdateClick = () => {
     if (!currentIncident) return;
 
-    // Validate Tier 3 category selection
-    if (updateStatusData.transferTo === 'tier3-auto') {
-      const isTier3 = (categoryItems || []).some(item => {
-        const parentName = item.subCategory?.mainCategory?.name?.toLowerCase().trim();
-        return item.name === updateStatusData.category &&
-          (parentName === 'tier 3 support' || parentName === 'tier 3');
-      });
 
-      if (!isTier3) {
-        alert("Please select a Tier 3 category when transferring to Automatically Assign For Tier 3.");
-        return;
-      }
-    }
 
     const updatedIncidentData = {
       ...currentIncident,
@@ -138,7 +131,10 @@ const AdminUpdateIncident = () => {
       description: updateStatusData.description || currentIncident.description,
     };
 
-    dispatch(updateIncidentRequest(updatedIncidentData));
+    dispatch(updateIncidentRequest({
+      incident_number: currentIncident.incident_number,
+      data: updatedIncidentData
+    }));
   };
 
   const handleBackClick = () => {

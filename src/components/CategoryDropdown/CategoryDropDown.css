@@ -1,149 +1,177 @@
 .AdminCategoryTree-content {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(5px);
-    background: rgba(0, 0, 0, 0.5); 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100000;
-    overflow: hidden;
-  }
-  
-  .AdminCategoryTree-content-TreePopup {
-    background: rgb(255, 255, 255);
-    border-radius: 8px;
-    width: 75vw;
-    max-width: 600px;
-    height: 82vh;
-    max-height: 600px;
-    overflow-y: auto;
-    padding: 20px;
-    flex-direction: column;
-    border: 1px solid #000000;
-  }
-  
-  
-  .AdminCategoryTree-content-TreePopup-Header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #8b8787;
-    margin-bottom: 5px;
-  }
-  
-  .AdminCategoryTree-content-TreePopup-Header h3 {
-    font-size: 18px;
-  }
-  
-  .AdminCategoryTree-content-TreePopup-Header-closeButton {
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ee3838;
-  }
-  
-  .AdminCategoryTree-node {
-    margin-bottom: 8px;
-  }
-  
-  .AdminCategoryTree-content-TreePopup-Body-Label {
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 15px;
-    padding: 5px 0;
-    display: flex;
-    align-items: center;
-    transition: transform 0.1s ease-in-out;
-  }
-  
-  .AdminCategoryTree-content-TreePopup-Body-Label:hover {
-    background-color: #f0f0f0;
-    transform: scale(1.02);
-    border-radius: 4px;
-  }
-  
-  .AdminCategoryTree-content-TreePopup-Body-SubNodes {
-    margin-left: 30px;
-  }
-  
-  .AdminCategoryTree-subnode {
-    margin: 5px 0;
-  }
-  
-  .AdminCategoryTree-content-TreePopup-Body-SubNodes-Label {
-    cursor: pointer;
-    padding: 5px 0;
-    font-size: 14px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    transition: transform 0.1s ease-in-out;
-  }
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100000;
+  overflow: hidden;
+}
 
-  .AdminCategoryTree-content-TreePopup-Body-SubNodes-Label.AdminCategoryTree-item:hover {
-    transform: scale(1.02);
-    background-color: #f0f0f0;
-    border-radius: 4px;
-  }
-  
-  .AdminCategoryTree-items {
-    margin-left: 25px;
-  }
-  .AdminCategoryTree-content-TreePopup-Body-SubNodes-Label:hover {
-    transform: scale(1.02);
-    background-color: #f0f0f0;
-    border-radius: 4px;
-  }
-  .AdminCategoryTree-item {
-    cursor: pointer;
-    padding: 5px 0 5px 20px;
-    font-size: 13px;
-    font-weight: 400;
-    transition: all 0.1s ease;
-  }
-  
-  .AdminCategoryTree-item:hover {
-    background-color: #f0f0f0;
-    border-radius: 4px;
-    transform: scale(1.01);
-  }
-  
-  .arrow-icon {
-    margin-right: 8px;
-    color: #555;
-  }
+.AdminCategoryTree-content-TreePopup {
+  background: rgb(255, 255, 255);
+  border-radius: 8px;
+  width: 75vw;
+  max-width: 600px;
+  height: 82vh;
+  max-height: 600px;
+  overflow-y: auto;
+  padding: 20px;
+  flex-direction: column;
+  border: 1px solid #000000;
+}
 
-  .AdminCategoryTree-search-container {
-    margin-bottom: 15px;
-    padding: 10px 0;
-    border-bottom: 1px solid #e0e0e0;
-  }
 
-  .AdminCategoryTree-search-input {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
+.AdminCategoryTree-content-TreePopup-Header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #8b8787;
+  margin-bottom: 5px;
+}
 
-  .AdminCategoryTree-search-input:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-  }
+.AdminCategoryTree-content-TreePopup-Header h3 {
+  font-size: 18px;
+}
 
-  .AdminCategoryTree-no-results {
-    text-align: center;
-    padding: 20px;
-    color: #666;
-    font-style: italic;
-  }
+.AdminCategoryTree-content-TreePopup-Header-closeButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ee3838;
+}
+
+.AdminCategoryTree-node {
+  margin-bottom: 8px;
+}
+
+.AdminCategoryTree-content-TreePopup-Body-Label {
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 15px;
+  padding: 5px 0;
+  display: flex;
+  align-items: center;
+  transition: transform 0.1s ease-in-out;
+}
+
+.AdminCategoryTree-content-TreePopup-Body-Label:hover {
+  background-color: #f0f0f0;
+  transform: scale(1.02);
+  border-radius: 4px;
+}
+
+.AdminCategoryTree-content-TreePopup-Body-SubNodes {
+  margin-left: 30px;
+}
+
+.AdminCategoryTree-subnode {
+  margin: 5px 0;
+}
+
+.AdminCategoryTree-content-TreePopup-Body-SubNodes-Label {
+  cursor: pointer;
+  padding: 5px 0;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  transition: transform 0.1s ease-in-out;
+}
+
+.AdminCategoryTree-content-TreePopup-Body-SubNodes-Label.AdminCategoryTree-item:hover {
+  transform: scale(1.02);
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+.AdminCategoryTree-items {
+  margin-left: 25px;
+}
+
+.AdminCategoryTree-content-TreePopup-Body-SubNodes-Label:hover {
+  transform: scale(1.02);
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+.AdminCategoryTree-item {
+  cursor: pointer;
+  padding: 5px 0 5px 20px;
+  font-size: 13px;
+  font-weight: 400;
+  transition: all 0.1s ease;
+}
+
+.AdminCategoryTree-item:hover {
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  transform: scale(1.01);
+}
+
+.arrow-icon {
+  margin-right: 8px;
+  color: #555;
+}
+
+.arrow-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.arrow-icon-placeholder {
+  display: inline-block;
+  width: 24px;
+  /* same width as icon to keep alignment */
+}
+
+.category-label-text {
+  cursor: pointer;
+  flex: 1;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+
+.category-label-text:hover {
+  background-color: #e8f0fe;
+  color: #1a73e8;
+}
+
+.AdminCategoryTree-search-container {
+  margin-bottom: 15px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.AdminCategoryTree-search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.AdminCategoryTree-search-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.AdminCategoryTree-no-results {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}

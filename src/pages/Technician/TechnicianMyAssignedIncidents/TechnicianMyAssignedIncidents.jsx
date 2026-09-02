@@ -29,8 +29,8 @@ const TechnicianMyAssignedIncidents = () => {
     const { allUsers } = useSelector((state) => state.sltusers);
     const { categoryItems } = useSelector((state) => state.categories);
     const { locations } = useSelector((state) => state.location);
-    
-    
+
+
     // Real authentication check - no mock users
     if (!user) {
         return (
@@ -50,7 +50,7 @@ const TechnicianMyAssignedIncidents = () => {
                     }}>
                         <h3>Authentication Required</h3>
                         <p>Please log in with your Microsoft account to view assigned incidents.</p>
-                        <button 
+                        <button
                             onClick={() => window.location.href = '/LogIn'}
                             style={{
                                 padding: '10px 20px',
@@ -69,7 +69,7 @@ const TechnicianMyAssignedIncidents = () => {
             </div>
         );
     }
-    
+
     if (user.role !== 'technician') {
         return (
             <div className="TechnicianMyAssignedIncidents-main-content">
@@ -99,7 +99,7 @@ const TechnicianMyAssignedIncidents = () => {
     const currentUser = user;
 
     const assignedUser = currentUser.serviceNum;
-    
+
     // Local state
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
@@ -115,6 +115,13 @@ const TechnicianMyAssignedIncidents = () => {
         dispatch(fetchAllUsersRequest());
         dispatch(fetchCategoryItemsRequest());
         dispatch(fetchLocationsRequest());
+
+        // Polling every 30s to catch new assignments
+        const intervalId = setInterval(() => {
+            if (assignedUser) {
+                dispatch(fetchAssignedToMeRequest({ serviceNum: assignedUser }));
+            }
+        }, 30000);
 
         // Listen for the custom event for successful transfer
         const handleIncidentTransferred = (event) => {
@@ -140,6 +147,7 @@ const TechnicianMyAssignedIncidents = () => {
 
         // Cleanup the event listener on component unmount
         return () => {
+            clearInterval(intervalId);
             window.removeEventListener("incident-transferred", handleIncidentTransferred);
         };
     }, [dispatch, assignedUser, currentUser]);
@@ -150,9 +158,12 @@ const TechnicianMyAssignedIncidents = () => {
     };
 
     const getUserName = (serviceNumber) => {
+        if (!serviceNumber || String(serviceNumber).trim() === '') return 'Unassigned';
         if (!Array.isArray(allUsers)) return serviceNumber;
-        const user = allUsers.find(u => u.service_number === serviceNumber || u.serviceNum === serviceNumber);
-        return user ? (user.display_name || user.user_name || user.name) : serviceNumber;
+        const foundUser = allUsers.find(
+            (user) => String(user.service_number) === String(serviceNumber) || String(user.serviceNum) === String(serviceNumber)
+        );
+        return foundUser ? (foundUser.display_name || foundUser.user_name || foundUser.name || serviceNumber) : serviceNumber;
     };
 
     // eslint-disable-next-line no-unused-vars
@@ -161,8 +172,8 @@ const TechnicianMyAssignedIncidents = () => {
         return location ? (location.name || location.loc_name) : locationNumber;
     };
 
-  
-    
+
+
     // Only show loading spinner if loading is true AND assignedToMe is empty
     if (loading && (!assignedToMe || assignedToMe.length === 0)) {
         return (
@@ -200,13 +211,15 @@ const TechnicianMyAssignedIncidents = () => {
         );
     }
 
-    const tableData = assignedToMe.map(item => ({
-        refNo: item.incident_number,
-        affectedUser: getUserName(item.informant),
-        category: getCategoryName(item.category),
-        status: item.status,
-        rawCategory: item.category
-    }));
+    const tableData = [...assignedToMe]
+        .sort((a, b) => String(b.incident_number).localeCompare(String(a.incident_number), undefined, { numeric: true }))
+        .map(item => ({
+            refNo: item.incident_number,
+            affectedUser: getUserName(item.informant),
+            category: getCategoryName(item.category),
+            status: item.status,
+            rawCategory: item.category
+        }));
 
     const filteredData = tableData.filter(item => {
         const matchesSearch = Object.values(item).some(val =>
@@ -220,7 +233,7 @@ const TechnicianMyAssignedIncidents = () => {
     const totalPages = Math.ceil(filteredData.length / rowsPerPage);
     const indexOfLast = currentPage * rowsPerPage;
     const indexOfFirst = indexOfLast - rowsPerPage;
-    const currentRows = filteredData.slice(indexOfFirst, indexOfLast);    const handleRowClick = (refNo) => {
+    const currentRows = filteredData.slice(indexOfFirst, indexOfLast); const handleRowClick = (refNo) => {
         const incident = assignedToMe.find(item => item.incident_number === refNo);
         if (incident) {
             setSelectedIncident(incident);
@@ -384,9 +397,9 @@ const TechnicianMyAssignedIncidents = () => {
                             <div className="TechnicianMyAssignedIncidents-showSearchBar-Show d-flex flex-wrap align-items-center">
                                 <div className="d-flex align-items-center me-3 mb-2 mb-sm-0">
                                     Entries:
-                                    <select 
-                                        onChange={e => setRowsPerPage(Number(e.target.value))} 
-                                        value={rowsPerPage} 
+                                    <select
+                                        onChange={e => setRowsPerPage(Number(e.target.value))}
+                                        value={rowsPerPage}
                                         className="TechnicianMyAssignedIncidents-showSearchBar-Show-select ms-2"
                                     >
                                         {[10, 20, 50, 100].map(size => (
@@ -396,9 +409,9 @@ const TechnicianMyAssignedIncidents = () => {
                                 </div>
                                 <div className="d-flex align-items-center me-3 mb-2 mb-sm-0">
                                     Status:
-                                    <select 
-                                        onChange={e => setStatusFilter(e.target.value)} 
-                                        value={statusFilter} 
+                                    <select
+                                        onChange={e => setStatusFilter(e.target.value)}
+                                        value={statusFilter}
                                         className="TechnicianMyAssignedIncidents-showSearchBar-Show-select ms-2"
                                     >
                                         <option value="">All Status</option>
@@ -410,9 +423,9 @@ const TechnicianMyAssignedIncidents = () => {
                                 </div>
                                 <div className="d-flex align-items-center mb-2 mb-sm-0">
                                     Category:
-                                    <select 
-                                        onChange={e => setCategoryFilter(e.target.value)} 
-                                        value={categoryFilter} 
+                                    <select
+                                        onChange={e => setCategoryFilter(e.target.value)}
+                                        value={categoryFilter}
                                         className="TechnicianMyAssignedIncidents-showSearchBar-Show-select2 ms-2"
                                     >
                                         <option value="">All Categories</option>
@@ -437,7 +450,7 @@ const TechnicianMyAssignedIncidents = () => {
                         </div>
                     </div>
                 </div>
-                
+
                 <div className="TechnicianMyAssignedIncidents-table">
                     <table className="TechnicianMyAssignedIncidents-table-table">
                         <thead>
