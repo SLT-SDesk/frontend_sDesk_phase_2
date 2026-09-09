@@ -22,8 +22,10 @@ const initialState: IncidentState = {
   uploadedAttachment: null, // Add uploaded attachment state
   incidentsByMainCategory: [], // Add incidents by main category
   performances: [],
+  assignedToMeLoading: false,
+  assignedToMeError: null,
 
-  
+
   loading: false,
   error: null,
 };
@@ -33,22 +35,22 @@ const incidentSlice = createSlice({
   initialState,
   reducers: {
     // ===============================
-// Technician Performance
-// ===============================
-fetchTechnicianPerformanceRequest(state) {
-  state.loading = true;
-  state.error = null;
-},
+    // Technician Performance
+    // ===============================
+    fetchTechnicianPerformanceRequest(state) {
+      state.loading = true;
+      state.error = null;
+    },
 
-fetchTechnicianPerformanceSuccess(state, action) {
-  state.loading = false;
-  state.performances = action.payload;
-},
+    fetchTechnicianPerformanceSuccess(state, action) {
+      state.loading = false;
+      state.performances = action.payload;
+    },
 
-fetchTechnicianPerformanceFailure(state, action) {
-  state.loading = false;
-  state.error = action.payload;
-},
+    fetchTechnicianPerformanceFailure(state, action) {
+      state.loading = false;
+      state.error = action.payload;
+    },
     fetchDashboardStatsRequest(state) {
       state.loading = true;
       state.error = null;
@@ -185,20 +187,20 @@ fetchTechnicianPerformanceFailure(state, action) {
     getIncidentByNumberFailure(state, action) {
       state.loading = false;
       state.error = action.payload;
-    }, // Get assigned to me
+    }, // Get assigned to me — uses isolated loading/error to avoid corrupting global state
     getAssignedToMeRequest(state, action) {
-      state.loading = true;
-      state.error = null;
+      state.assignedToMeLoading = true;
+      state.assignedToMeError = null;
     },
     getAssignedToMeSuccess(state, action) {
-      state.loading = false;
+      state.assignedToMeLoading = false;
       state.assignedToMe = Array.isArray(action.payload)
         ? action.payload
         : action.payload?.data || [];
     },
     getAssignedToMeFailure(state, action) {
-      state.loading = false;
-      state.error = action.payload;
+      state.assignedToMeLoading = false;
+      state.assignedToMeError = action.payload;
     }, // Get assigned by me
     getAssignedByMeRequest(state, action) {
       state.loading = true;
@@ -445,7 +447,7 @@ fetchTechnicianPerformanceFailure(state, action) {
     // Socket-based live incident addition
     addIncidentToList(state, action) {
       const newIncident = action.payload;
-      
+
       // Add to incidents array if not already present
       const incidentExists = state.incidents.some(
         (incident) => incident.incident_number === newIncident.incident_number
@@ -458,7 +460,7 @@ fetchTechnicianPerformanceFailure(state, action) {
     // Socket-based live incident addition to assignedToMe
     addIncidentToAssignedToMe(state, action) {
       const newIncident = action.payload;
-      
+
       const incidentExists = state.assignedToMe.some(
         (incident) => incident.incident_number === newIncident.incident_number
       );
@@ -470,7 +472,7 @@ fetchTechnicianPerformanceFailure(state, action) {
     // Socket-based live incident addition to assignedByMe
     addIncidentToAssignedByMe(state, action) {
       const newIncident = action.payload;
-      
+
       const incidentExists = state.assignedByMe.some(
         (incident) => incident.incident_number === newIncident.incident_number
       );
