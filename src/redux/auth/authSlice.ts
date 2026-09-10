@@ -69,9 +69,12 @@ const authSlice = createSlice({
       state.isLoggedIn = true;
     },
 
-    fetchLoggedUserFailure: (state) => {
+    fetchLoggedUserFailure: (state, action: PayloadAction<string>) => {
       state.loading = false;
       state.authInitialized = true;
+      if (action.payload) {
+        state.error = action.payload;
+      }
     },
 
     refreshTokenRequest(state) {

@@ -69,6 +69,7 @@ const TechnicianPerformance = ({ dateRange, onRowClick }) => {
   // NEW-Logged-in admin user
   const admin = useSelector((state) => state.auth?.user);
   const adminTeamName = admin?.teamName;
+  const isSuperAdmin = admin?.role?.toLowerCase() === "superadmin" || admin?.role?.toLowerCase() === "super admin";
 
 
 
@@ -86,7 +87,7 @@ const TechnicianPerformance = ({ dateRange, onRowClick }) => {
     let result = (techniciansFromStore || []);
 
     // Filter by team only if the user is NOT a superAdmin
-    if (admin.role !== "superAdmin") {
+    if (!isSuperAdmin) {
       if (!adminTeamName) {
         setFilteredTechnicians([]);
         return;

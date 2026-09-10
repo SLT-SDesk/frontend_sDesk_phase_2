@@ -110,7 +110,9 @@ export interface IncidentState {
   uploadedAttachment: UploadedAttachment | null; // Add uploaded attachment state
   incidentsByMainCategory: Incident[]; // Add incidents by main category
   performances: TechnicianPerformance[];
-  
+  assignedToMeLoading: boolean;
+  assignedToMeError: string | null;
+
   loading: boolean;
   error: string | null;
 }

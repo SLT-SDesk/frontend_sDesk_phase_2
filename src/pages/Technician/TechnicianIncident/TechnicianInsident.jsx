@@ -12,7 +12,7 @@ import {
   fetchIncidentHistoryRequest,
   uploadAttachmentRequest,
 } from "../../../redux/incident/incidentSlice";
-import { fetchCategoriesRequest } from "../../../redux/categories/categorySlice";
+import { fetchCategoriesRequest, fetchCategoryItemsRequest } from "../../../redux/categories/categorySlice";
 import { fetchLocationsRequest } from "../../../redux/location/locationSlice";
 import {
   fetchUserByServiceNumberRequest,
@@ -174,6 +174,7 @@ const TechnicianInsident = ({
 
     // Dispatch Redux actions to fetch data
     dispatch(fetchCategoriesRequest());
+    dispatch(fetchCategoryItemsRequest());
     dispatch(fetchLocationsRequest());
     dispatch(fetchAllUsersRequest()); // Enable to load users for auto-fill
 
@@ -237,30 +238,37 @@ const TechnicianInsident = ({
     // For popup mode, don't wait for incident loading since we already have the data
     if (isPopup) {
       setIsLoading(false);
+      // In popup mode, do NOT pick up incidentState.error — it may be from
+      // unrelated fetches (e.g. fetchAssignedToMe error) and would
+      // incorrectly block the form/update button.
       return;
     }
 
     // For non-popup mode, only wait for incident loading, not categories/locations
     setIsLoading(incidentState.loading);
 
-    // Update error state
-    const anyError =
-      incidentState.error || categoryState.error || locationState.error;
-    setError(anyError);
+    // Update error state — only use incident-specific error, not category/location errors
+    setError(incidentState.error || null);
   }, [
     incidentState.loading,
     incidentState.error,
-    categoryState.error,
-    locationState.error,
     isPopup,
   ]);
 
-  // Reset isUpdating when loading finishes
+  const [updateError, setUpdateError] = useState(null);
+
+  // Reset isUpdating and catch specific update errors when loading finishes
   useEffect(() => {
     if (!incidentState.loading) {
+      if (isUpdating && incidentState.error) {
+        setUpdateError(incidentState.error);
+      }
       setIsUpdating(false);
+    } else if (incidentState.loading) {
+      // Clear error when a new request starts
+      setUpdateError(null);
     }
-  }, [incidentState.loading]);
+  }, [incidentState.loading, incidentState.error]);
 
   const handleUpdateStatusChange = (data) => {
     setUpdateStatusData(data);
@@ -551,7 +559,13 @@ const TechnicianInsident = ({
                 </div>
               )}
 
-              <div className={`col-12 d-flex ${isPopup ? 'justify-content-end' : 'justify-content-between'}`}>
+              {updateError && (
+                <div className="alert alert-danger mt-3" role="alert">
+                  Failed to update incident: {updateError}
+                </div>
+              )}
+
+              <div className={`col-12 d-flex ${isPopup ? 'justify-content-end' : 'justify-content-between'} mt-3`}>
                 {!isPopup && (
                   <button
                     className="technician-details-back-btn"
@@ -564,9 +578,9 @@ const TechnicianInsident = ({
                   <button
                     className="technician-details-update-btn"
                     onClick={handleUpdateClick}
-                    disabled={isUpdating || incidentState.loading}
+                    disabled={isUpdating}
                   >
-                    {isUpdating || incidentState.loading ? "Updating..." : "Update"}
+                    {isUpdating ? "Updating..." : "Update"}
                   </button>
                 )}
               </div>

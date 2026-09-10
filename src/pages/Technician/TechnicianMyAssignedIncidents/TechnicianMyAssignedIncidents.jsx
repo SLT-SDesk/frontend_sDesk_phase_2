@@ -24,7 +24,7 @@ const TechnicianMyAssignedIncidents = () => {
     const [showTransferSuccess, setShowTransferSuccess] = useState(false);
 
     // Redux state
-    const { assignedToMe, loading, error } = useSelector((state) => state.incident);
+    const { assignedToMe, assignedToMeLoading: loading, assignedToMeError: error } = useSelector((state) => state.incident);
     const { user } = useSelector((state) => state.auth);
     const { allUsers } = useSelector((state) => state.sltusers);
     const { categoryItems } = useSelector((state) => state.categories);
@@ -153,8 +153,9 @@ const TechnicianMyAssignedIncidents = () => {
     }, [dispatch, assignedUser, currentUser]);
 
     const getCategoryName = (categoryNumber) => {
-        const category = categoryItems.find(item => item.grandchild_category_number === categoryNumber);
-        return category ? category.grandchild_category_name : categoryNumber;
+        if (!categoryNumber) return 'N/A';
+        const category = categoryItems.find(item => item.category_code === categoryNumber);
+        return category ? category.name : categoryNumber;
     };
 
     const getUserName = (serviceNumber) => {
@@ -191,15 +192,17 @@ const TechnicianMyAssignedIncidents = () => {
         );
     }
 
-    if (error) {
+    // Non-blocking error: show a warning banner but still render incidents if we have them
+    const showErrorBanner = error && (!assignedToMe || assignedToMe.length === 0);
+    if (showErrorBanner) {
         return (
             <div className="TechnicianMyAssignedIncidents-main-content">
-                <div className="TechnicianMyAssignedIncidents-direction-bar">
-                    Incidents {'>'} My Assigned Incidents
+                <div className="TechnicianMyAssignedIncidents-tickets-creator">
+                    <span className="TechnicianMyAssignedIncidents-svr-desk">Incidents &gt; My Assigned Incidents</span>
                 </div>
                 <div className="TechnicianMyAssignedIncidents-content2">
                     <div className="error-container">
-                        <p>Error loading assigned incidents: {error}</p>
+                        <p>Could not load incidents. Please retry.</p>
                         <button onClick={() => {
                             dispatch(fetchAssignedToMeRequest({ serviceNum: assignedUser }));
                         }}>

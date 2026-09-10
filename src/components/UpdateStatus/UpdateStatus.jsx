@@ -40,42 +40,36 @@ const UpdateStatus = forwardRef(({
   const [priority, setPriority] = useState("");
   const [status, setStatus] = useState("");
 
-  // Determine current handler's tier and disabled state for transfer options
-  const handlerTech = techniciansList.find(
-    (tech) => String(tech.serviceNum) === String(incident?.handler)
+  // Determine the logged-in user's tier to control which transfer options are available
+  const loggedInTech = techniciansList.find(
+    (tech) => String(tech.serviceNum) === String(loggedInUser?.serviceNum || loggedInUser?.service_number)
   );
-  const handlerTier = handlerTech ? String(handlerTech.tier).toLowerCase() : "";
+  const loggedInTier = loggedInTech ? String(loggedInTech.tier).toLowerCase() : "";
   const currentStatus = incident?.status;
-  const isTransferDisabled =
-    currentStatus === "Pending Tier2 Assignment" ||
-    currentStatus === "Pending Tier3 Assignment" ||
-    currentStatus === "Closed";
+  // Only block transfer when incident is Closed
+  const isTransferDisabled = currentStatus === "Closed";
 
   useEffect(() => {
     dispatch(fetchCategoriesRequest());
     dispatch(fetchTechniciansRequest());
   }, [dispatch]);
 
-  // Revert category if transfer target is changed from Tier 3 while a Tier 3 category is selected
+  // When 'Automatically Assign For Tier3' is selected, clear the category
+  // so the technician is prompted to pick a valid Tier 3 category.
+  // When deselected, restore the original incident category.
   useEffect(() => {
-    if (transferTo !== 'tier3-auto') {
-      const isCurrentTier3 = mainCategories.some(mainCat => {
-        const name = mainCat.name?.toLowerCase().trim();
-        if (name !== 'tier 3 support' && name !== 'tier 3') return false;
-        return mainCat.subCategories?.some(subCat =>
-          subCat.categoryItems?.some(item => item.name === selectedCategory.name)
-        );
+    if (transferTo === 'tier3-auto') {
+      // Clear category — tech must select a Tier 3 one
+      setSelectedCategory({ name: '', number: '' });
+    } else if (incident && categoryDataset && categoryDataset.length > 0) {
+      // Restore original incident category
+      const categoryItem = categoryDataset.find((item) => item.category_code === incident.category);
+      setSelectedCategory({
+        name: categoryItem ? categoryItem.name : incidentData.category || "",
+        number: categoryItem ? categoryItem.category_code : ""
       });
-
-      if (isCurrentTier3 && incident && categoryDataset) {
-        const categoryItem = categoryDataset.find((item) => item.grandchild_category_number === incident.category);
-        setSelectedCategory({
-          name: categoryItem ? categoryItem.grandchild_category_name : incidentData.category || "",
-          number: categoryItem ? categoryItem.grandchild_category_number : ""
-        });
-      }
     }
-  }, [transferTo, incident, incidentData, categoryDataset, mainCategories, selectedCategory.name]);
+  }, [transferTo]);
 
   const handleCategorySelect = (selectedCategory) => {
     setSelectedCategory(selectedCategory);
@@ -90,7 +84,7 @@ const UpdateStatus = forwardRef(({
   useEffect(() => {
     const data = {
       updatedBy,
-      category: selectedCategory.name,
+      category: selectedCategory.number || selectedCategory.name,
       location: selectedLocation.number,
       transferTo,
       description,
@@ -122,8 +116,8 @@ const UpdateStatus = forwardRef(({
       const filteredTechnicians = usersDataset.filter((user) => user.role === "technician");
       setTechnicians(filteredTechnicians);
 
-      const categoryItem = categoryDataset.find((item) => item.grandchild_category_number === incident.category);
-      setSelectedCategory({ name: categoryItem ? categoryItem.grandchild_category_name : incidentData.category || "", number: categoryItem ? categoryItem.grandchild_category_number : "" });
+      const categoryItem = categoryDataset.find((item) => item.category_code === incident.category);
+      setSelectedCategory({ name: categoryItem ? categoryItem.name : incidentData.category || "", number: categoryItem ? categoryItem.category_code : "" });
 
       const locationItem = locationDataset.find((item) => item.loc_number === incident.location);
       setSelectedLocation({ name: locationItem ? locationItem.loc_name : incidentData.location || "", number: locationItem ? locationItem.loc_number : "" });
@@ -176,9 +170,11 @@ const UpdateStatus = forwardRef(({
               <Form.Control
                 type="text"
                 value={selectedCategory.name}
+                placeholder={transferTo === 'tier3-auto' && !selectedCategory.name ? '⚠ Select a Tier 3 category' : ''}
                 readOnly
                 disabled={loggedInUser?.role === 'technician' && transferTo !== 'tier3-auto'}
                 onClick={() => (loggedInUser?.role !== 'technician' || transferTo === 'tier3-auto') && setIsCategoryPopupOpen(true)}
+                style={transferTo === 'tier3-auto' && !selectedCategory.name ? { borderColor: '#dc3545', color: '#dc3545' } : {}}
               />
             </Form.Group>
 
@@ -198,8 +194,9 @@ const UpdateStatus = forwardRef(({
                 disabled={isTransferDisabled}
               >
                 <option value="">Select One</option>
-                <option value="tier2-auto" disabled={handlerTier === "tier2" || handlerTier === "tier3"}>Automatically Assign For Tier2</option>
-                <option value="tier3-auto" disabled={handlerTier === "tier3"}>Automatically Assign For Tier3</option>
+                {/* Tier 1 can transfer to Tier 2 or Tier 3; Tier 2 can transfer to Tier 3 only */}
+                <option value="tier2-auto" disabled={loggedInTier === "tier2" || loggedInTier === "tier3"}>Automatically Assign For Tier2</option>
+                <option value="tier3-auto" disabled={loggedInTier === "tier3"}>Automatically Assign For Tier3</option>
                 <option value="teamadmin">Assign For TeamAdmin</option>
                 {technicians.map((technician) => (
                   <option key={technician.service_number} value={technician.service_number}>
