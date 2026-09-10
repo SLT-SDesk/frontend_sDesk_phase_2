@@ -44,13 +44,9 @@ const CategoryDropdown = ({ onSelect, onClose, hideTier3 = false, showOnlyTier3 
 
     // Called when clicking the NAME of a subcategory
     const handleSubCategoryClick = (subcategory) => {
-        if (!subcategory.categoryItems || subcategory.categoryItems.length === 0) {
-            // No children → select directly
-            handleSelect(subcategory);
-        } else {
-            // Has children → toggle expand
-            toggleExpand(`sub-${subcategory.id}`);
-        }
+        // Always expand/collapse — subcategory nodes (SUB* codes) are NOT valid
+        // for backend reassignment. Only leaf CategoryItems (item.category_code) can be selected.
+        toggleExpand(`sub-${subcategory.id}`);
     };
 
     // Filter categories based on search term (case insensitive)

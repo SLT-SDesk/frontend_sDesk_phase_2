@@ -258,7 +258,11 @@ function* handleGetAssignedToMe(action) {
     const response = yield call(getIncidentsAssignedToMe, serviceNum);
     yield put(getAssignedToMeSuccess(response.data));
   } catch (error) {
-    yield put(getAssignedToMeFailure(error.message));
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to fetch assigned incidents";
+    yield put(getAssignedToMeFailure(errorMessage));
   }
 }
 

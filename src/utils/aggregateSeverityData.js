@@ -9,7 +9,11 @@ export function aggregateSeverityData(incidents, performances) {
 
   // ---------- Performance lookup ----------
   const performanceMap = performances.reduce((acc, p) => {
-    acc[p.incidentNumber] = p;
+    // Support both camelCase and snake_case incident number keys
+    const incNo = p.incidentNumber || p.incident_number;
+    if (incNo) {
+      acc[incNo] = p;
+    }
     return acc;
   }, {});
 
@@ -23,15 +27,35 @@ export function aggregateSeverityData(incidents, performances) {
   // ---------- Aggregate ----------
   incidents.forEach((incident) => {
     const severityKey = incident.priority?.toLowerCase();
-    if (!result[severityKey]) return;
+    if (!severityKey || !result[severityKey]) return;
 
-    const perf = performanceMap[incident.incident_number];
-    if (!perf) return;
+    // Find the SLA mapping correctly ignoring case
+    const slaKey = Object.keys(SLA).find(k => k.toLowerCase() === severityKey);
+    const sla = slaKey ? SLA[slaKey] : null;
+    if (!sla) return;
 
     const bucket = result[severityKey];
-    const sla = SLA[incident.priority];
 
+    // Always count the incident in the total for its severity bucket
     bucket.totalIncidents += 1;
+
+    // Lookup performance record using the map
+    let perf = performanceMap[incident.incident_number];
+
+    // Fallback: If no performance API record, check if incident was enriched in saga
+    if (!perf && incident.responseTimeMinutes !== undefined) {
+      perf = {
+        responseTimeMinutes: incident.responseTimeMinutes,
+        resolutionTimeMinutes: incident.resolveTimeMinutes
+      };
+    }
+
+    // If still no performance record (e.g., brand new incident), skip time metrics
+    if (!perf) {
+      // It's unresolved/new. We treat it as late/pending for resolve, and skip response time
+      bucket.resolve.late += 1;
+      return;
+    }
 
     // ===== RESPONSE =====
     const responseMinutes = Number(perf.responseTimeMinutes ?? 0);
@@ -43,7 +67,7 @@ export function aggregateSeverityData(incidents, performances) {
       bucket.response.late += 1;
     }
 
-    // ===== resolve rate changed =====
+    // ===== RESOLVE =====
     if (perf.resolutionTimeMinutes > 0) {
       const resolveMinutes = Number(perf.resolutionTimeMinutes);
       bucket.resolve.totalMinutes += resolveMinutes;
@@ -57,7 +81,6 @@ export function aggregateSeverityData(incidents, performances) {
       // unresolved ticket
       bucket.resolve.late += 1;
     }
-
   });
 
   // ---------- Calculate totals across all severities ----------
