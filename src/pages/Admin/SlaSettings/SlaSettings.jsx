@@ -101,13 +101,13 @@ const SlaSettings = () => {
   useEffect(() => {
     const incidentCounts = aggregateIncidentCounts(filteredIncidents);
     const teamTechs = aggregateTeamData(
-      currentAdmin?.teamId
+      !isSuperAdmin && currentAdmin?.teamId
         ? technicians.filter((tech) => tech.teamId === currentAdmin.teamId)
         : technicians
     );
     setTeamTechnicians(teamTechs);
     setTeamIncidents(incidentCounts);
-  }, [filteredIncidents, technicians, currentAdmin?.teamId]);
+  }, [filteredIncidents, technicians, currentAdmin?.teamId, isSuperAdmin]);
 
   const dataSla = useMemo(() => {
     return aggregateSeverityData(filteredIncidents, performances);

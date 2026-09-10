@@ -23,14 +23,51 @@ import {
 function* handleLoginWithMicrosoft(action: any) {
   try {
     const response = yield call(loginWithMicrosoft, action.payload);
-    const { user } = response.data;
+
+    // If the backend explicitly signals failure (HTTP 200 with success: false),
+    // surface the actual backend error message to the user.
+    if (response.data?.success === false) {
+      yield put(
+        loginWithMicrosoftFailure(
+          response.data.message || "Login failed. Please try again."
+        )
+      );
+      return;
+    }
+
+    // Check various possible locations for user data in the login response
+    const user =
+      response.data?.user ||
+      response.data?.data?.user ||
+      (response.data?.role ? response.data : null);
+
     if (user) {
       yield put(loginWithMicrosoftSuccess(user));
       yield put(fetchLoggedUserRequest());
-    } else {
-      yield put(
-        loginWithMicrosoftFailure("Failed to get user info from backend")
-      );
+      return;
+    }
+
+    // If login succeeded (no success:false) but user data is missing from the payload,
+    // attempt to fetch the user profile from the session (HttpOnly cookie flow).
+    try {
+      const fetchResponse = yield call(fetchLoggedUser);
+      const fetchedUser =
+        fetchResponse.data?.user ||
+        fetchResponse.data?.data?.user ||
+        (fetchResponse.data?.role ? fetchResponse.data : null);
+
+      if (fetchedUser) {
+        yield put(loginWithMicrosoftSuccess(fetchedUser));
+        yield put(fetchLoggedUserRequest());
+      } else {
+        yield put(
+          loginWithMicrosoftFailure(
+            fetchResponse.data?.message || "Failed to get user info from backend"
+          )
+        );
+      }
+    } catch (e: any) {
+      yield put(loginWithMicrosoftFailure("Failed to get user info from backend"));
     }
   } catch (error: any) {
     yield put(
@@ -77,7 +114,7 @@ function* handleFetchLoggedUser() {
               yield put(
                 fetchLoggedUserFailure(
                   retryResponse.data.message ||
-                    "Failed to fetch logged user after refresh"
+                  "Failed to fetch logged user after refresh"
                 )
               );
             } else {
