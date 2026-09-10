@@ -48,8 +48,8 @@ const SlaSettings = () => {
   const { technicians } = useSelector((state) => state.technicians);
 
   // Decide which data source to use based on role
-  const sourceIncidents =
-    user?.role === "superAdmin" ? incidents : incidentsByMainCategory;
+  const isSuperAdmin = user?.role?.toLowerCase() === "superadmin" || user?.role?.toLowerCase() === "super admin";
+  const sourceIncidents = isSuperAdmin ? incidents : incidentsByMainCategory;
 
   //filtered incidents by date range - MEMOIZED to prevent infinite loop
   const filteredIncidents = useMemo(() => {
@@ -70,12 +70,32 @@ const SlaSettings = () => {
 
 
   useEffect(() => {
-    dispatch(fetchAllIncidentsRequest()); //fetch all incidents
-    if (currentAdmin?.teamId) {
-      dispatch(fetchIncidentsByMainCategoryCodeRequest(currentAdmin.teamId));
-    }
-    dispatch(fetchTechnicianPerformanceRequest());
-    dispatch(fetchTechniciansRequest());
+    const fetchData = () => {
+      dispatch(fetchAllIncidentsRequest());
+      if (currentAdmin?.teamId) {
+        dispatch(fetchIncidentsByMainCategoryCodeRequest(currentAdmin.teamId));
+      }
+      dispatch(fetchTechnicianPerformanceRequest());
+      dispatch(fetchTechniciansRequest());
+    };
+
+    fetchData(); // initial load
+
+    const intervalId = setInterval(fetchData, 30000); // poll every 30 seconds
+
+    // Add event listeners for direct user actions
+    const handleInstantUpdate = () => {
+      fetchData();
+    };
+
+    window.addEventListener("incident-transferred", handleInstantUpdate);
+    window.addEventListener("incident-popup-close", handleInstantUpdate);
+
+    return () => {
+      clearInterval(intervalId); // cleanup on unmount
+      window.removeEventListener("incident-transferred", handleInstantUpdate);
+      window.removeEventListener("incident-popup-close", handleInstantUpdate);
+    };
   }, [dispatch, currentAdmin?.teamId]);
 
   useEffect(() => {
