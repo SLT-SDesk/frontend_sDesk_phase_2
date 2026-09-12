@@ -21,6 +21,7 @@ import {
 } from "../../../redux/incident/incidentSlice";
 
 import { fetchTechniciansRequest } from "../../../redux/technicians/technicianSlice";
+import { fetchCategoryItemsRequest, fetchMainCategoriesRequest } from "../../../redux/categories/categorySlice";
 
 import { aggregateIncidentCounts } from "../../../utils/aggregateIncidentCounts";
 import { aggregateSeverityData } from "../../../utils/aggregateSeverityData";
@@ -46,6 +47,9 @@ const SlaSettings = () => {
     (state) => state.incident
   );
   const { technicians } = useSelector((state) => state.technicians);
+  const { categoryItems, mainCategories } = useSelector((state) => state.categories);
+
+  const [selectedTeam, setSelectedTeam] = useState("");
 
   // Decide which data source to use based on role
   const isSuperAdmin = user?.role?.toLowerCase() === "superadmin" || user?.role?.toLowerCase() === "super admin";
@@ -53,7 +57,27 @@ const SlaSettings = () => {
 
   //filtered incidents by date range - MEMOIZED to prevent infinite loop
   const filteredIncidents = useMemo(() => {
-    return (sourceIncidents || []).filter((incident) => {
+    let baseIncidents = sourceIncidents || [];
+
+    // Apply team filter for Super Admin if a team is selected
+    if (isSuperAdmin && selectedTeam) {
+      baseIncidents = baseIncidents.filter(incident => {
+        // Direct match (if category is already the main category code)
+        if (String(incident.category) === String(selectedTeam)) return true;
+
+        // Grandchild match
+        const cat = categoryItems?.find(item => String(item.grandchild_category_number) === String(incident.category));
+        if (cat && String(cat.parent_category_number) === String(selectedTeam)) return true;
+
+        // Child match
+        const catAsChild = categoryItems?.find(item => String(item.child_category_number) === String(incident.category));
+        if (catAsChild && String(catAsChild.parent_category_number) === String(selectedTeam)) return true;
+
+        return false;
+      });
+    }
+
+    return baseIncidents.filter((incident) => {
       const incidentDate = new Date(incident.update_on || incident.createdAt);
 
       const start = new Date(range.start);
@@ -66,7 +90,7 @@ const SlaSettings = () => {
 
       return incidentDate >= start && incidentDate <= end;
     });
-  }, [sourceIncidents, range]);
+  }, [sourceIncidents, range, isSuperAdmin, selectedTeam, categoryItems]);
 
 
   useEffect(() => {
@@ -77,6 +101,8 @@ const SlaSettings = () => {
       }
       dispatch(fetchTechnicianPerformanceRequest());
       dispatch(fetchTechniciansRequest());
+      dispatch(fetchCategoryItemsRequest());
+      dispatch(fetchMainCategoriesRequest());
     };
 
     fetchData(); // initial load
@@ -100,14 +126,19 @@ const SlaSettings = () => {
 
   useEffect(() => {
     const incidentCounts = aggregateIncidentCounts(filteredIncidents);
-    const teamTechs = aggregateTeamData(
-      !isSuperAdmin && currentAdmin?.teamId
-        ? technicians.filter((tech) => tech.teamId === currentAdmin.teamId)
-        : technicians
-    );
+
+    let filteredTechnicians = technicians;
+    if (!isSuperAdmin && currentAdmin?.teamId) {
+      filteredTechnicians = technicians.filter((tech) => String(tech.teamId) === String(currentAdmin.teamId));
+    } else if (isSuperAdmin && selectedTeam) {
+      filteredTechnicians = technicians.filter((tech) => String(tech.teamId) === String(selectedTeam));
+    }
+
+    const teamTechs = aggregateTeamData(filteredTechnicians);
+
     setTeamTechnicians(teamTechs);
     setTeamIncidents(incidentCounts);
-  }, [filteredIncidents, technicians, currentAdmin?.teamId, isSuperAdmin]);
+  }, [filteredIncidents, technicians, currentAdmin?.teamId, isSuperAdmin, selectedTeam]);
 
   const dataSla = useMemo(() => {
     return aggregateSeverityData(filteredIncidents, performances);
@@ -188,6 +219,23 @@ const SlaSettings = () => {
           </div>
 
           <div className="sla-date-wrapper">
+            {isSuperAdmin && (
+              <select
+                className="sla-date-button"
+                style={{ marginRight: '10px', paddingRight: '28px' }}
+                value={selectedTeam}
+                onChange={(e) => setSelectedTeam(e.target.value)}
+              >
+                <option value="">Filter: [All Teams]</option>
+                {mainCategories
+                  ?.filter((team) => !['test 1', 'testing-parent category'].includes(team.name.toLowerCase()))
+                  ?.map((team) => (
+                    <option key={team.id} value={team.category_code}>
+                      {team.name}
+                    </option>
+                  ))}
+              </select>
+            )}
             <button
               type="button"
               onClick={openDatePopup}

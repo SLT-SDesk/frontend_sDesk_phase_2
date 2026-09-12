@@ -5,18 +5,21 @@
     min-width: 0;
     box-sizing: border-box;
   }
+
   .UserViewIncident-content2 {
     padding: 0.5rem 0.2rem;
     width: 100vw;
     min-width: 0;
     box-sizing: border-box;
   }
+
   .UserViewIncident-TitleBar {
     flex-direction: column;
     gap: 0.5rem;
     align-items: stretch;
     width: 100%;
   }
+
   .UserViewIncident-TitleBar-buttons {
     width: 100%;
     display: flex;
@@ -24,6 +27,7 @@
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
   }
+
   .UserViewIncident-table-table {
     font-size: 12px;
     width: 100vw;
@@ -32,6 +36,7 @@
     overflow-x: auto;
     box-sizing: border-box;
   }
+
   .UserViewIncident-table-table thead,
   .UserViewIncident-table-table tbody,
   .UserViewIncident-table-table tr {
@@ -39,28 +44,33 @@
     width: 100%;
     table-layout: fixed;
   }
+
   .UserViewIncident-table-table th,
   .UserViewIncident-table-table td {
     padding: 6px 4px;
     font-size: 12px;
     word-break: break-word;
   }
+
   .UserViewIncident-showSearchBar {
     flex-direction: column;
     gap: 0.5rem;
     align-items: flex-start;
   }
+
   .UserViewIncident-content3 {
     flex-direction: column;
     gap: 0.5rem;
     align-items: flex-start;
     font-size: 12px;
   }
+
   .UserViewIncident-content3-team-pagination-buttons button {
     font-size: 12px;
     padding: 2px 8px;
     margin: 0 2px;
   }
+
   .UserViewIncident-TitleBar-buttons-ExportData {
     width: auto;
     font-size: 12px;
@@ -70,18 +80,20 @@
     display: flex;
     justify-content: flex-end;
   }
+
   .UserViewIncident-refno {
     font-size: 12px;
     word-break: break-all;
   }
 }
+
 /* UserViewIncident.css - Responsive version maintaining original UI */
 
 .UserViewIncident-main-content {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  height: 100vh;
+  overflow: hidden;
 }
 
 .UserViewIncident-direction-bar {
@@ -201,7 +213,8 @@
 .UserViewIncident-table {
   flex: 1;
   height: 100%;
-  padding: 10px 20px 0px 20px;
+  padding: 0px 20px 0px 20px;
+  margin-top: 10px;
   max-height: 81%;
   overflow-y: auto;
 }
@@ -223,6 +236,9 @@
 .UserViewIncident-table th {
   background-color: #e9ecef;
   font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .UserViewIncident-table td {
@@ -298,7 +314,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   padding: 10px;
@@ -355,6 +371,7 @@
     opacity: 0;
     transform: scale(0.9) translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -405,9 +422,9 @@
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .modal-backdrop {
-    background: rgba(0,0,0,0.8);
+    background: rgba(0, 0, 0, 0.8);
   }
-  
+
   .modal-card {
     border: 2px solid #000;
   }
@@ -418,15 +435,16 @@
   .modal-card {
     animation: none;
   }
-  
+
   .modal-card button {
     transition: none;
   }
-  
+
   .modal-card button:hover {
     transform: none;
   }
 }
+
 @media (max-width: 768px) and (min-width: 481px) {
   .modal-backdrop {
     padding: 15px;
@@ -487,7 +505,7 @@
     border-radius: 8px;
     margin: 0;
     font-size: 14px;
-    box-shadow: 0 24px 80px rgba(0,0,0,0.22), 0 10px 40px rgba(0,0,0,0.16);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22), 0 10px 40px rgba(0, 0, 0, 0.16);
   }
 
   /* Enhanced mobile scrolling */
@@ -733,7 +751,7 @@
 /* Landscape orientation adjustments */
 @media (max-height: 500px) and (orientation: landscape) {
   .UserViewIncident-main-content {
-    height: 100vh;
+    overflow: hidden;
   }
 
   .UserViewIncident-direction-bar {
@@ -766,6 +784,7 @@
 
 /* Print styles */
 @media print {
+
   .UserViewIncident-TitleBar-buttons,
   .UserViewIncident-showSearchBar,
   .UserViewIncident-content3,
@@ -792,7 +811,7 @@
     font-size: 15px;
     padding: 18px 14px 14px 14px;
     border-radius: 12px;
-    box-shadow: 0 10px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(0, 0, 0, 0.08);
     margin-top: -10px;
   }
 }

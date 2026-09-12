@@ -1,296 +1,316 @@
-pre, code, .debug, [class*="debug"] {
+pre,
+code,
+.debug,
+[class*="debug"] {
   display: none !important;
 }
+
 .TechnicianMyAssignedIncidents-main-content {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    height: 100vh;
-  
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+
 }
+
 .TechnicianMyAssignedIncidents-tickets-creator {
-    display: flex;
-    align-items: center; 
-    background-color: #f0f0f0; 
-    padding: 10px; 
-    border-radius: 5px; 
-    width: 1290px;
-  
-   
-  }
-  
-  .TechnicianMyAssignedIncidents-svr-desk {
-    font-weight: bold;
-    margin-right: 10px; 
-  }
+  display: flex;
+  align-items: center;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+  width: 1290px;
+
+
+}
+
+.TechnicianMyAssignedIncidents-svr-desk {
+  font-weight: bold;
+  margin-right: 10px;
+}
 
 
 .TechnicianMyAssignedIncidents-content2 {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    overflow: hidden;
-    padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+  padding-bottom: 20px;
 }
 
 .TechnicianMyAssignedIncidents-TitleBar {
-    display: flex;
-    flex-direction: row;
-    height: 50px;
-    width: 100%;
-    justify-content: space-between;
+  display: flex;
+  flex-direction: row;
+  height: 50px;
+  width: 100%;
+  justify-content: space-between;
 }
 
 .TechnicianMyAssignedIncidents-TitleBar-NameAndIcon {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin: 10px 0px 10px 20px;
-    gap: 10px;
-    font-size: 20px;
-    font-weight: 600;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 10px 0px 10px 20px;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .TechnicianMyAssignedIncidents-TitleBar-buttons {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin: 10px 20px 10px 0px;
-    gap: 20px;
-    font-size: 13px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 10px 20px 10px 0px;
+  gap: 20px;
+  font-size: 13px;
 }
 
 /* Add this to your TechnicianMyAssignedIncidents.css */
 .transfer-success-popup {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: #4CAF50; /* Green background */
-    color: white;
-    padding: 15px 25px;
-    border-radius: 8px;
-    z-index: 1050; /* Ensure it's above other elements */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    font-size: 16px;
-    font-weight: bold;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #4CAF50;
+  /* Green background */
+  color: white;
+  padding: 15px 25px;
+  border-radius: 8px;
+  z-index: 1050;
+  /* Ensure it's above other elements */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  font-size: 16px;
+  font-weight: bold;
 }
 
 .TechnicianMyAssignedIncidents-TitleBar-buttons-ExportData {
-    display: flex;
-    align-items: center;
-    border-radius: 5px;
-    border: 2px solid #ffffff;
-    gap: 5px;
-    font-weight: 600;
-    background-color: #b10e0e; 
-    color: aliceblue;
-     animation: fadeInOut 3s ease-in-out;
-     margin-top: -4%;
-     margin-left: 93.5%;
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  border: 2px solid #ffffff;
+  gap: 5px;
+  font-weight: 600;
+  background-color: #b10e0e;
+  color: aliceblue;
+  animation: fadeInOut 3s ease-in-out;
+  margin-top: -4%;
+  margin-left: 93.5%;
 }
 
 .TechnicianMyAssignedIncidents-showSearchBar {
-    display: flex;
-    flex-direction: row;
-    height: 40px;
-    max-height: 40px;
-    align-items: center;
-    width: 100%;
-    background-color: rgb(255, 255, 255);
-    justify-content: space-between;
+  display: flex;
+  flex-direction: row;
+  height: 40px;
+  max-height: 40px;
+  align-items: center;
+  width: 100%;
+  background-color: rgb(255, 255, 255);
+  justify-content: space-between;
 }
 
 .TechnicianMyAssignedIncidents-showSearchBar-Show {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    margin: 0px 0px 0px 20px;
-    font-weight: 600;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin: 0px 0px 0px 20px;
+  font-weight: 600;
 }
 
 .TechnicianMyAssignedIncidents-showSearchBar-Show-select {
-    display: flex;
-    border: 1px solid #ccc;
-    width: 100px;
-    font-size: 14px;
-    height: 25px;
-    border-radius: 5px;
-    margin-right: 20px;
+  display: flex;
+  border: 1px solid #ccc;
+  width: 100px;
+  font-size: 14px;
+  height: 25px;
+  border-radius: 5px;
+  margin-right: 20px;
 }
 
 .TechnicianMyAssignedIncidents-showSearchBar-Show-select2 {
-    display: flex;
-    border: 1px solid #ccc;
-    width: 180px;
-    font-size: 14px;
-    height: 25px;
-    border-radius: 5px;
-    margin-right: 20px;
+  display: flex;
+  border: 1px solid #ccc;
+  width: 180px;
+  font-size: 14px;
+  height: 25px;
+  border-radius: 5px;
+  margin-right: 20px;
 }
 
 .TechnicianMyAssignedIncidents-showSearchBar-SearchBar {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    margin: 0px 20px 0px 0px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin: 0px 20px 0px 0px;
 }
 
 .TechnicianMyAssignedIncidents-showSearchBar-SearchBar-input {
-    width: 100%;
-    min-width: 0;
-    max-width: 100%;
-    font-size: 1.05rem;
-    height: 2.3rem;
-    padding: 0.6rem 1rem;
-    box-sizing: border-box;
-    margin: 0.3rem 0 0.7rem 0;
-    background: #fff;
-    border: 2px solid #bdbdbd;
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-    outline: none;
-    transition: border 0.2s, box-shadow 0.2s;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 1.05rem;
+  height: 2.3rem;
+  padding: 0.6rem 1rem;
+  box-sizing: border-box;
+  margin: 0.3rem 0 0.7rem 0;
+  background: #fff;
+  border: 2px solid #bdbdbd;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
 }
 
 .TechnicianMyAssignedIncidents-showSearchBar-SearchBar-input:focus {
-    border: 2px solid #1976d2;
-    box-shadow: 0 2px 12px rgba(25,118,210,0.10);
+  border: 2px solid #1976d2;
+  box-shadow: 0 2px 12px rgba(25, 118, 210, 0.10);
 }
 
 .TechnicianMyAssignedIncidents-table {
-    flex: 1;
-    height: 100%;
-    padding: 10px 20px 0px 20px;
-    max-height: 80%;
-    overflow-y: auto;
+  flex: 1;
+  height: 100%;
+  padding: 0px 20px 0px 20px;
+  margin-top: 10px;
+  max-height: 80%;
+  overflow-y: auto;
 }
 
 .TechnicianMyAssignedIncidents-table table {
-    border-collapse: collapse;
-    background-color: #f8f9fa;
-    width: 100%;
+  border-collapse: collapse;
+  background-color: #f8f9fa;
+  width: 100%;
 }
 
 .TechnicianMyAssignedIncidents-table th,
 .TechnicianMyAssignedIncidents-table td {
-    padding: 8px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-    font-size: 12px;
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  font-size: 12px;
 }
 
 .TechnicianMyAssignedIncidents-table th {
-    background-color: #e9ecef;
-    font-weight: bold;
+  background-color: #e9ecef;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .TechnicianMyAssignedIncidents-table td {
-    white-space: nowrap;
+  white-space: nowrap;
 }
 
 .TechnicianMyAssignedIncidents-table td:nth-child(2),
 .TechnicianMyAssignedIncidents-table td:nth-child(3),
 .TechnicianMyAssignedIncidents-table td:nth-child(4) {
-    white-space: normal;
-    min-width: 100px;
+  white-space: normal;
+  min-width: 100px;
 }
 
 .TechnicianMyAssignedIncidents-content3 {
-    display: flex;
-    flex-grow: 1;
-    max-height: 53px;
-    justify-content: space-between;
-    align-items: center;
-    padding: 25px 30px 12px 20px;
-    font-size: 12px;
-    font-weight: bold;
-    position: sticky;
-    bottom: 100px;
-    z-index: 90px;    
+  display: flex;
+  flex-grow: 1;
+  max-height: 53px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 30px 12px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  position: sticky;
+  bottom: 100px;
+  z-index: 90px;
 }
 
-.TechnicianMyAssignedIncidents-footer-content{
-margin-top: -900%;
+.TechnicianMyAssignedIncidents-footer-content {
+  margin-top: -900%;
 
-}
-@keyframes fadeInOut {
-    0%, 100% {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
 }
 
 @keyframes fadeInOut {
-    0%, 100% {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
+
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes fadeInOut {
+
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
 }
 
 
 
 .TechnicianMyAssignedIncidents-content3-team-pagination-buttons {
-    display: flex;
-    gap: 5px;
-    align-items: center;
+  display: flex;
+  gap: 5px;
+  align-items: center;
 }
 
 
 .TechnicianMyAssignedIncidents-content3-team-pagination-buttons button {
-    padding: 2px 8px;
-    border: 1px solid #ddd;
-    background-color: white;
-    cursor: pointer;
-    border-radius: 3px;
-    min-width: 30px;
+  padding: 2px 8px;
+  border: 1px solid #ddd;
+  background-color: white;
+  cursor: pointer;
+  border-radius: 3px;
+  min-width: 30px;
 }
 
 .TechnicianMyAssignedIncidents-content3-team-pagination-buttons button.active {
-    background-color: #df5050;
-    color: white;
-    border-color: #000000;
+  background-color: #df5050;
+  color: white;
+  border-color: #000000;
 }
 
 .TechnicianMyAssignedIncidents-content3-team-pagination-buttons button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .TechnicianMyAssignedIncidents-content3-team-pagination-buttons span {
-    padding: 5px 10px;
-    color: #666;
+  padding: 5px 10px;
+  color: #666;
 }
-.refno-link {
-    cursor: pointer;
-    text-decoration: none;
-    color: inherit;
-  }
-  
 
- .TechnicianMyAssignedIncidents-main-content {
-    height: auto;
-    min-height: 100vh;
-    padding: 0 5px;
-  }
-  .TechnicianMyAssignedIncidents-tickets-creator {
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 10px 5px;
-  }
-  .TechnicianMyAssignedIncidents-TitleBar {
-    flex-direction: column;
-    height: auto;
-    gap: 10px;
-    padding: 0 5px;
-  }
+.refno-link {
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+
+.TechnicianMyAssignedIncidents-main-content {
+  height: auto;
+  min-overflow: hidden;
+  padding: 0 5px;
+}
+
+.TechnicianMyAssignedIncidents-tickets-creator {
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px 5px;
+}
+
+.TechnicianMyAssignedIncidents-TitleBar {
+  flex-direction: column;
+  height: auto;
+  gap: 10px;
+  padding: 0 5px;
+}
 
 
 @media (max-width: 767.98px) {
   .TechnicianMyAssignedIncidents-main-content {
     padding: 0 2px;
   }
+
   .TechnicianMyAssignedIncidents-tickets-creator {
     width: 100%;
     flex-direction: column;
@@ -298,30 +318,36 @@ margin-top: -900%;
     padding: 8px 2px;
     font-size: 0.98rem;
   }
+
   .TechnicianMyAssignedIncidents-TitleBar {
     flex-direction: column;
     height: auto;
     gap: 8px;
     padding: 0 2px;
   }
+
   .TechnicianMyAssignedIncidents-table {
     padding: 5px 2px 0 2px;
     max-height: none;
     min-width: 320px;
   }
+
   .TechnicianMyAssignedIncidents-table table {
     font-size: 11px;
     min-width: 600px;
   }
+
   .TechnicianMyAssignedIncidents-content3 {
     font-size: 11px;
     padding: 15px 5px 15px 5px;
   }
+
   .TechnicianMyAssignedIncidents-content3-team-pagination-buttons button {
     min-width: 24px;
     font-size: 11px;
     padding: 2px 4px;
   }
+
   .TechnicianMyAssignedIncidents-showSearchBar {
     display: flex;
     flex-direction: column !important;
@@ -331,6 +357,7 @@ margin-top: -900%;
     gap: 0.5rem;
     width: 100%;
   }
+
   .TechnicianMyAssignedIncidents-showSearchBar-Show {
     display: flex;
     flex-direction: column !important;
@@ -339,7 +366,8 @@ margin-top: -900%;
     margin: 0 !important;
     width: 100%;
   }
-  .TechnicianMyAssignedIncidents-showSearchBar-Show > div {
+
+  .TechnicianMyAssignedIncidents-showSearchBar-Show>div {
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -347,6 +375,7 @@ margin-top: -900%;
     width: 100%;
     margin-bottom: 10px;
   }
+
   .TechnicianMyAssignedIncidents-showSearchBar-Show-select,
   .TechnicianMyAssignedIncidents-showSearchBar-Show-select2 {
     width: 100%;
@@ -357,6 +386,7 @@ margin-top: -900%;
     margin: 0 0 0.5rem 0;
     padding: 2px 6px;
   }
+
   .TechnicianMyAssignedIncidents-showSearchBar-SearchBar {
     width: 100%;
     margin: 0.2rem 0 0.7rem 0;
@@ -366,6 +396,7 @@ margin-top: -900%;
     align-items: center;
     background: transparent;
   }
+
   .TechnicianMyAssignedIncidents-showSearchBar-SearchBar-input {
     width: 100%;
     min-width: 0;
@@ -389,6 +420,7 @@ margin-top: -900%;
     width: 100% !important;
     min-width: 0 !important;
   }
+
   .TechnicianMyAssignedIncidents-showSearchBar-Show {
     flex-direction: column !important;
     align-items: stretch !important;
@@ -396,13 +428,15 @@ margin-top: -900%;
     margin: 0 !important;
     width: 100% !important;
   }
-  .TechnicianMyAssignedIncidents-showSearchBar-Show > div {
+
+  .TechnicianMyAssignedIncidents-showSearchBar-Show>div {
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 4px !important;
     width: 100% !important;
     margin-bottom: 8px !important;
   }
+
   .TechnicianMyAssignedIncidents-showSearchBar-Show-select,
   .TechnicianMyAssignedIncidents-showSearchBar-Show-select2 {
     width: 100% !important;
@@ -413,6 +447,7 @@ margin-top: -900%;
     margin: 0 0 0.5rem 0 !important;
     padding: 4px 8px !important;
   }
+
   .TechnicianMyAssignedIncidents-showSearchBar-SearchBar {
     flex-direction: column !important;
     align-items: stretch !important;
@@ -420,6 +455,7 @@ margin-top: -900%;
     margin: 0 !important;
     gap: 0.5rem !important;
   }
+
   .TechnicianMyAssignedIncidents-showSearchBar-SearchBar-input {
     width: 100% !important;
     min-width: 0 !important;

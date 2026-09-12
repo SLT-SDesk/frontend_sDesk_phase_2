@@ -24,8 +24,6 @@ const SuperAdminReportedMyIncidents = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
 
@@ -90,10 +88,7 @@ const SuperAdminReportedMyIncidents = () => {
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-  const indexOfLast = currentPage * rowsPerPage;
-  const indexOfFirst = indexOfLast - rowsPerPage;
-  const currentRows = filteredData.slice(indexOfFirst, indexOfLast);
+  const currentRows = filteredData;
 
   // ✅ Row click → open popup
   const handleRowClick = (refNo) => {
@@ -259,18 +254,6 @@ const SuperAdminReportedMyIncidents = () => {
             <div className="col-md-7 col-lg-8 p-0">
               <div className="SuperAdminReportedMyIncidents-showSearchBar-Show d-flex flex-wrap align-items-center">
                 <div className="d-flex align-items-center me-3 mb-2 mb-sm-0">
-                  Entries:
-                  <select
-                    onChange={e => setRowsPerPage(Number(e.target.value))}
-                    value={rowsPerPage}
-                    className="SuperAdminReportedMyIncidents-showSearchBar-Show-select ms-2"
-                  >
-                    {[10, 20, 50, 100].map(size => (
-                      <option key={size} value={size}>{size} entries</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="d-flex align-items-center me-3 mb-2 mb-sm-0">
                   Status:
                   <select
                     onChange={e => setStatusFilter(e.target.value)}
@@ -345,33 +328,12 @@ const SuperAdminReportedMyIncidents = () => {
           </table>
         </div>
 
-        {/* ✅ Pagination */}
+        {/* ✅ Activity Info Footer */}
         <div className="SuperAdminReportedMyIncidents-content3">
-          <span className="SuperAdminReportedMyIncidents-content3-team-entry-info">
-            Showing {indexOfFirst + 1} to {Math.min(indexOfLast, filteredData.length)} of {filteredData.length} entries
-          </span>
-          <div className="SuperAdminReportedMyIncidents-content3-team-pagination-buttons">
-            <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button
-                key={i + 1}
-                onClick={() => setCurrentPage(i + 1)}
-                className={currentPage === i + 1 ? 'active' : ''}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '5px', paddingRight: '10px' }}>
+            <span style={{ fontWeight: 'bold', fontSize: '13px', color: '#333' }}>
+              Total incidents: {filteredData.length} entries
+            </span>
           </div>
         </div>
       </div>
