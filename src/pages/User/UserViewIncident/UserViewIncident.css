@@ -93,7 +93,7 @@
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  height: 100vh;
+  overflow: hidden;
 }
 
 .UserViewIncident-direction-bar {
@@ -751,7 +751,7 @@
 /* Landscape orientation adjustments */
 @media (max-height: 500px) and (orientation: landscape) {
   .UserViewIncident-main-content {
-    height: 100vh;
+    overflow: hidden;
   }
 
   .UserViewIncident-direction-bar {
