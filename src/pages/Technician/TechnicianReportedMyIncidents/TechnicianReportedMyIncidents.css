@@ -4,7 +4,7 @@
     flex-grow: 1;
     height: 100vh;
 }
-  
+
 .TechnicianReportedMyIncidents-direction-bar {
     display: flex;
     align-items: center;
@@ -13,7 +13,7 @@
     padding-left: 20px;
     font-size: 15px;
 }
-  
+
 .TechnicianReportedMyIncidents-content2 {
     display: flex;
     flex-direction: column;
@@ -21,7 +21,7 @@
     overflow: hidden;
     padding-bottom: 20px;
 }
-  
+
 .TechnicianReportedMyIncidents-TitleBar {
     display: flex;
     flex-direction: row;
@@ -29,7 +29,7 @@
     width: 100%;
     justify-content: space-between;
 }
-  
+
 .TechnicianReportedMyIncidents-TitleBar-NameAndIcon {
     display: flex;
     flex-direction: row;
@@ -39,7 +39,7 @@
     font-size: 20px;
     font-weight: 600;
 }
-  
+
 .TechnicianReportedMyIncidents-TitleBar-buttons {
     display: flex;
     flex-direction: row;
@@ -48,7 +48,7 @@
     gap: 20px;
     font-size: 13px;
 }
-  
+
 .TechnicianReportedMyIncidents-TitleBar-buttons-ExportData {
     display: flex;
     align-items: center;
@@ -59,7 +59,7 @@
     background-color: #b10e0e;
     color: aliceblue;
 }
-  
+
 .TechnicianReportedMyIncidents-showSearchBar {
     display: flex;
     flex-direction: row;
@@ -70,7 +70,7 @@
     background-color: rgb(255, 255, 255);
     justify-content: space-between;
 }
-  
+
 .TechnicianReportedMyIncidents-showSearchBar-Show {
     display: flex;
     flex-direction: row;
@@ -78,7 +78,7 @@
     margin: 0px 0px 0px 20px;
     font-weight: 600;
 }
-  
+
 .TechnicianReportedMyIncidents-showSearchBar-Show-select {
     display: flex;
     border: 1px solid #ccc;
@@ -88,7 +88,7 @@
     border-radius: 5px;
     margin-right: 20px;
 }
-  
+
 .TechnicianReportedMyIncidents-showSearchBar-Show-select2 {
     display: flex;
     border: 1px solid #ccc;
@@ -98,7 +98,7 @@
     border-radius: 5px;
     margin-right: 20px;
 }
-  
+
 .TechnicianReportedMyIncidents-showSearchBar-SearchBar {
     display: flex;
     flex-direction: row;
@@ -106,7 +106,7 @@
     gap: 10px;
     margin: 0px 20px 0px 0px;
 }
-  
+
 .TechnicianReportedMyIncidents-showSearchBar-SearchBar-input {
     display: flex;
     padding: 8px 12px;
@@ -116,21 +116,22 @@
     height: 25px;
     border-radius: 5px;
 }
-  
+
 .TechnicianReportedMyIncidents-table {
     flex: 1;
     height: 100%;
-    padding: 10px 20px 0px 20px;
+    padding: 0px 20px 0px 20px;
+    margin-top: 10px;
     max-height: 80%;
     overflow-y: auto;
 }
-  
+
 .TechnicianReportedMyIncidents-table-table {
     border-collapse: collapse;
     background-color: #f8f9fa;
     width: 100%;
 }
-  
+
 .TechnicianReportedMyIncidents-table th,
 .TechnicianReportedMyIncidents-table td {
     padding: 8px;
@@ -138,23 +139,26 @@
     border-bottom: 1px solid #ddd;
     font-size: 12px;
 }
-  
+
 .TechnicianReportedMyIncidents-table th {
     background-color: #e9ecef;
     font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
-  
+
 .TechnicianReportedMyIncidents-table td {
     white-space: nowrap;
 }
-  
+
 .TechnicianReportedMyIncidents-table td:nth-child(2),
 .TechnicianReportedMyIncidents-table td:nth-child(3),
 .TechnicianReportedMyIncidents-table td:nth-child(4) {
     white-space: normal;
     min-width: 100px;
 }
-  
+
 .TechnicianReportedMyIncidents-content3 {
     display: flex;
     flex-grow: 1;
@@ -168,13 +172,13 @@
     bottom: 0;
     z-index: 100;
 }
-  
+
 .TechnicianReportedMyIncidents-content3-team-pagination-buttons {
     display: flex;
     gap: 5px;
     align-items: center;
 }
-  
+
 .TechnicianReportedMyIncidents-content3-team-pagination-buttons button {
     padding: 2px 8px;
     border: 1px solid #ddd;
@@ -183,88 +187,90 @@
     border-radius: 3px;
     min-width: 30px;
 }
-  
+
 .TechnicianReportedMyIncidents-content3-team-pagination-buttons button.active {
     background-color: #df5050;
     color: white;
     border-color: #000000;
 }
-  
+
 .TechnicianReportedMyIncidents-content3-team-pagination-buttons button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
-  
+
 .TechnicianReportedMyIncidents-content3-team-pagination-buttons span {
     padding: 5px 10px;
     color: #666;
 }
+
 .TechnicianReportedMyIncidents-tickets-creator {
     display: flex;
-    align-items: center; 
-    background-color: #f0f0f0; 
-    padding: 10px; 
-    border-radius: 5px; 
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
     width: 1290px;
-  
-   
-  }
-  
-  .TechnicianReportedMyIncidents-svr-desk {
+
+
+}
+
+.TechnicianReportedMyIncidents-svr-desk {
     font-weight: bold;
-    margin-right: 10px; 
-  }
-  @media (max-width: 991.98px) {
+    margin-right: 10px;
+}
+
+@media (max-width: 991.98px) {
     .TechnicianReportedMyIncidents-showSearchBar {
-      flex-direction: column;
-      height: auto !important;
-      max-height: none !important;
+        flex-direction: column;
+        height: auto !important;
+        max-height: none !important;
     }
-    
+
     .TechnicianReportedMyIncidents-showSearchBar-Show,
     .TechnicianReportedMyIncidents-showSearchBar-SearchBar {
-      margin: 5px 20px;
-      width: 100%;
+        margin: 5px 20px;
+        width: 100%;
     }
-    
+
     .TechnicianReportedMyIncidents-showSearchBar-Show {
-      flex-wrap: wrap;
+        flex-wrap: wrap;
     }
-    
+
     .TechnicianReportedMyIncidents-showSearchBar-Show-select,
     .TechnicianReportedMyIncidents-showSearchBar-Show-select2 {
-      width: auto;
-      margin-right: 10px;
-      margin-left: 5px;
+        width: auto;
+        margin-right: 10px;
+        margin-left: 5px;
     }
-    
+
     .TechnicianReportedMyIncidents-showSearchBar-SearchBar-input {
-      width: 100%;
+        width: 100%;
     }
-  }
-  
-  @media (max-width: 767.98px) {
+}
+
+@media (max-width: 767.98px) {
     .TechnicianReportedMyIncidents-showSearchBar-Show {
-      flex-direction: column;
-      align-items: flex-start;
+        flex-direction: column;
+        align-items: flex-start;
     }
-    
-    .TechnicianReportedMyIncidents-showSearchBar-Show > div {
-      margin-bottom: 10px;
-      width: 100%;
+
+    .TechnicianReportedMyIncidents-showSearchBar-Show>div {
+        margin-bottom: 10px;
+        width: 100%;
     }
-    
+
     .TechnicianReportedMyIncidents-showSearchBar-Show-select,
     .TechnicianReportedMyIncidents-showSearchBar-Show-select2 {
-      width: 70%;
+        width: 70%;
     }
-  }
-  
-  @media (max-width: 767.98px) {
+}
+
+@media (max-width: 767.98px) {
     .TechnicianReportedMyIncidents-table {
-      overflow-x: auto;
+        overflow-x: auto;
     }
-  }
+}
 
 .popup-overlay {
     position: fixed;
@@ -283,9 +289,12 @@
     background-color: white;
     padding: 20px;
     border-radius: 8px;
-    width: 90%; /* Increased width */
-    max-width: 1200px; /* Increased max-width */
-    max-height: 90vh; /* Increased max-height */
+    width: 90%;
+    /* Increased width */
+    max-width: 1200px;
+    /* Increased max-width */
+    max-height: 90vh;
+    /* Increased max-height */
     overflow-y: auto;
     position: relative;
 }
@@ -294,8 +303,10 @@
     position: absolute;
     top: 10px;
     right: 10px;
-    background-color: #dc3545; /* Red background */
-    color: white; /* White text */
+    background-color: #dc3545;
+    /* Red background */
+    color: white;
+    /* White text */
     border: none;
     border-radius: 5px;
     padding: 5px 10px;
@@ -305,7 +316,8 @@
 }
 
 .popup-close:hover {
-    background-color: #c82333; /* Darker red on hover */
+    background-color: #c82333;
+    /* Darker red on hover */
 }
 
 /* Responsive adjustments for popup */
@@ -322,6 +334,7 @@
         max-width: 800px;
         padding: 15px;
     }
+
     .popup-close {
         font-size: 16px;
         padding: 4px 8px;
@@ -331,10 +344,12 @@
 @media (max-width: 768px) {
     .popup-content {
         width: 98%;
-        max-width: none; /* Allow full width on small screens */
+        max-width: none;
+        /* Allow full width on small screens */
         max-height: 95vh;
         padding: 10px;
     }
+
     .popup-close {
         font-size: 14px;
         padding: 3px 6px;

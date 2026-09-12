@@ -5,13 +5,13 @@ import { FaHistory, FaSearch } from 'react-icons/fa';
 import { TiExportOutline } from 'react-icons/ti';
 import { IoIosArrowForward } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
-import * as XLSX from "xlsx";          
-import { saveAs } from "file-saver";   
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
-import { 
-    fetchAssignedToMeRequest, 
-    updateIncidentInList, 
-    addIncidentToAssignedToMe 
+import {
+    fetchAssignedToMeRequest,
+    updateIncidentInList,
+    addIncidentToAssignedToMe
 } from '../../../redux/incident/incidentSlice';
 import { fetchAllUsersRequest } from '../../../redux/sltusers/sltusersSlice';
 import { fetchCategoryItemsRequest } from '../../../redux/categories/categorySlice';
@@ -38,8 +38,6 @@ const AdminMyAssignedIncidents = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     // ---------------- FETCH DATA ----------------
     useEffect(() => {
@@ -132,10 +130,7 @@ const AdminMyAssignedIncidents = () => {
         return matchesSearch && matchesStatus && matchesCategory;
     });
 
-    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-    const indexOfLast = currentPage * rowsPerPage;
-    const indexOfFirst = indexOfLast - rowsPerPage;
-    const currentRows = filteredData.slice(indexOfFirst, indexOfLast);
+    const currentRows = filteredData;
 
     const handleRowClick = (refNo) => {
         const incident = assignedToMe.find(item => item.incident_number === refNo);
@@ -173,7 +168,7 @@ const AdminMyAssignedIncidents = () => {
         // Export
         const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
         const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-        saveAs(data, `My_Assigned_Incidents_${new Date().toISOString().slice(0,10)}.xlsx`);
+        saveAs(data, `My_Assigned_Incidents_${new Date().toISOString().slice(0, 10)}.xlsx`);
     };
 
     const renderTableRows = () => {
@@ -208,45 +203,6 @@ const AdminMyAssignedIncidents = () => {
         ));
     };
 
-    const renderPaginationButtons = () => {
-        const maxButtons = 7;
-        const buttons = [];
-
-        if (totalPages <= maxButtons) {
-            return Array.from({ length: totalPages }, (_, i) => (
-                <button
-                    key={i + 1}
-                    onClick={() => setCurrentPage(i + 1)}
-                    className={currentPage === i + 1 ? 'active' : ''}
-                >
-                    {i + 1}
-                </button>
-            ));
-        }
-
-        buttons.push(
-            <button key={1} onClick={() => setCurrentPage(1)} className={currentPage === 1 ? 'active' : ''}>1</button>,
-            <button key={2} onClick={() => setCurrentPage(2)} className={currentPage === 2 ? 'active' : ''}>2</button>
-        );
-
-        if (currentPage > 3) buttons.push(<span key="ellipsis1">...</span>);
-
-        if (currentPage > 3 && currentPage < totalPages - 2) {
-            buttons.push(
-                <button key={currentPage} onClick={() => setCurrentPage(currentPage)} className="active">{currentPage}</button>
-            );
-        }
-
-        if (currentPage < totalPages - 2) buttons.push(<span key="ellipsis2">...</span>);
-
-        buttons.push(
-            <button key={totalPages - 1} onClick={() => setCurrentPage(totalPages - 1)} className={currentPage === totalPages - 1 ? 'active' : ''}>{totalPages - 1}</button>,
-            <button key={totalPages} onClick={() => setCurrentPage(totalPages)} className={currentPage === totalPages ? 'active' : ''}>{totalPages}</button>
-        );
-
-        return buttons;
-    };
-
     const uniqueCategories = [...new Set(tableData.map(item => item.category))];
 
     return (
@@ -263,9 +219,9 @@ const AdminMyAssignedIncidents = () => {
                         My Assigned Incidents - {loggedInUser ? (loggedInUser.userName || loggedInUser.name) : ''}
                     </div>
                     <div className="AdminMyAssignedIncidents-TitleBar-buttons">
-                        <button 
+                        <button
                             className="AdminMyAssignedIncidents-TitleBar-buttons-ExportData"
-                            onClick={exportToExcel}       
+                            onClick={exportToExcel}
                         >
                             <TiExportOutline />
                             Export Data
@@ -276,18 +232,6 @@ const AdminMyAssignedIncidents = () => {
                 {/* Search & Filter Bar */}
                 <div className="AdminMyAssignedIncidents-showSearchBar flex flex-col md:flex-row md:items-center md:justify-between gap-4 w-full">
                     <div className="AdminMyAssignedIncidents-showSearchBar-Show flex flex-col sm:flex-row flex-wrap gap-2 w-full sm:w-auto">
-                        <div className="flex flex-col sm:flex-row gap-2 sm:items-center w-full sm:w-auto">
-                            <span>Entries:</span>
-                            <select
-                                onChange={e => setRowsPerPage(Number(e.target.value))}
-                                value={rowsPerPage}
-                                className="AdminMyAssignedIncidents-showSearchBar-Show-select w-full sm:w-24"
-                            >
-                                {[10, 20, 50, 100].map(size => (
-                                    <option key={size} value={size}>{size} entries</option>
-                                ))}
-                            </select>
-                        </div>
                         <div className="flex flex-col sm:flex-row gap-2 sm:items-center w-full sm:w-auto">
                             <span>Status:</span>
                             <select
@@ -347,13 +291,10 @@ const AdminMyAssignedIncidents = () => {
 
                 <div className='AdminMyAssignedIncidents-footer-content'>
                     <div className="AdminMyAssignedIncidents-content3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-4">
-                        <span>
-                            Showing {indexOfFirst + 1} to {Math.min(indexOfLast, filteredData.length)} of {filteredData.length} entries
-                        </span>
-                        <div className="AdminMyAssignedIncidents-content3-team-pagination-buttons flex gap-2 flex-wrap">
-                            <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>Previous</button>
-                            {renderPaginationButtons()}
-                            <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>Next</button>
+                        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '5px', paddingRight: '10px' }}>
+                            <span style={{ fontWeight: 'bold', fontSize: '13px', color: '#333' }}>
+                                Total incidents: {filteredData.length} entries
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -362,10 +303,10 @@ const AdminMyAssignedIncidents = () => {
                 <div className="incident-popup-overlay">
                     <div className="incident-popup-content">
                         <button className="incident-popup-close-btn" onClick={() => setShowIncidentPopup(false)}>X</button>
-                        <TechnicianInsident 
-                            incidentData={selectedIncident} 
-                            isPopup={true} 
-                            loggedInUser={loggedInUser} 
+                        <TechnicianInsident
+                            incidentData={selectedIncident}
+                            isPopup={true}
+                            loggedInUser={loggedInUser}
                         />
                     </div>
                 </div>

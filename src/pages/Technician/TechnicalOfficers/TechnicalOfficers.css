@@ -156,7 +156,8 @@
 .TechnicalOfficers-table {
   flex: 1;
   height: 100%;
-  padding: 10px 20px 0px 20px;
+  padding: 0px 20px 0px 20px;
+  margin-top: 10px;
   max-height: 75vh;
   overflow: hidden;
   margin-top: 10px;
@@ -835,7 +836,8 @@
   }
 
   .TechnicalOfficers-table {
-    padding: 10px 20px 0px 20px;
+    padding: 0px 20px 0px 20px;
+    margin-top: 10px;
     margin-top: 10px;
     max-height: 75vh;
   }

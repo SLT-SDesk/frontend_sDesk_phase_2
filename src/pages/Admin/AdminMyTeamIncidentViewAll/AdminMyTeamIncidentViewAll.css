@@ -1,39 +1,43 @@
 /* AdminMyTeamIncidentViewAll.css */
 
-.AdminincidentViewAll-main-content{
+.AdminincidentViewAll-main-content {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     height: 100vh;
 }
+
 .AdminincidentViewAll-direction-bar {
     display: flex;
-  align-items: center;
-  background: linear-gradient(135deg, #3333ff 0%, #ccddff 100%);
-  color: white;
-  height: 40px;
-  padding-left: 20px;
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0px -20px 20px -3px;
-  border-radius: 0 0 15px 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    background: linear-gradient(135deg, #3333ff 0%, #ccddff 100%);
+    color: white;
+    height: 40px;
+    padding-left: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0px -20px 20px -3px;
+    border-radius: 0 0 15px 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
-.AdminincidentViewAll-content2{
+
+.AdminincidentViewAll-content2 {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     overflow: hidden;
     padding-bottom: 20px;
 }
-.AdminincidentViewAll-TitleBar{
+
+.AdminincidentViewAll-TitleBar {
     display: flex;
     flex-direction: row;
     height: 50px;
     width: 100%;
     justify-content: space-between;
 }
-.AdminincidentViewAll-TitleBar-NameAndIcon{
+
+.AdminincidentViewAll-TitleBar-NameAndIcon {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -42,7 +46,8 @@
     font-size: 20px;
     font-weight: 600;
 }
-.AdminincidentViewAll-TitleBar-buttons{
+
+.AdminincidentViewAll-TitleBar-buttons {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -50,7 +55,8 @@
     gap: 20px;
     font-size: 13px;
 }
-.AdminincidentViewAll-TitleBar-buttons-ExportData{
+
+.AdminincidentViewAll-TitleBar-buttons-ExportData {
     display: flex;
     align-items: center;
     border-radius: 5px;
@@ -60,7 +66,8 @@
     background-color: #b10e0e;
     color: aliceblue;
 }
-.AdminincidentViewAll-TitleBar-buttons-AddUser{
+
+.AdminincidentViewAll-TitleBar-buttons-AddUser {
     display: flex;
     align-items: center;
     border-radius: 5px;
@@ -70,7 +77,8 @@
     background-color: #b10e0e;
     color: aliceblue;
 }
-.AdminincidentViewAll-TitleBar-buttons-ExportData{
+
+.AdminincidentViewAll-TitleBar-buttons-ExportData {
     display: flex;
     align-items: center;
     border-radius: 5px;
@@ -80,7 +88,8 @@
     background-color: #b10e0e;
     color: aliceblue;
 }
-.AdminincidentViewAll-showSearchBar{
+
+.AdminincidentViewAll-showSearchBar {
     display: flex;
     flex-direction: row;
     height: 40px;
@@ -90,14 +99,16 @@
     background-color: rgb(255, 255, 255);
     justify-content: space-between;
 }
-.AdminincidentViewAll-showSearchBar-Show{
+
+.AdminincidentViewAll-showSearchBar-Show {
     display: flex;
     flex-direction: row;
     gap: 10px;
     margin: 0px 0px 0px 20px;
     font-weight: 600;
 }
-.AdminincidentViewAll-showSearchBar-Show-select{
+
+.AdminincidentViewAll-showSearchBar-Show-select {
     display: flex;
     background-origin: 4px;
     border: 1px solid #ccc;
@@ -107,7 +118,8 @@
     border-radius: 5px;
     margin-right: 30px;
 }
-.AdminincidentViewAll-showSearchBar-Show-select2{
+
+.AdminincidentViewAll-showSearchBar-Show-select2 {
     display: flex;
     background-origin: 4px;
     border: 1px solid #ccc;
@@ -117,14 +129,16 @@
     border-radius: 5px;
     margin-right: 30px;
 }
-.AdminincidentViewAll-showSearchBar-SearchBar{
+
+.AdminincidentViewAll-showSearchBar-SearchBar {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 10px;
     margin: 0px 20px 0px 0px;
 }
-.AdminincidentViewAll-showSearchBar-SearchBar-input{
+
+.AdminincidentViewAll-showSearchBar-SearchBar-input {
     display: flex;
     padding: 8px 12px;
     background-origin: 4px;
@@ -134,56 +148,62 @@
     height: 25px;
     border-radius: 5px;
 }
+
 .AdminincidentViewAll-table {
     flex: 1;
     height: 100%;
-    padding: 10px 20px 0px 20px;
+    padding: 0px 20px 0px 20px;
+    margin-top: 10px;
     max-height: 80%;
     overflow-y: auto;
     overflow-x: hidden;
-  }
+}
 
-  .AdminincidentViewAll-table table {
+.AdminincidentViewAll-table table {
     border-collapse: collapse;
     background-color: #f8f9fa;
     width: 100%;
-  }
-  
-  .AdminincidentViewAll-table th,
-  .AdminincidentViewAll-table td {
+}
+
+.AdminincidentViewAll-table th,
+.AdminincidentViewAll-table td {
     padding: 8px;
     text-align: left;
     border-bottom: 1px solid #ddd;
     font-size: 12px;
-  }
-  
-  .AdminincidentViewAll-table th {
+}
+
+.AdminincidentViewAll-table th {
     background-color: #e9ecef;
     font-weight: bold;
-  }
-  
-  .AdminincidentViewAll-table td {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.AdminincidentViewAll-table td {
     white-space: nowrap;
-  }
-  
-  .AdminincidentViewAll-table td:nth-child(3),
-  .AdminincidentViewAll-table td:nth-child(4),
-  .AdminincidentViewAll-table td:nth-child(5),
-  .AdminincidentViewAll-table td:nth-child(6),
-  .AdminincidentViewAll-table td:nth-child(7) {
+}
+
+.AdminincidentViewAll-table td:nth-child(3),
+.AdminincidentViewAll-table td:nth-child(4),
+.AdminincidentViewAll-table td:nth-child(5),
+.AdminincidentViewAll-table td:nth-child(6),
+.AdminincidentViewAll-table td:nth-child(7) {
     white-space: normal;
     min-width: 100px;
-  }
-  
-  .AdminincidentViewAll-table-edit-btn,
-  .AdminincidentViewAll-table-delete-btn {
+}
+
+.AdminincidentViewAll-table-edit-btn,
+.AdminincidentViewAll-table-delete-btn {
     background: none;
     border: none;
     cursor: pointer;
     font-size: 16px;
     margin-right: 10px;
-  }
-  .AdminincidentViewAll-content3 {
+}
+
+.AdminincidentViewAll-content3 {
     display: flex;
     flex-grow: 1;
     max-height: 53px;
@@ -204,12 +224,12 @@
 }
 
 .AdminincidentViewAll-content3-team-pagination-buttons button {
-    padding: 2px 8px; 
+    padding: 2px 8px;
     border: 1px solid #ddd;
     background-color: white;
     cursor: pointer;
     border-radius: 3px;
-    min-width: 30px; 
+    min-width: 30px;
 }
 
 .AdminincidentViewAll-content3-team-pagination-buttons button.active {
@@ -234,25 +254,25 @@
         height: 100vh;
         overflow: hidden;
     }
-    
+
     .AdminincidentViewAll-direction-bar {
         padding-left: 15px;
         font-size: 14px;
         min-height: 35px;
     }
-    
+
     .AdminincidentViewAll-TitleBar {
         flex-direction: row;
         height: 50px;
         padding: 0;
     }
-    
+
     .AdminincidentViewAll-TitleBar-NameAndIcon {
         margin: 10px 0px 10px 15px;
         justify-content: flex-start;
         font-size: 18px;
     }
-    
+
     .AdminincidentViewAll-TitleBar-buttons {
         margin: 10px 15px 10px 0px;
         justify-content: flex-end;
@@ -260,7 +280,7 @@
         gap: 15px;
         font-size: 12px;
     }
-    
+
     .AdminincidentViewAll-TitleBar-buttons-ExportData,
     .AdminincidentViewAll-TitleBar-buttons-AddUser {
         padding: 8px 15px;
@@ -276,7 +296,7 @@
         font-weight: 600;
         gap: 5px;
     }
-    
+
     .AdminincidentViewAll-showSearchBar {
         flex-direction: row;
         height: 40px;
@@ -285,7 +305,7 @@
         gap: 0;
         overflow: visible;
     }
-    
+
     .AdminincidentViewAll-showSearchBar-Show {
         margin: 0px 0px 0px 15px;
         justify-content: flex-start;
@@ -294,7 +314,7 @@
         flex-direction: row;
         align-items: center;
     }
-    
+
     .AdminincidentViewAll-showSearchBar-Show-select,
     .AdminincidentViewAll-showSearchBar-Show-select2 {
         width: 120px;
@@ -302,7 +322,7 @@
         font-size: 13px;
         height: 25px;
     }
-    
+
     .AdminincidentViewAll-showSearchBar-SearchBar {
         margin: 0px 15px 0px 0px;
         justify-content: flex-end;
@@ -310,7 +330,7 @@
         flex-direction: row;
         align-items: center;
     }
-    
+
     .AdminincidentViewAll-showSearchBar-SearchBar-input {
         width: 180px;
         max-width: none;
@@ -318,7 +338,7 @@
         height: 25px;
         padding: 6px 10px;
     }
-    
+
     .AdminincidentViewAll-table {
         padding: 10px 15px 0px 15px;
         overflow-x: auto;
@@ -329,7 +349,7 @@
         background: white;
         margin-top: 10px;
     }
-    
+
     .AdminincidentViewAll-table table {
         min-width: 700px;
         width: 100%;
@@ -337,7 +357,7 @@
         table-layout: auto;
         border-collapse: collapse;
     }
-    
+
     .AdminincidentViewAll-table th,
     .AdminincidentViewAll-table td {
         padding: 8px 6px;
@@ -347,7 +367,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    
+
     .AdminincidentViewAll-table th {
         background-color: #f8f9fa;
         font-weight: bold;
@@ -355,19 +375,19 @@
         top: 0;
         z-index: 10;
     }
-    
+
     .AdminincidentViewAll-table th:nth-child(1),
     .AdminincidentViewAll-table td:nth-child(1) {
         width: 15%;
         min-width: 80px;
     }
-    
+
     .AdminincidentViewAll-table th:nth-child(2),
     .AdminincidentViewAll-table td:nth-child(2) {
         width: 15%;
         min-width: 100px;
     }
-    
+
     .AdminincidentViewAll-table th:nth-child(3),
     .AdminincidentViewAll-table td:nth-child(3) {
         width: 25%;
@@ -375,25 +395,25 @@
         white-space: normal;
         word-wrap: break-word;
     }
-    
+
     .AdminincidentViewAll-table th:nth-child(4),
     .AdminincidentViewAll-table td:nth-child(4) {
         width: 15%;
         min-width: 100px;
     }
-    
+
     .AdminincidentViewAll-table th:nth-child(5),
     .AdminincidentViewAll-table td:nth-child(5) {
         width: 15%;
         min-width: 90px;
     }
-    
+
     .AdminincidentViewAll-table th:nth-child(6),
     .AdminincidentViewAll-table td:nth-child(6) {
         width: 15%;
         min-width: 80px;
     }
-    
+
     .AdminincidentViewAll-content3 {
         padding: 15px 20px 10px 15px;
         flex-direction: row;
@@ -401,13 +421,13 @@
         max-height: 50px;
         font-size: 11px;
     }
-    
+
     .AdminincidentViewAll-content3-team-pagination-buttons {
         justify-content: flex-end;
         flex-wrap: wrap;
         gap: 5px;
     }
-    
+
     .AdminincidentViewAll-content3-team-pagination-buttons button {
         padding: 4px 8px;
         min-width: 28px;
@@ -422,13 +442,13 @@
         height: 50px;
         padding: 0;
     }
-    
+
     .AdminincidentViewAll-TitleBar-NameAndIcon {
         margin: 10px 0px 10px 20px;
         justify-content: flex-start;
         font-size: 20px;
     }
-    
+
     .AdminincidentViewAll-TitleBar-buttons {
         margin: 10px 20px 10px 0px;
         justify-content: flex-end;
@@ -436,7 +456,7 @@
         gap: 20px;
         font-size: 13px;
     }
-    
+
     .AdminincidentViewAll-showSearchBar {
         flex-direction: row;
         height: 40px;
@@ -445,7 +465,7 @@
         gap: 0;
         overflow: visible;
     }
-    
+
     .AdminincidentViewAll-showSearchBar-Show {
         margin: 0px 0px 0px 20px;
         justify-content: flex-start;
@@ -454,7 +474,7 @@
         flex-direction: row;
         align-items: center;
     }
-    
+
     .AdminincidentViewAll-showSearchBar-Show-select,
     .AdminincidentViewAll-showSearchBar-Show-select2 {
         width: 140px;
@@ -462,7 +482,7 @@
         font-size: 14px;
         height: 25px;
     }
-    
+
     .AdminincidentViewAll-showSearchBar-SearchBar {
         margin: 0px 20px 0px 0px;
         justify-content: flex-end;
@@ -470,7 +490,7 @@
         flex-direction: row;
         align-items: center;
     }
-    
+
     .AdminincidentViewAll-showSearchBar-SearchBar-input {
         width: 210px;
         max-width: none;
@@ -478,23 +498,24 @@
         height: 25px;
         padding: 8px 12px;
     }
-    
+
     .AdminincidentViewAll-table {
-        padding: 10px 20px 0px 20px;
+        padding: 0px 20px 0px 20px;
+        margin-top: 10px;
         overflow-x: visible;
         overflow-y: auto;
         max-height: 80%;
         border: none;
         background: transparent;
     }
-    
+
     .AdminincidentViewAll-table table {
         min-width: auto;
         width: 100%;
         font-size: 12px;
         table-layout: auto;
     }
-    
+
     .AdminincidentViewAll-content3 {
         padding: 25px 30px 12px 20px;
         flex-direction: row;
@@ -502,7 +523,7 @@
         max-height: 53px;
         font-size: 12px;
     }
-    
+
     .AdminincidentViewAll-content3-team-pagination-buttons {
         justify-content: flex-end;
         flex-wrap: nowrap;
@@ -516,19 +537,19 @@
         padding-left: 10px;
         font-size: 13px;
     }
-    
+
     .AdminincidentViewAll-TitleBar {
         flex-direction: column;
         height: auto;
         padding: 10px 0;
     }
-    
+
     .AdminincidentViewAll-TitleBar-NameAndIcon {
         margin: 10px;
         font-size: 18px;
         justify-content: center;
     }
-    
+
     .AdminincidentViewAll-TitleBar-buttons {
         margin: 10px;
         font-size: 12px;
@@ -536,13 +557,13 @@
         flex-wrap: wrap;
         gap: 10px;
     }
-    
+
     .AdminincidentViewAll-TitleBar-buttons-ExportData,
     .AdminincidentViewAll-TitleBar-buttons-AddUser {
         padding: 8px 12px;
         font-size: 11px;
     }
-    
+
     .AdminincidentViewAll-showSearchBar {
         flex-direction: column;
         height: auto;
@@ -552,7 +573,7 @@
         overflow: visible;
         z-index: 10;
     }
-    
+
     .AdminincidentViewAll-showSearchBar-Show {
         margin: 0 10px;
         flex-direction: column;
@@ -560,7 +581,7 @@
         gap: 10px;
         width: calc(100% - 20px);
     }
-    
+
     .AdminincidentViewAll-showSearchBar-Show-select,
     .AdminincidentViewAll-showSearchBar-Show-select2 {
         width: 100%;
@@ -569,13 +590,13 @@
         font-size: 12px;
         height: 30px;
     }
-    
+
     .AdminincidentViewAll-showSearchBar-SearchBar {
         margin: 0 10px;
         width: calc(100% - 20px);
         justify-content: center;
     }
-    
+
     .AdminincidentViewAll-showSearchBar-SearchBar-input {
         width: 100%;
         max-width: 280px;
@@ -583,7 +604,7 @@
         height: 30px;
         padding: 6px 10px;
     }
-    
+
     .AdminincidentViewAll-table {
         padding: 3px;
         margin-top: 5px;
@@ -599,7 +620,7 @@
         background-color: white;
         position: relative;
     }
-    
+
     .AdminincidentViewAll-table table {
         min-width: 100%;
         width: 100%;
@@ -607,7 +628,7 @@
         table-layout: auto;
         border-collapse: collapse;
     }
-    
+
     .AdminincidentViewAll-table th,
     .AdminincidentViewAll-table td {
         padding: 3px 4px;
@@ -620,30 +641,30 @@
         vertical-align: top;
         line-height: 1.2;
     }
-    
+
     .AdminincidentViewAll-table th {
         background-color: #f8f9fa;
         font-weight: bold;
         position: sticky;
         top: 0;
         z-index: 10;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         font-size: 7px;
     }
-    
+
     /* Responsive column widths for mobile screens - Equal width */
     .AdminincidentViewAll-table th:nth-child(1),
     .AdminincidentViewAll-table td:nth-child(1) {
         width: 16.66%;
         min-width: 50px;
     }
-    
+
     .AdminincidentViewAll-table th:nth-child(2),
     .AdminincidentViewAll-table td:nth-child(2) {
         width: 16.66%;
         min-width: 50px;
     }
-    
+
     .AdminincidentViewAll-table th:nth-child(3),
     .AdminincidentViewAll-table td:nth-child(3) {
         width: 16.66%;
@@ -653,25 +674,25 @@
         word-break: break-word;
         hyphens: auto;
     }
-    
+
     .AdminincidentViewAll-table th:nth-child(4),
     .AdminincidentViewAll-table td:nth-child(4) {
         width: 16.66%;
         min-width: 50px;
     }
-    
+
     .AdminincidentViewAll-table th:nth-child(5),
     .AdminincidentViewAll-table td:nth-child(5) {
         width: 16.66%;
         min-width: 50px;
     }
-    
+
     .AdminincidentViewAll-table th:nth-child(6),
     .AdminincidentViewAll-table td:nth-child(6) {
         width: 16.66%;
         min-width: 50px;
     }
-    
+
     .AdminincidentViewAll-content3 {
         padding: 10px;
         font-size: 10px;
@@ -679,18 +700,18 @@
         gap: 10px;
         max-height: none;
     }
-    
+
     .AdminincidentViewAll-content3-team-pagination-buttons {
         justify-content: center;
         flex-wrap: wrap;
     }
-    
+
     .AdminincidentViewAll-content3-team-pagination-buttons button {
         padding: 1px 6px;
         min-width: 25px;
         font-size: 10px;
     }
-    
+
     .AdminincidentViewAll-content3-team-pagination-buttons span {
         padding: 3px 6px;
         font-size: 10px;
@@ -704,14 +725,14 @@
         margin: 3px;
         padding: 2px;
     }
-    
+
     .AdminincidentViewAll-TitleBar-buttons {
         flex-direction: column;
         gap: 4px;
         align-items: center;
         margin: 3px;
     }
-    
+
     .AdminincidentViewAll-TitleBar-buttons-ExportData,
     .AdminincidentViewAll-TitleBar-buttons-AddUser {
         width: 95%;
@@ -721,95 +742,95 @@
         padding: 5px 8px;
         min-height: 26px;
     }
-    
+
     .AdminincidentViewAll-showSearchBar {
         padding: 6px 0;
         gap: 6px;
     }
-    
+
     .AdminincidentViewAll-showSearchBar-Show-select,
     .AdminincidentViewAll-showSearchBar-Show-select2 {
         height: 28px;
         font-size: 11px;
     }
-    
+
     .AdminincidentViewAll-showSearchBar-SearchBar-input {
         height: 28px;
         font-size: 11px;
         padding: 4px 8px;
     }
-    
+
     .AdminincidentViewAll-table {
         max-height: calc(100vh - 220px);
         min-height: 180px;
         padding: 2px;
     }
-    
+
     .AdminincidentViewAll-table table {
         font-size: 7px;
     }
-    
+
     .AdminincidentViewAll-table th,
     .AdminincidentViewAll-table td {
         font-size: 7px;
         padding: 2px 3px;
         line-height: 1.1;
     }
-    
+
     .AdminincidentViewAll-table th {
         font-size: 6px;
         font-weight: 700;
     }
-    
+
     /* Equal width columns for smallest screens */
     .AdminincidentViewAll-table th:nth-child(1),
     .AdminincidentViewAll-table td:nth-child(1) {
         width: 16.66%;
         min-width: 40px;
     }
-    
+
     .AdminincidentViewAll-table th:nth-child(2),
     .AdminincidentViewAll-table td:nth-child(2) {
         width: 16.66%;
         min-width: 40px;
     }
-    
+
     .AdminincidentViewAll-table th:nth-child(3),
     .AdminincidentViewAll-table td:nth-child(3) {
         width: 16.66%;
         min-width: 40px;
     }
-    
+
     .AdminincidentViewAll-table th:nth-child(4),
     .AdminincidentViewAll-table td:nth-child(4) {
         width: 16.66%;
         min-width: 40px;
     }
-    
+
     .AdminincidentViewAll-table th:nth-child(5),
     .AdminincidentViewAll-table td:nth-child(5) {
         width: 16.66%;
         min-width: 40px;
     }
-    
+
     .AdminincidentViewAll-table th:nth-child(6),
     .AdminincidentViewAll-table td:nth-child(6) {
         width: 16.66%;
         min-width: 40px;
     }
-    
+
     .AdminincidentViewAll-content3 {
         padding: 4px 6px;
         font-size: 7px;
         gap: 4px;
     }
-    
+
     .AdminincidentViewAll-content3-team-pagination-buttons button {
         padding: 2px 4px;
         min-width: 20px;
         font-size: 7px;
     }
-    
+
     .AdminincidentViewAll-content3-team-pagination-buttons span {
         padding: 2px 4px;
         font-size: 7px;
@@ -822,32 +843,33 @@
         flex-direction: row;
         justify-content: center;
     }
-    
+
     .AdminincidentViewAll-table table {
         min-width: 100%;
         width: 100%;
     }
-    
+
     .AdminincidentViewAll-table th,
     .AdminincidentViewAll-table td {
         font-size: 9px;
         padding: 4px 5px;
     }
 }
+
 /* STEP A (ADMIN): NEW BUTTON STYLE FOR ACTIONS COLUMN */
 .incident-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  background-color: #ffffff;
-  font-size: 12px;
-  cursor: pointer;
-  white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid #d1d5db;
+    background-color: #ffffff;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
 .incident-action-btn:hover {
-  background-color: #f3f4f6;
+    background-color: #f3f4f6;
 }
