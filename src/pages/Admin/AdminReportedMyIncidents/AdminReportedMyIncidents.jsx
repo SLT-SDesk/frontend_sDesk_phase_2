@@ -29,8 +29,6 @@ const AdminReportedMyIncidents = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
 
@@ -63,10 +61,7 @@ const AdminReportedMyIncidents = () => {
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-  const indexOfLast = currentPage * rowsPerPage;
-  const indexOfFirst = indexOfLast - rowsPerPage;
-  const currentRows = filteredData.slice(indexOfFirst, indexOfLast);
+  const currentRows = filteredData;
 
   const handleRowClick = (refNo) => {
     const incident = assignedByMe.find(
@@ -147,47 +142,6 @@ const AdminReportedMyIncidents = () => {
         <td>{row["Priority"]}</td>
       </tr>
     ));
-
-  const renderPaginationButtons = () => {
-    const maxButtons = 7;
-    const buttons = [];
-
-    if (totalPages <= maxButtons) {
-      return Array.from({ length: totalPages }, (_, i) => (
-        <button
-          key={i + 1}
-          onClick={() => setCurrentPage(i + 1)}
-          className={currentPage === i + 1 ? "active" : ""}
-        >
-          {i + 1}
-        </button>
-      ));
-    }
-
-    buttons.push(
-      <button key={1} onClick={() => setCurrentPage(1)} className={currentPage === 1 ? "active" : ""}>1</button>,
-      <button key={2} onClick={() => setCurrentPage(2)} className={currentPage === 2 ? "active" : ""}>2</button>
-    );
-
-    if (currentPage > 3) buttons.push(<span key="ellipsis1">...</span>);
-    if (currentPage > 3 && currentPage < totalPages - 2)
-      buttons.push(
-        <button
-          key={currentPage}
-          onClick={() => setCurrentPage(currentPage)}
-          className="active"
-        >
-          {currentPage}
-        </button>
-      );
-    if (currentPage < totalPages - 2) buttons.push(<span key="ellipsis2">...</span>);
-    buttons.push(
-      <button key={totalPages - 1} onClick={() => setCurrentPage(totalPages - 1)} className={currentPage === totalPages - 1 ? "active" : ""}>{totalPages - 1}</button>,
-      <button key={totalPages} onClick={() => setCurrentPage(totalPages)} className={currentPage === totalPages ? "active" : ""}>{totalPages}</button>
-    );
-
-    return buttons;
-  };
 
   const renderPopup = () => {
     if (!isPopupVisible || !selectedIncident) return null;
@@ -270,18 +224,6 @@ const AdminReportedMyIncidents = () => {
             <div className="col-md-7 col-lg-8 p-0">
               <div className="AdminReportedMyIncidents-showSearchBar-Show d-flex flex-wrap align-items-center">
                 <div className="d-flex align-items-center me-3 mb-2 mb-sm-0">
-                  Entries:
-                  <select
-                    onChange={(e) => setRowsPerPage(Number(e.target.value))}
-                    value={rowsPerPage}
-                    className="AdminReportedMyIncidents-showSearchBar-Show-select ms-2"
-                  >
-                    {[10, 20, 50, 100].map((size) => (
-                      <option key={size} value={size}>{size} entries</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="d-flex align-items-center me-3 mb-2 mb-sm-0">
                   Status:
                   <select
                     onChange={(e) => setStatusFilter(e.target.value)}
@@ -335,15 +277,12 @@ const AdminReportedMyIncidents = () => {
           </table>
         </div>
 
-        {/* Pagination */}
+        {/* Total info footer */}
         <div className="AdminReportedMyIncidents-content3">
-          <span className="AdminReportedMyIncidents-content3-team-entry-info">
-            Showing {indexOfFirst + 1} to {Math.min(indexOfLast, filteredData.length)} of {filteredData.length} entries
-          </span>
-          <div className="AdminReportedMyIncidents-content3-team-pagination-buttons">
-            <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>Previous</button>
-            {renderPaginationButtons()}
-            <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>Next</button>
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '5px', paddingRight: '10px' }}>
+            <span style={{ fontWeight: 'bold', fontSize: '13px', color: '#333' }}>
+              Total incidents: {filteredData.length} entries
+            </span>
           </div>
         </div>
       </div>

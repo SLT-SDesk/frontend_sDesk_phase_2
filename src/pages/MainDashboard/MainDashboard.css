@@ -1,7 +1,7 @@
 .MainDashboard-main-content {
   flex-grow: 1;
   padding: 20px;
-  height: 100vh;
+  overflow: hidden;
   overflow-y: auto;
   background: linear-gradient(135deg, #ecebeb 0%, #f3efef 100%);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;

@@ -2,35 +2,35 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    height: 100vh;
+    overflow: hidden;
 }
 
 .AdminMyAssignedIncidents-tickets-creator {
     display: flex;
-    align-items: center; 
-    background-color: #f0f0f0; 
-    padding: 10px; 
-    border-radius: 5px; 
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
     width: 100%;
 }
 
 .AdminMyAssignedIncidents-svr-desk {
     font-weight: bold;
-    margin-right: 10px; 
+    margin-right: 10px;
 }
 
 .AdminMyAssignedIncidents-direction-bar {
     display: flex;
-  align-items: center;
-  background: linear-gradient(135deg, #3333ff 0%, #ccddff 100%);
-  color: white;
-  height: 40px;
-  padding-left: 20px;
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0px -20px 20px -3px;
-  border-radius: 0 0 15px 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    background: linear-gradient(135deg, #3333ff 0%, #ccddff 100%);
+    color: white;
+    height: 40px;
+    padding-left: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0px -20px 20px -3px;
+    border-radius: 0 0 15px 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .AdminMyAssignedIncidents-content2 {
@@ -139,7 +139,8 @@
 .AdminMyAssignedIncidents-table {
     flex: 1;
     height: 100%;
-    padding: 10px 20px 0px 20px;
+    padding: 0px 20px 0px 20px;
+    margin-top: 10px;
     max-height: 80%;
     overflow-y: auto;
 }
@@ -161,6 +162,9 @@
 .AdminMyAssignedIncidents-table th {
     background-color: #e9ecef;
     font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .AdminMyAssignedIncidents-table td {
@@ -242,7 +246,9 @@
 }
 
 @keyframes fadeInOut {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 0;
         transform: translateY(-20px);
     }

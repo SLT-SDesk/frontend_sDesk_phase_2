@@ -13,7 +13,7 @@ import UserUpdateIncident from "../UserUpdateIncident/UserUpdateIncident";
 import "./UserViewIncident.css";
 
 const UserViewIncident = () => {
-  
+
   const dispatch = useDispatch();
 
   // Get data from Redux store
@@ -21,7 +21,7 @@ const UserViewIncident = () => {
   const { assignedByMe, loading, error, incidentHistory } = useSelector(
     (state) => state.incident
   );
-  
+
 
 
   // State for filters and pagination
@@ -29,9 +29,7 @@ const UserViewIncident = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter] = useState("all");
   const [categoryFilter] = useState("all");
-  const [searchTerm, setSearchTerm] = useState(""); // Define searchTerm state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
   const [selectedIncident, setSelectedIncident] = useState(null);
 
@@ -54,7 +52,7 @@ const UserViewIncident = () => {
         priorityFilter === "all" || incident.priority === priorityFilter;
       const categoryMatch =
         categoryFilter === "all" || incident.category === categoryFilter;
-      const searchMatch = 
+      const searchMatch =
         !searchTerm ||
         Object.values(incident).some(value =>
           String(value).toLowerCase().includes(searchTerm.toLowerCase())
@@ -87,23 +85,19 @@ const UserViewIncident = () => {
   }
   if (!user) return <div>Loading user data...</div>;
 
-  // Pagination calculations
-  const totalPages = Math.ceil(filteredIncidents.length / itemsPerPage);
-  const indexOfLast = currentPage * itemsPerPage;
-  const indexOfFirst = indexOfLast - itemsPerPage;
-  const currentRows = filteredIncidents.slice(indexOfFirst, indexOfLast);
+  const currentRows = filteredIncidents;
 
   const handleExport = () => {
     const dataToExport = currentRows.map(incident => {
-        
 
-        return {
-            'Ref No': incident.incident_number,
-            'Category': incident.category,
-            'Status': incident.status,
-            'Priority': incident.priority,
-            
-        };
+
+      return {
+        'Ref No': incident.incident_number,
+        'Category': incident.category,
+        'Status': incident.status,
+        'Priority': incident.priority,
+
+      };
     });
 
     const wb = XLSX.utils.book_new();
@@ -138,11 +132,11 @@ const UserViewIncident = () => {
     //     ws['!autofilter'] = { ref: XLSX.utils.encode_range(range) };
     // }
     XLSX.utils.book_append_sheet(wb, ws, "UserViewIncidents");
-    
+
     const today = new Date();
     const dateString = `${today.getFullYear()}_${today.getMonth() + 1}_${today.getDate()}`;
     XLSX.writeFile(wb, `UserViewIncidentData_${dateString}.xlsx`);
-};
+  };
 
   // Popup open handler
   const handleRefNoClick = (incident) => {
@@ -151,30 +145,6 @@ const UserViewIncident = () => {
   };
 
   // Render pagination buttons (assuming this function is correct from previous steps)
-  const renderPaginationButtons = () => {
-    const buttons = [];
-    const maxButtons = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
-    let endPage = Math.min(totalPages, startPage + maxButtons - 1);
-
-    if (endPage - startPage + 1 < maxButtons) {
-      startPage = Math.max(1, endPage - maxButtons + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      buttons.push(
-        <button
-          key={i}
-          onClick={() => setCurrentPage(i)}
-          className={currentPage === i ? "active" : ""}
-        >
-          {i}
-        </button>
-      );
-    }
-    return buttons;
-  };
-
   return (
     <div className="UserViewIncident-main-content">
       <div className="UserViewIncident-direction-bar">
@@ -184,7 +154,7 @@ const UserViewIncident = () => {
         <div className="UserViewIncident-TitleBar">
           <div className="UserViewIncident-TitleBar-NameAndIcon">
             <FaHistory size={20} />
-            My Incidents - {user.name || user.email} 
+            My Incidents - {user.name || user.email}
           </div>
           <div className="UserViewIncident-TitleBar-buttons">
             <button className="UserViewIncident-TitleBar-buttons-ExportData" onClick={handleExport}>
@@ -266,27 +236,10 @@ const UserViewIncident = () => {
           </table>
         </div>
         <div className="UserViewIncident-content3">
-          <span className="UserViewIncident-content3-team-entry-info">
-            Showing {indexOfFirst + 1} to{" "}
-            {Math.min(indexOfLast, filteredIncidents.length)} of{" "}
-            {filteredIncidents.length} entries
-          </span>
-          <div className="UserViewIncident-content3-team-pagination-buttons">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            {renderPaginationButtons()}
-            <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '5px', paddingRight: '10px' }}>
+            <span style={{ fontWeight: 'bold', fontSize: '13px', color: '#333' }}>
+              Total incidents: {filteredIncidents.length} entries
+            </span>
           </div>
         </div>
       </div>

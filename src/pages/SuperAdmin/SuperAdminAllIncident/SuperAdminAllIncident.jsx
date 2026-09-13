@@ -25,8 +25,6 @@ const SuperAdminAllIncident = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -151,11 +149,8 @@ const SuperAdminAllIncident = () => {
     return matchesSearch && matchesStatus && matchesCategory;
   });
 
-  // ✅ Pagination logic
-  const totalPages = Math.max(1, Math.ceil(filteredData.length / rowsPerPage));
-  const indexOfLast = currentPage * rowsPerPage;
-  const indexOfFirst = indexOfLast - rowsPerPage;
-  const currentRows = filteredData.slice(indexOfFirst, indexOfLast);
+  // ✅ Data to render
+  const currentRows = filteredData;
 
   const handleRowClick = (refNo) => {
     const incident = incidents.find((item) => item.incident_number === refNo);
@@ -303,75 +298,6 @@ const SuperAdminAllIncident = () => {
     ));
   };
 
-  // ✅ Render pagination buttons
-  const renderPaginationButtons = () => {
-    const maxButtons = 7;
-    const buttons = [];
-
-    if (totalPages <= maxButtons) {
-      return Array.from({ length: totalPages }, (_, i) => (
-        <button
-          key={i + 1}
-          onClick={() => setCurrentPage(i + 1)}
-          className={currentPage === i + 1 ? "active" : ""}
-        >
-          {i + 1}
-        </button>
-      ));
-    }
-
-    buttons.push(
-      <button
-        key={1}
-        onClick={() => setCurrentPage(1)}
-        className={currentPage === 1 ? "active" : ""}
-      >
-        1
-      </button>,
-      <button
-        key={2}
-        onClick={() => setCurrentPage(2)}
-        className={currentPage === 2 ? "active" : ""}
-      >
-        2
-      </button>
-    );
-
-    if (currentPage > 3) buttons.push(<span key="ellipsis1">...</span>);
-    if (currentPage > 3 && currentPage < totalPages - 2) {
-      buttons.push(
-        <button
-          key={currentPage}
-          onClick={() => setCurrentPage(currentPage)}
-          className="active"
-        >
-          {currentPage}
-        </button>
-      );
-    }
-    if (currentPage < totalPages - 2)
-      buttons.push(<span key="ellipsis2">...</span>);
-
-    buttons.push(
-      <button
-        key={totalPages - 1}
-        onClick={() => setCurrentPage(totalPages - 1)}
-        className={currentPage === totalPages - 1 ? "active" : ""}
-      >
-        {totalPages - 1}
-      </button>,
-      <button
-        key={totalPages}
-        onClick={() => setCurrentPage(totalPages)}
-        className={currentPage === totalPages ? "active" : ""}
-      >
-        {totalPages}
-      </button>
-    );
-
-    return buttons;
-  };
-
   if (error) {
     return (
       <div className="SuperAdminincidentViewAll-main-content">
@@ -413,17 +339,6 @@ const SuperAdminAllIncident = () => {
         {/* ✅ Search & Filter */}
         <div className="SuperAdminincidentViewAll-showSearchBar">
           <div className="SuperAdminincidentViewAll-showSearchBar-Show">
-            Entries:
-            <select
-              onChange={(e) => setRowsPerPage(Number(e.target.value))}
-              value={rowsPerPage}
-            >
-              {[10, 20, 50, 100].map((size) => (
-                <option key={size} value={size}>
-                  {size} entries
-                </option>
-              ))}
-            </select>
             Status:
             <select
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -482,29 +397,12 @@ const SuperAdminAllIncident = () => {
           </table>
         </div>
 
-        {/* ✅ Pagination */}
+        {/* ✅ Activity Info Footer */}
         <div className="SuperAdminincidentViewAll-content3">
-          <span>
-            Showing {indexOfFirst + 1} to{" "}
-            {Math.min(indexOfLast, filteredData.length)} of{" "}
-            {filteredData.length} entries
-          </span>
-          <div className="SuperAdminincidentViewAll-content3-team-pagination-buttons">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            {renderPaginationButtons()}
-            <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '5px', paddingRight: '10px' }}>
+            <span style={{ fontWeight: 'bold', fontSize: '13px', color: '#333' }}>
+              Total incidents: {filteredData.length} entries
+            </span>
           </div>
         </div>
 
