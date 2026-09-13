@@ -7,70 +7,32 @@ on:
   workflow_dispatch:
 
 jobs:
-  quality:
-    name: Code Quality Checks
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-      - name: Install Dependencies
-        run: npm ci
-      - name: Lint Code (Non-Blocking)
-        run: npm run lint || echo "Lint issues detected – continuing"
-      - name: Type Check (Non-Blocking)
-        run: npm run typecheck || echo "TypeScript errors detected – continuing"
-      - name: Run Tests
-        run: npm run test || echo "No tests configured"
-      - name: Security Audit
-        run: npm audit --audit-level=high || echo "Security vulnerabilities detected – continuing"
-
-  build:
-    name: Build Application
-    runs-on: ubuntu-latest
-    needs: quality
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-      - name: Install Dependencies
-        run: npm ci
-      - name: Generate Production .env
-        run: |
-          echo "VITE_APP_URL=${{ secrets.VITE_APP_URL }}" >> .env
-          echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env
-          echo "VITE_SOCKET_URL=${{ secrets.VITE_SOCKET_URL }}" >> .env
-          echo "VITE_MICROSOFT_CLIENT_ID=${{ secrets.VITE_MICROSOFT_CLIENT_ID }}" >> .env
-          echo "VITE_MICROSOFT_TENANT_ID=${{ secrets.VITE_MICROSOFT_TENANT_ID }}" >> .env
-          echo "VITE_AZURE_CLIENT_SECRET=${{ secrets.VITE_AZURE_CLIENT_SECRET }}" >> .env
-          echo "AZURE_REDIRECT_URI=${{ secrets.AZURE_REDIRECT_URI }}" >> .env
-      - name: Build Frontend
-        run: npm run build
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build
-          path: dist
-
   deploy:
-    name: Direct Production Deployment
     runs-on: ubuntu-latest
-    needs: build
+
     steps:
-      - name: Download Build Artifact
-        uses: actions/download-artifact@v4
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          name: frontend-build
-          path: dist
-      - name: Upload Build to Server
+          node-version: '20'
+
+      - name: 📦 Install Dependencies & Build Frontend
+        run: |
+          npm install
+          npm run build
+        env:
+          VITE_APP_URL: ${{ secrets.VITE_APP_URL }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_SOCKET_URL: ${{ secrets.VITE_SOCKET_URL }}
+          VITE_MICROSOFT_CLIENT_ID: ${{ secrets.VITE_MICROSOFT_CLIENT_ID }}
+          VITE_MICROSOFT_TENANT_ID: ${{ secrets.VITE_MICROSOFT_TENANT_ID }}
+          VITE_AZURE_CLIENT_SECRET: ${{ secrets.VITE_AZURE_CLIENT_SECRET }}
+          AZURE_REDIRECT_URI: ${{ secrets.AZURE_REDIRECT_URI }}
+
+      - name: 🚀 Upload Build to Server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -79,9 +41,9 @@ jobs:
           port: 3251
           source: "dist/*"
           target: "/home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_tmp/"
-          overwrite: true
           strip_components: 1
-      - name: Execute Deployment
+
+      - name: 🔄 Deploy to Nginx & Log Live
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -89,23 +51,28 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 3251
           script: |
-            BASE_DIR="/var/www/sdesk_new/frontend_sDesk_phase_2"
-            TMP_SRC="/home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_tmp"
-
-            echo "Deploying new version to: $BASE_DIR"
-
-            sudo rm -rf $BASE_DIR/*
-            sudo mkdir -p $BASE_DIR
-
-            sudo cp -r $TMP_SRC/* $BASE_DIR/
-
-            echo "Setting permissions..."
-            sudo chown -R nginx:nginx $BASE_DIR
-
-            echo "Restarting Nginx..."
-            sudo systemctl restart nginx
+            LOG_FILE="/home/${{ secrets.SSH_USERNAME }}/frontend_deployment.log"
             
-            echo "Cleaning up temp files..."
-            rm -rf $TMP_SRC
-
-            echo "Frontend Deployment Completed Successfully"
+            echo "" >> $LOG_FILE
+            echo "=====================================================================" >> $LOG_FILE
+            echo "| 🚀 SDESK FRONTEND DEPLOYMENT STARTED | Time: $(date '+%Y-%m-%d %H:%M:%S') |" >> $LOG_FILE
+            echo "=====================================================================" >> $LOG_FILE
+            
+            {
+              echo "[1/3] Preparing deployment directories..."
+              sudo rm -rf /var/www/sdesk_new/frontend_sDesk_phase_2/*
+              
+              echo "[2/3] Moving new frontend files..."
+              sudo cp -r ~/sdesk_frontend_tmp/* /var/www/sdesk_new/frontend_sDesk_phase_2/
+              
+              echo "[3/3] Restarting Nginx Server..."
+              sudo systemctl restart nginx
+              
+              echo "Cleaning up temp files..."
+              rm -rf ~/sdesk_frontend_tmp
+              
+              echo "---------------------------------------------------------------------"
+              echo "| ✅ FRONTEND DEPLOYMENT SUCCESS       | Time: $(date '+%Y-%m-%d %H:%M:%S') |"
+              echo "====================================================================="
+              echo ""
+            } >> $LOG_FILE 2>&1
