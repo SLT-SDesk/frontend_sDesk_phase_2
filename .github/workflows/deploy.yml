@@ -1,4 +1,4 @@
-name: SDesk Frontend CI-CD Pipeline
+name: sDesk Frontend Deploy
 
 on:
   push:
