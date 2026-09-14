@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { FaRegStar, FaStar, FaTrashAlt } from "react-icons/fa";
 import { IoIosNotifications } from "react-icons/io";
 import apiClient from "../../api/axiosInstance";
@@ -16,6 +16,24 @@ export default function NotificationDropdown({
   const [confirmMessage, setConfirmMessage] = useState("");
   const [confirmMode, setConfirmMode] = useState("delete");
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        if (!showConfirm) {
+          setShowDropdown(false);
+        }
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showDropdown, showConfirm]);
 
   const toggleDropdown = () => setShowDropdown(!showDropdown);
 
@@ -58,7 +76,7 @@ export default function NotificationDropdown({
   const handleMarkRead = (id) => {
     apiClient
       .patch(`/notifications/${id}/read`)
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => {
         setNotifications((prev) =>
           prev.map((n) => (n.id === id ? { ...n, read: true } : n))
@@ -69,7 +87,7 @@ export default function NotificationDropdown({
   const handleMarkUnread = (id) => {
     apiClient
       .patch(`/notifications/${id}/unread`)
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => {
         setNotifications((prev) =>
           prev.map((n) => (n.id === id ? { ...n, read: false } : n))
@@ -317,7 +335,7 @@ export default function NotificationDropdown({
   }, [user]);
 
   return (
-    <div className="notification-wrapper">
+    <div className="notification-wrapper" ref={dropdownRef}>
       {/* Bell button */}
       <button className="notification-button" onClick={toggleDropdown}>
         <div className="notification-bell-container">
@@ -340,16 +358,14 @@ export default function NotificationDropdown({
           ) : (
             // Wrap list so it becomes scrollable when there are many notifications
             <div
-              className={`notification-list ${
-                notifications.length > 5 ? "notification-list--scroll" : ""
-              }`}
+              className={`notification-list ${notifications.length > 5 ? "notification-list--scroll" : ""
+                }`}
             >
               {notifications.map((n) => (
                 <div
                   key={n.id}
-                  className={`notification-item ${
-                    n.starred ? "notification-important" : ""
-                  }`}
+                  className={`notification-item ${n.starred ? "notification-important" : ""
+                    }`}
                 >
                   <div className="notification-text">
                     <p>
@@ -359,34 +375,34 @@ export default function NotificationDropdown({
                        */}
                       {n.actorName
                         ? (() => {
-                            const msg = n.message || "";
-                            const idx = msg.indexOf(n.actorName);
-                            if (idx >= 0) {
-                              const before = msg.slice(0, idx);
-                              const after = msg.slice(idx + n.actorName.length);
-                              return (
-                                <>
-                                  {before}
-                                  <strong>
-                                    {n.actorName}
-                                    {n.actorServiceNum
-                                      ? ` (${n.actorServiceNum})`
-                                      : ""}
-                                  </strong>
-                                  {after}
-                                </>
-                              );
-                            }
-                            // fallback
+                          const msg = n.message || "";
+                          const idx = msg.indexOf(n.actorName);
+                          if (idx >= 0) {
+                            const before = msg.slice(0, idx);
+                            const after = msg.slice(idx + n.actorName.length);
                             return (
                               <>
-                                {msg}{" "}
-                                {n.actorServiceNum
-                                  ? `(${n.actorServiceNum})`
-                                  : ""}
+                                {before}
+                                <strong>
+                                  {n.actorName}
+                                  {n.actorServiceNum
+                                    ? ` (${n.actorServiceNum})`
+                                    : ""}
+                                </strong>
+                                {after}
                               </>
                             );
-                          })()
+                          }
+                          // fallback
+                          return (
+                            <>
+                              {msg}{" "}
+                              {n.actorServiceNum
+                                ? `(${n.actorServiceNum})`
+                                : ""}
+                            </>
+                          );
+                        })()
                         : n.message}
                     </p>
                     <span className="notification-time">

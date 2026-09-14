@@ -393,7 +393,6 @@ function AdminUserList() {
                   contactNumber: newUser.contactNumber,
                 })
               );
-              dispatch(fetchTechniciansRequest());
             }
             setIsAddUserOpen(false);
           }}

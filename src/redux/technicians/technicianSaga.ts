@@ -83,6 +83,7 @@ function* handleCreateTechnician(action: PayloadAction<Partial<Technician>>) {
     try {
         const response = yield call(createTechnician, action.payload);
         yield put(createTechnicianSuccess(response.data));
+        yield put(fetchTechniciansRequest(undefined));
     } catch (error: any) {
         yield put(createTechnicianFailure(error.message));
     }
@@ -100,7 +101,7 @@ function* handleUpdateTechnician(
         }
         const response = yield call(updateTechnician, serviceNum, data);
         yield put(updateTechnicianSuccess(response.data));
-        yield put(fetchTechniciansRequest());
+        yield put(fetchTechniciansRequest(undefined));
     } catch (error: any) {
         yield put(updateTechnicianFailure(error.message));
     }
