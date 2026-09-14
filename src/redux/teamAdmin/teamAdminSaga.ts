@@ -42,7 +42,7 @@ function* handleCreateTeamAdmin(action) {
       });
     } else {
     }
-    
+
     // Optionally, refetch the list to ensure sync
     yield put(fetchTeamAdminsRequest());
   } catch (error) {
@@ -64,13 +64,14 @@ function* handleUpdateTeamAdmin(action) {
 function* handleDeleteTeamAdmin(action) {
   try {
     // Accept both string and object payloads for backward compatibility
-    let teamId, id;
+    let teamId, id, serviceNumber;
     if (typeof action.payload === "string") {
       teamId = action.payload;
       id = action.payload;
     } else {
       teamId = action.payload.teamId;
       id = action.payload.id;
+      serviceNumber = action.payload.serviceNumber;
     }
     if (!teamId) {
       yield put(deleteTeamAdminFailure("teamId is undefined"));
@@ -78,6 +79,15 @@ function* handleDeleteTeamAdmin(action) {
     }
     yield call(deleteTeamAdmin, id); // backend now expects record ID (UUID)
     yield put(deleteTeamAdminSuccess(id)); // reducer expects id
+
+    // Update user role back to user in slt_users table
+    if (serviceNumber) {
+      yield put({
+        type: 'sltusers/updateUserRoleRequest',
+        payload: { serviceNum: serviceNumber, role: 'user' }
+      });
+    }
+
     yield put(fetchTeamAdminsRequest());
   } catch (error) {
     yield put(deleteTeamAdminFailure(error.message));
