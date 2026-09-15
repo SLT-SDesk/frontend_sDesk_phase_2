@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { 
-  fetchTechniciansRequest, 
-  updateTechnicianOnlineStatus 
+import {
+  fetchTechniciansRequest,
+  updateTechnicianOnlineStatus
 } from '../../../redux/technicians/technicianSlice';
 import socket from '../../../utils/socket';
 import { FaUsers, FaSearch, FaCircle } from 'react-icons/fa';
@@ -41,13 +41,13 @@ const Roster = () => {
       const name = tech.name || '';
       const serviceNum = tech.serviceNumber || tech.serviceNum || '';
       const team = tech.teamName || tech.team || '';
-      
-      const matchesSearch = 
+
+      const matchesSearch =
         name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         serviceNum.toLowerCase().includes(searchTerm.toLowerCase());
-      
+
       const matchesTeam = filterTeam === 'All' || team === filterTeam;
-      
+
       return matchesSearch && matchesTeam;
     });
   }, [technicians, searchTerm, filterTeam]);
@@ -68,19 +68,19 @@ const Roster = () => {
           <h1><FaUsers className="title-icon" /> Technician Roster</h1>
           <p className="subtitle">Real-time status and availability of all technical officers</p>
         </div>
-        
+
         <div className="roster-controls">
           <div className="search-box">
             <FaSearch className="search-icon" />
-            <input 
-              type="text" 
-              placeholder="Search by name or service number..." 
+            <input
+              type="text"
+              placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
-          <select 
+
+          <select
             className="team-filter"
             value={filterTeam}
             onChange={(e) => setFilterTeam(e.target.value)}
@@ -105,7 +105,7 @@ const Roster = () => {
                   {tech.active ? 'Online' : 'Offline'}
                 </div>
               </div>
-              
+
               <div className="card-body">
                 <h3 className="tech-name">{tech.name}</h3>
                 <p className="tech-id">ID: {tech.serviceNumber || tech.serviceNum}</p>
@@ -122,7 +122,7 @@ const Roster = () => {
                   <span className="info-value">{tech.position || 'N/A'}</span>
                 </div>
               </div>
-              
+
               <div className="card-footer">
                 <div className="contact-info">
                   {tech.email && <span className="email">{tech.email}</span>}

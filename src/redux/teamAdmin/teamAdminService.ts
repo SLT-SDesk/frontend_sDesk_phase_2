@@ -49,3 +49,15 @@ export const deleteTeamAdmin = async (id: string) => {
     throw error;
   }
 };
+
+export const updateUserRole = async (serviceNumber: string, role: string) => {
+  try {
+    return await apiClient.post(buildUrl(API_BASE, `/user-role/assign`), {
+      serviceNumber,
+      role,
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+

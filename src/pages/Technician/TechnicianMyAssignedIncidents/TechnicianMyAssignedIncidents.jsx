@@ -98,7 +98,7 @@ const TechnicianMyAssignedIncidents = () => {
 
     const currentUser = user;
 
-    const assignedUser = currentUser.serviceNum;
+    const assignedUser = currentUser?.serviceNum || currentUser?.service_number;
 
     // Local state
     const [searchTerm, setSearchTerm] = useState('');
@@ -290,7 +290,7 @@ const TechnicianMyAssignedIncidents = () => {
         const description = [
             ['My Assigned Incidents Report'],
             [''],
-            ['Technical Officer: ' + (currentUser.name || currentUser.display_name || currentUser.serviceNum)],
+            ['Technical Officer: ' + (currentUser.name || currentUser.display_name || currentUser.serviceNum || currentUser.service_number)],
             ['Service Number: ' + assignedUser],
             ['Role: Technical Officer'],
             ['Generated on: ' + new Date().toLocaleString()],
@@ -340,7 +340,7 @@ const TechnicianMyAssignedIncidents = () => {
                 <div className="TechnicianMyAssignedIncidents-TitleBar">
                     <div className="TechnicianMyAssignedIncidents-TitleBar-NameAndIcon">
                         <FaHistory size={20} />
-                        My Assigned Incidents - {currentUser.name || currentUser.display_name || currentUser.serviceNum}
+                        My Assigned Incidents - {currentUser.name || currentUser.display_name || currentUser.serviceNum || currentUser.service_number}
                     </div>
                     <div className="TechnicianMyAssignedIncidents-TitleBar-buttons">
                         <button className="TechnicianMyAssignedIncidents-TitleBar-buttons-ExportData" onClick={handleExport}>
