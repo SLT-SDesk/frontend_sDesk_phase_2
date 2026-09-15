@@ -164,7 +164,7 @@ const TechnicianPerformance = ({ dateRange, onRowClick }) => {
         {/* Search box */}
         <TextField
           variant="filled"
-          placeholder="Search by name or service number..."
+          placeholder="Search..."
           size="small"
           fullWidth
           value={search}
