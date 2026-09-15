@@ -38,6 +38,7 @@ export const fetchTechnicians = async (active?: boolean, level?: string) => {
     if (level) {
       params.append('level', level);
     }
+    params.append('_t', new Date().getTime().toString()); // Cache buster to prevent stale reverts
     const queryString = params.toString();
     const url = buildUrl(API_BASE, `/technicians${queryString ? `?${queryString}` : ''}`);
     return await apiClient.get(url);

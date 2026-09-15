@@ -342,12 +342,22 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
     // Always validate against the displayed (fetched) values
     const nameToUse = formData.name;
     const emailToUse = formData.email;
-    const isUserAdmin = !isEdit && teamAdmins && teamAdmins.some(admin => admin.serviceNumber === formData.id || admin.serviceNum === formData.id || admin.id === formData.id);
+    const isUserAdminFallback = !isEdit && teamAdmins && teamAdmins.some(admin => String(admin.serviceNumber) === String(formData.id) || String(admin.serviceNum) === String(formData.id) || String(admin.id) === String(formData.id));
+    const isUserRoleAdmin = !isEdit && user && user.role === 'admin';
+    const isUserRoleSuperAdmin = !isEdit && user && user.role === 'superAdmin';
+    const isUserRoleTechnician = !isEdit && user && (user.role === 'technician' || user.role === 'teamLeader');
+
+    // Check if user is already added to the local technicians table
+    const isAlreadyTechnician = !isEdit && allTechnicians && allTechnicians.some(tech => String(tech.serviceNum) === String(formData.id) || String(tech.serviceNumber) === String(formData.id) || String(tech.id) === String(formData.id));
 
     if (!formData.id) {
       newErrors.id = 'Service Number is required';
-    } else if (isUserAdmin) {
-      newErrors.id = 'User is already an Admin. Cannot add as a Technical Officer.';
+    } else if (isUserRoleSuperAdmin) {
+      newErrors.id = 'User is a Super Admin. Cannot add as a Technical Officer.';
+    } else if (isUserRoleAdmin || isUserAdminFallback) {
+      newErrors.id = 'User is an Admin. Cannot add as a Technical Officer.';
+    } else if (isUserRoleTechnician || isAlreadyTechnician) {
+      newErrors.id = 'User is already a Technical Officer.';
     }
     if (!emailToUse) newErrors.email = 'Email is required';
     if (!nameToUse) newErrors.name = 'Name is required';
