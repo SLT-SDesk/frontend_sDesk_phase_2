@@ -33,7 +33,7 @@ const AdminMyAssignedIncidents = () => {
     const { categoryItems } = useSelector((state) => state.categories);
     const { locations } = useSelector((state) => state.location);
 
-    const assignedUser = loggedInUser ? loggedInUser.serviceNumber : null;
+    const assignedUser = loggedInUser ? (loggedInUser.serviceNumber || loggedInUser.serviceNum || loggedInUser.service_number) : null;
 
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
@@ -50,7 +50,7 @@ const AdminMyAssignedIncidents = () => {
 
         if (loggedInUser && socket.connected) {
             socket.emit("user_connected", {
-                serviceNum: loggedInUser.serviceNumber || loggedInUser.serviceNum,
+                serviceNum: assignedUser,
                 userName: loggedInUser.userName || loggedInUser.name || loggedInUser.user_name,
                 role: loggedInUser.role,
             });

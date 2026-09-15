@@ -82,7 +82,7 @@ function* handleFetchActiveTechnicians() {
 function* handleCreateTechnician(action: PayloadAction<Partial<Technician>>) {
     try {
         const response = yield call(createTechnician, action.payload);
-        yield put(createTechnicianSuccess(response.data));
+        yield put(createTechnicianSuccess({ ...response.data, ...action.payload }));
     } catch (error: any) {
         yield put(createTechnicianFailure(error.message));
     }
@@ -99,8 +99,7 @@ function* handleUpdateTechnician(
             data = rest;
         }
         const response = yield call(updateTechnician, serviceNum, data);
-        yield put(updateTechnicianSuccess(response.data));
-        yield put(fetchTechniciansRequest());
+        yield put(updateTechnicianSuccess({ ...response.data, ...data, serviceNum }));
     } catch (error: any) {
         yield put(updateTechnicianFailure(error.message));
     }

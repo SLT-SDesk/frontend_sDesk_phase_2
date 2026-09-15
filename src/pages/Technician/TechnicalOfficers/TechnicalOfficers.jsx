@@ -153,8 +153,8 @@ function TechnicalOfficers() {
       (searchLower === "active"
         ? user.active
         : searchLower === "inactive"
-        ? !user.active
-        : (user.active ? "active" : "inactive").includes(searchLower)) ||
+          ? !user.active
+          : (user.active ? "active" : "inactive").includes(searchLower)) ||
       user.tier.toString().toLowerCase().includes(searchLower) ||
       user.email.toLowerCase().includes(searchLower) ||
       user.contactNumber.toLowerCase().includes(searchLower);
@@ -234,7 +234,7 @@ function TechnicalOfficers() {
             <FaSearch className="TechnicalOfficers-content2-content3-search-icon" />
             <input
               type="text"
-              placeholder="Search by service number, name, status, tier, email, or contact..."
+              placeholder="Search..."
               value={searchQuery}
               onChange={handleSearch}
               className="TechnicalOfficers-content2-content3-search-input"
@@ -283,9 +283,8 @@ function TechnicalOfficers() {
                         <td>{user.contactNumber}</td>
                         <td>
                           <button
-                            className={`TechnicalOfficers-table-toggle-btn ${
-                              user.active ? "active" : "inactive"
-                            }`}
+                            className={`TechnicalOfficers-table-toggle-btn ${user.active ? "active" : "inactive"
+                              }`}
                             onClick={() => handleToggleActive(user)}
                             title={user.active ? "Deactivate" : "Activate"}
                           >
@@ -316,9 +315,8 @@ function TechnicalOfficers() {
 
       {isTogglePopupOpen && (
         <ConfirmPopup
-          message={`Are you sure you want to ${
-            technicianToToggle?.active ? "deactivate" : "activate"
-          } ${technicianToToggle?.name}?`}
+          message={`Are you sure you want to ${technicianToToggle?.active ? "deactivate" : "activate"
+            } ${technicianToToggle?.name}?`}
           onConfirm={confirmToggle}
           onCancel={cancelToggle}
         />

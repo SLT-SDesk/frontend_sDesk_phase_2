@@ -360,10 +360,7 @@ const ManageTeamAdmin = () => {
     setShowConfirm(true);
 
     setConfirmAction(() => async () => {
-      await Promise.all([
-        dispatch(deleteTeamAdminRequest({ teamId: admin.teamId, id: admin.id })),
-        updateUserRole(admin.serviceNumber, "user"),
-      ]);
+      dispatch(deleteTeamAdminRequest({ teamId: admin.teamId, id: admin.id, serviceNumber: admin.serviceNumber }));
       setInfoMessage("Admin deleted");
       setTimeout(() => setInfoMessage(""), 2000);
     });

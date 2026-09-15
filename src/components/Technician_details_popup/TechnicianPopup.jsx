@@ -1,9 +1,14 @@
 // TechnicianPopup.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import DateRangePopup from '../AdminDateRangePopup/DateRangePopup';
 
 import { fetchTechnicianSessionsRequest } from "../../redux/technicians/technicianSlice";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchTechnicianPerformanceRequest,
+  getAssignedToMeRequest,
+} from "../../redux/incident/incidentSlice";
+import { getIncidentsAssignedToMe, getAllTechnicianPerformance } from "../../redux/incident/incidentService";
 
 const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   const [activeTab, setActiveTab] = useState(0);
@@ -21,8 +26,10 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   const dispatch = useDispatch();
 
   const { technicianSessions } = useSelector((state) => state.technicians);
-  const { incidents } = useSelector((state) => state.incident);
-  const { performances } = useSelector((state) => state.incident);
+
+  // Local state for this popup's data — bypasses Redux shared state conflicts
+  const [popupIncidents, setPopupIncidents] = useState([]);
+  const [popupPerformances, setPopupPerformances] = useState([]);
 
   console.log('TechnicianDetailsPopup render:', { isOpen, technician });
 
@@ -37,39 +44,81 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   endOfDay.setHours(23, 59, 59, 999);
 
 
-  const filteredIncidents = (incidents || []).filter((incident) => {
-    if (!technicianServiceNum) return false;
-
-    if (String(incident.handler) !== String(technicianServiceNum)) return false;
-
-    const incidentDateRaw =
-      incident.updatedAt ||
-      incident.updated_at ||
-      incident.update_on ||
-      incident.createdAt ||
-      incident.created_at;
-
-    if (!incidentDateRaw) return false;
-
-    const incidentDate = new Date(incidentDateRaw);
-    return incidentDate >= startOfDay && incidentDate <= endOfDay;
-
-  });
-
-
-
+  // Reset view state whenever the selected technician changes
   useEffect(() => {
+    if (!technician) return;
+    setActiveTab(0);
+    setSelectedPriority('all');
+    setDateRange({
+      selection: 'Today',
+      startDate: new Date(),
+      endDate: new Date(),
+    });
     setTechnicianServiceNumber(
       technician?.serviceNum || technician?.serviceNumber || null
     );
   }, [technician]);
 
+  const filteredIncidents = useMemo(() => {
+    // Date-filtered incidents for performance metrics
+    return (popupIncidents || []).filter((incident) => {
+      const incidentDateRaw =
+        incident.updatedAt ||
+        incident.updated_at ||
+        incident.update_on ||
+        incident.createdAt ||
+        incident.created_at;
 
+      if (!incidentDateRaw) return false;
+
+      const incidentDate = new Date(incidentDateRaw);
+      return incidentDate >= startOfDay && incidentDate <= endOfDay;
+    });
+  }, [popupIncidents, startOfDay, endOfDay]);
+
+  // All assigned incidents (no date filter) — for the count display
+  const allAssignedIncidents = popupIncidents || [];
+
+
+
+  // One-time fetch when technician changes
   useEffect(() => {
     if (!technicianServiceNumber) return;
 
     dispatch(fetchTechnicianSessionsRequest(technicianServiceNumber));
   }, [dispatch, technicianServiceNumber]);
+
+  // Real-time polling while the popup is open — direct API calls, no Redux sharing issues
+  useEffect(() => {
+    if (!isOpen || !technicianServiceNumber) return;
+
+    let cancelled = false;
+
+    const poll = async () => {
+      try {
+        const [incidentRes, perfRes] = await Promise.all([
+          getIncidentsAssignedToMe(technicianServiceNumber),
+          getAllTechnicianPerformance(),
+        ]);
+        if (!cancelled) {
+          setPopupIncidents(Array.isArray(incidentRes.data) ? incidentRes.data : incidentRes.data?.data || []);
+          setPopupPerformances(Array.isArray(perfRes.data) ? perfRes.data : perfRes.data?.data || []);
+        }
+      } catch (err) {
+        console.error('Popup poll error:', err);
+      }
+      // Sessions still use Redux dispatch (already working)
+      dispatch(fetchTechnicianSessionsRequest(technicianServiceNumber));
+    };
+
+    poll(); // immediate refresh on open
+    const intervalId = setInterval(poll, 30000); // refresh every 30 seconds
+
+    return () => {
+      cancelled = true;
+      clearInterval(intervalId);
+    };
+  }, [dispatch, isOpen, technicianServiceNumber]);
 
   useEffect(() => {
     const sessions = transformSessionData(
@@ -159,12 +208,11 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
     medium: { response: 240, resolve: 960 }
   };
 
-  const performanceMap = (performances || []).reduce((acc, p) => {
+  const performanceMap = (popupPerformances || []).reduce((acc, p) => {
     const key = p.incidentNumber || p.incident_number;
     if (key) acc[key] = p;
     return acc;
   }, {});
-
   const getFilteredMetrics = () => {
     const incidentsToUse =
       selectedPriority === 'all'
@@ -391,7 +439,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                   {loading ? (
                     <div className="text-2xl font-bold text-gray-400">...</div>
                   ) : (
-                    <span className="text-3xl font-bold text-gray-900">{filteredIncidents.length}</span>
+                    <span className="text-3xl font-bold text-gray-900">{allAssignedIncidents.length}</span>
                   )}
                 </div>
 
@@ -403,7 +451,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                   >
                     <p className="mb-3 text-sm font-semibold text-gray-700">Critical</p>
                     <div className="flex items-center justify-center mx-auto text-lg font-bold text-white bg-red-500 rounded-full w-11 h-11">
-                      {filteredIncidents.filter(
+                      {allAssignedIncidents.filter(
                         i => String(i.priority).toLowerCase() === 'critical'
                       ).length
                       }
@@ -416,7 +464,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                   >
                     <p className="mb-3 text-sm font-semibold text-gray-700">High</p>
                     <div className="flex items-center justify-center mx-auto text-lg font-bold text-white bg-orange-500 rounded-full w-11 h-11">
-                      {filteredIncidents.filter(
+                      {allAssignedIncidents.filter(
                         i => String(i.priority).toLowerCase() === 'high'
                       ).length}
                     </div>
@@ -428,7 +476,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                   >
                     <p className="mb-3 text-sm font-semibold text-gray-700">Medium</p>
                     <div className="flex items-center justify-center mx-auto text-lg font-bold text-white bg-yellow-500 rounded-full w-11 h-11">
-                      {filteredIncidents.filter(
+                      {allAssignedIncidents.filter(
                         i => String(i.priority).toLowerCase() === 'medium'
                       ).length}
                     </div>

@@ -8,6 +8,7 @@ import {
   lookupUserRequest,
   clearLookupUser,
 } from "../../redux/userLookup/userLookupSlice";
+import { fetchTeamAdminsRequest } from "../../redux/teamAdmin/teamAdminSlice";
 
 
 // Helper: returns true if the given team name is "IT Help Desk" (case-insensitive)
@@ -34,6 +35,7 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
   const subCategories = useSelector(state => state.categories?.subCategories || []);
   const { user, loading: lookupLoading, error: lookupError } =
     useSelector(state => state.userLookup);
+  const teamAdmins = useSelector(state => state.teamAdmin?.teamAdmins || []);
 
 
   const [formData, setFormData] = useState({
@@ -129,6 +131,11 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
   // Fetch all subcategories when component mounts
   useEffect(() => {
     dispatch({ type: 'categories/fetchSubCategoriesRequest' });
+  }, [dispatch]);
+
+  // Fetch team admins when component mounts to validate if user is already an admin
+  useEffect(() => {
+    dispatch(fetchTeamAdminsRequest());
   }, [dispatch]);
 
   // Fetch subcategories when mainCategories are loaded, when loggedInUser changes, or when the selected tier changes
@@ -335,7 +342,23 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
     // Always validate against the displayed (fetched) values
     const nameToUse = formData.name;
     const emailToUse = formData.email;
-    if (!formData.id) newErrors.id = 'Service Number is required';
+    const isUserAdminFallback = !isEdit && teamAdmins && teamAdmins.some(admin => String(admin.serviceNumber) === String(formData.id) || String(admin.serviceNum) === String(formData.id) || String(admin.id) === String(formData.id));
+    const isUserRoleAdmin = !isEdit && user && user.role === 'admin';
+    const isUserRoleSuperAdmin = !isEdit && user && user.role === 'superAdmin';
+    const isUserRoleTechnician = !isEdit && user && (user.role === 'technician' || user.role === 'teamLeader');
+
+    // Check if user is already added to the local technicians table
+    const isAlreadyTechnician = !isEdit && allTechnicians && allTechnicians.some(tech => String(tech.serviceNum) === String(formData.id) || String(tech.serviceNumber) === String(formData.id) || String(tech.id) === String(formData.id));
+
+    if (!formData.id) {
+      newErrors.id = 'Service Number is required';
+    } else if (isUserRoleSuperAdmin) {
+      newErrors.id = 'User is a Super Admin. Cannot add as a Technical Officer.';
+    } else if (isUserRoleAdmin || isUserAdminFallback) {
+      newErrors.id = 'User is an Admin. Cannot add as a Technical Officer.';
+    } else if (isUserRoleTechnician || isAlreadyTechnician) {
+      newErrors.id = 'User is already a Technical Officer.';
+    }
     if (!emailToUse) newErrors.email = 'Email is required';
     if (!nameToUse) newErrors.name = 'Name is required';
     if (!formData.teamName) newErrors.teamName = 'Team is required';
@@ -452,14 +475,21 @@ const AdminAddUser = ({ onSubmit, onClose, isEdit = false, editUser = null, addT
                   required
                   readOnly={isEdit}
                 />
+
                 {/* Show 'User Found' or 'User Not Found' message */}
-                {!isEdit && user && <span className="success-message">User Found</span>}
-
-                {!isEdit && lookupError && hasSubmitted && (
-                  <span className="error-message">User Not Found</span>
-                )}
-
-
+                {(() => {
+                  const isAdmin = !isEdit && teamAdmins && teamAdmins.some(admin => admin.serviceNumber === formData.id || admin.serviceNum === formData.id || admin.id === formData.id);
+                  if (isAdmin) {
+                    return <span className="error-message">User is already an Admin</span>;
+                  }
+                  if (!isEdit && user) {
+                    return <span className="success-message">User Found</span>;
+                  }
+                  if (!isEdit && lookupError && hasSubmitted) {
+                    return <span className="error-message">User Not Found</span>;
+                  }
+                  return null;
+                })()}
 
               </div>
               <div>

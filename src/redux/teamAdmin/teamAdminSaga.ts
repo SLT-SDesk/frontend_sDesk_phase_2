@@ -5,6 +5,7 @@ import {
   createTeamAdmin,
   updateTeamAdmin,
   deleteTeamAdmin,
+  updateUserRole,
 } from "./teamAdminService";
 import {
   fetchTeamAdminsRequest,
@@ -36,13 +37,13 @@ function* handleCreateTeamAdmin(action) {
     const response = yield call(createTeamAdmin, { ...rest, teamId, serviceNumber });
     yield put(createTeamAdminSuccess(response.data));    // Update user role in slt_users table
     if (serviceNumber) {
-      yield put({
-        type: 'sltusers/updateUserRoleRequest',
-        payload: { serviceNum: serviceNumber, role: 'admin' }
-      });
-    } else {
+      try {
+        yield call(updateUserRole, serviceNumber, 'admin');
+      } catch (roleError) {
+        console.error("Failed to set user role:", roleError);
+      }
     }
-    
+
     // Optionally, refetch the list to ensure sync
     yield put(fetchTeamAdminsRequest());
   } catch (error) {
@@ -64,13 +65,14 @@ function* handleUpdateTeamAdmin(action) {
 function* handleDeleteTeamAdmin(action) {
   try {
     // Accept both string and object payloads for backward compatibility
-    let teamId, id;
+    let teamId, id, serviceNumber;
     if (typeof action.payload === "string") {
       teamId = action.payload;
       id = action.payload;
     } else {
       teamId = action.payload.teamId;
       id = action.payload.id;
+      serviceNumber = action.payload.serviceNumber;
     }
     if (!teamId) {
       yield put(deleteTeamAdminFailure("teamId is undefined"));
@@ -78,6 +80,16 @@ function* handleDeleteTeamAdmin(action) {
     }
     yield call(deleteTeamAdmin, id); // backend now expects record ID (UUID)
     yield put(deleteTeamAdminSuccess(id)); // reducer expects id
+
+    // Update user role back to user in slt_users table sequentially
+    if (serviceNumber) {
+      try {
+        yield call(updateUserRole, serviceNumber, 'user');
+      } catch (roleError) {
+        console.error("Failed to update user role:", roleError);
+      }
+    }
+
     yield put(fetchTeamAdminsRequest());
   } catch (error) {
     yield put(deleteTeamAdminFailure(error.message));

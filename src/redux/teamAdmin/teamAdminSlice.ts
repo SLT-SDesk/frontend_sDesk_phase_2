@@ -34,11 +34,10 @@ const teamAdminSlice = createSlice({
       state.loading = true;
       state.error = null;
     },
-    createTeamAdminSuccess(state, action) {
+    createTeamAdminSuccess(state) {
       state.loading = false;
       state.error = null;
-      // Optionally, add the new admin to the list
-      state.teamAdmins = [action.payload, ...state.teamAdmins];
+      // Let fetchTeamAdminsRequest handle the list population
     },
     createTeamAdminFailure(state, action) {
       state.loading = false;
