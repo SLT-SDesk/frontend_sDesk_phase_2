@@ -76,16 +76,6 @@ jobs:
         with:
           name: frontend-build
           path: dist
-          
-      - name: Create Temp Directory on Server
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 3251
-          script: mkdir -p /home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_tmp/
-
       - name: Upload Build to Server
         uses: appleboy/scp-action@v0.1.7
         with:
