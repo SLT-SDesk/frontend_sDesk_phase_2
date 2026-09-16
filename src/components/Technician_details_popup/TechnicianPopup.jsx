@@ -2,49 +2,39 @@
 import { useState, useEffect, useMemo } from 'react';
 import DateRangePopup from '../AdminDateRangePopup/DateRangePopup';
 
-import { fetchTechnicianSessionsRequest } from "../../redux/technicians/technicianSlice";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchTechnicianPerformanceRequest,
-  getAssignedToMeRequest,
-} from "../../redux/incident/incidentSlice";
 import { getIncidentsAssignedToMe, getAllTechnicianPerformance } from "../../redux/incident/incidentService";
+import { fetchTechnicianSessionsByServiceNum } from "../../redux/technicians/technicianService";
 
 const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   const [activeTab, setActiveTab] = useState(0);
-  const [selectedPriority, setSelectedPriority] = useState('all'); // 'all', 'critical', 'high', 'medium'
+  const [selectedPriority, setSelectedPriority] = useState('all');
   const [dateRangePopupOpen, setDateRangePopupOpen] = useState(false);
   const [dateRange, setDateRange] = useState({
     selection: 'Today',
     startDate: new Date(),
     endDate: new Date()
   });
-  const [technicianServiceNumber, setTechnicianServiceNumber] = useState(technician?.serviceNum || technician?.serviceNumber || null);
-  const [technicianSSessions, setTechnicianSSessions] = useState([]);
-  const [loading, setLoading] = useState(false);
 
-  const dispatch = useDispatch();
-
-  const { technicianSessions } = useSelector((state) => state.technicians);
-
-  // Local state for this popup's data — bypasses Redux shared state conflicts
+  // Local state — all fetched directly (no shared Redux) so each technician gets isolated data
   const [popupIncidents, setPopupIncidents] = useState([]);
   const [popupPerformances, setPopupPerformances] = useState([]);
+  const [popupSessions, setPopupSessions] = useState([]);
 
-  console.log('TechnicianDetailsPopup render:', { isOpen, technician });
-
-  const technicianServiceNum =
-    technician?.serviceNum || technician?.serviceNumber;
+  const technicianServiceNumber = technician?.serviceNum || technician?.serviceNumber || null;
 
 
-  const startOfDay = new Date(dateRange.startDate);
-  startOfDay.setHours(0, 0, 0, 0);
 
-  const endOfDay = new Date(dateRange.endDate);
-  endOfDay.setHours(23, 59, 59, 999);
+  // Memoize date boundaries so they are stable references
+  const { startOfDay, endOfDay } = useMemo(() => {
+    const start = new Date(dateRange.startDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(dateRange.endDate);
+    end.setHours(23, 59, 59, 999);
+    return { startOfDay: start, endOfDay: end };
+  }, [dateRange]);
 
 
-  // Reset view state whenever the selected technician changes
+  // Reset all local data whenever the selected technician changes to prevent stale data flash
   useEffect(() => {
     if (!technician) return;
     setActiveTab(0);
@@ -54,14 +44,18 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
       startDate: new Date(),
       endDate: new Date(),
     });
-    setTechnicianServiceNumber(
-      technician?.serviceNum || technician?.serviceNumber || null
-    );
+    // Clear stale data from previous technician immediately
+    setPopupIncidents([]);
+    setPopupPerformances([]);
+    setPopupSessions([]);
   }, [technician]);
 
+  // All assigned incidents (no date filter) — used for counts AND performance metrics
+  const allAssignedIncidents = useMemo(() => popupIncidents || [], [popupIncidents]);
+
+  // Date-filtered incidents — used only for sessions tab filtering
   const filteredIncidents = useMemo(() => {
-    // Date-filtered incidents for performance metrics
-    return (popupIncidents || []).filter((incident) => {
+    return allAssignedIncidents.filter((incident) => {
       const incidentDateRaw =
         incident.updatedAt ||
         incident.updated_at ||
@@ -74,21 +68,11 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
       const incidentDate = new Date(incidentDateRaw);
       return incidentDate >= startOfDay && incidentDate <= endOfDay;
     });
-  }, [popupIncidents, startOfDay, endOfDay]);
-
-  // All assigned incidents (no date filter) — for the count display
-  const allAssignedIncidents = popupIncidents || [];
+  }, [allAssignedIncidents, startOfDay, endOfDay]);
 
 
 
-  // One-time fetch when technician changes
-  useEffect(() => {
-    if (!technicianServiceNumber) return;
-
-    dispatch(fetchTechnicianSessionsRequest(technicianServiceNumber));
-  }, [dispatch, technicianServiceNumber]);
-
-  // Real-time polling while the popup is open — direct API calls, no Redux sharing issues
+  // Real-time polling while the popup is open — direct API calls, isolated per technician
   useEffect(() => {
     if (!isOpen || !technicianServiceNumber) return;
 
@@ -96,36 +80,40 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
 
     const poll = async () => {
       try {
-        const [incidentRes, perfRes] = await Promise.all([
+        const [incidentRes, perfRes, sessionRes] = await Promise.all([
           getIncidentsAssignedToMe(technicianServiceNumber),
           getAllTechnicianPerformance(),
+          fetchTechnicianSessionsByServiceNum(technicianServiceNumber),
         ]);
         if (!cancelled) {
           setPopupIncidents(Array.isArray(incidentRes.data) ? incidentRes.data : incidentRes.data?.data || []);
           setPopupPerformances(Array.isArray(perfRes.data) ? perfRes.data : perfRes.data?.data || []);
+          // Sessions come back as { sessions: [...] } or directly as an array
+          const rawSessions = sessionRes.data?.sessions || sessionRes.data || [];
+          setPopupSessions(Array.isArray(rawSessions) ? rawSessions : []);
         }
       } catch (err) {
         console.error('Popup poll error:', err);
       }
-      // Sessions still use Redux dispatch (already working)
-      dispatch(fetchTechnicianSessionsRequest(technicianServiceNumber));
     };
 
     poll(); // immediate refresh on open
     const intervalId = setInterval(poll, 30000); // refresh every 30 seconds
 
+    const handleInstantUpdate = () => {
+      if (!cancelled) poll();
+    };
+
+    window.addEventListener("incident-transferred", handleInstantUpdate);
+    window.addEventListener("incident-popup-close", handleInstantUpdate);
+
     return () => {
       cancelled = true;
       clearInterval(intervalId);
+      window.removeEventListener("incident-transferred", handleInstantUpdate);
+      window.removeEventListener("incident-popup-close", handleInstantUpdate);
     };
-  }, [dispatch, isOpen, technicianServiceNumber]);
-
-  useEffect(() => {
-    const sessions = transformSessionData(
-      technicianSessions?.sessions || []
-    );
-    setTechnicianSSessions(sessions);
-  }, [technicianSessions]);
+  }, [isOpen, technicianServiceNumber]);
 
 
   // console.log('Technician Sessions from Redux:', technicianSSessions);
@@ -173,13 +161,23 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
     }));
   };
 
-  const filteredSessions = technicianSSessions.filter((session) => {
-    if (!session.rawLoginTime) return false;
-
-    const sessionDate = new Date(session.rawLoginTime);
-
-    return sessionDate >= startOfDay && sessionDate <= endOfDay;
-  });
+  // Transform and date-filter sessions from local state
+  const filteredSessions = useMemo(() => {
+    return (popupSessions || [])
+      .map(session => ({
+        id: session.id,
+        rawLoginTime: session.login_time,
+        duration: calculateDuration(session.login_time, session.logout_time),
+        loginTime: formatTime(session.login_time),
+        logoutTime: formatTime(session.logout_time),
+        isActive: session.logout_time === null,
+      }))
+      .filter(session => {
+        if (!session.rawLoginTime) return false;
+        const sessionDate = new Date(session.rawLoginTime);
+        return sessionDate >= startOfDay && sessionDate <= endOfDay;
+      });
+  }, [popupSessions, startOfDay, endOfDay]);
 
 
 
@@ -214,10 +212,12 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
     return acc;
   }, {});
   const getFilteredMetrics = () => {
+    // Use ALL assigned incidents for performance metrics (not date-filtered),
+    // so new incidents are always counted regardless of date field name inconsistencies.
     const incidentsToUse =
       selectedPriority === 'all'
-        ? filteredIncidents
-        : filteredIncidents.filter(
+        ? allAssignedIncidents
+        : allAssignedIncidents.filter(
           i => String(i.priority).toLowerCase() === selectedPriority
         );
 
@@ -234,9 +234,22 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
       const sla = SLA[priority];
       if (!sla) return;
 
-      const perf = performanceMap[incident.incident_number];
-      if (!perf) return;
+      let perf = performanceMap[incident.incident_number || incident.incidentNumber];
 
+      // Fallback
+      if (!perf && incident.responseTimeMinutes !== undefined) {
+        perf = {
+          responseTimeMinutes: incident.responseTimeMinutes,
+          resolutionTimeMinutes: incident.resolveTimeMinutes
+        };
+      }
+
+      if (!perf) {
+        // No performance record = SLA breach / still pending
+        responseTotal += 1;
+        resolveTotal += 1;
+        return;
+      }
 
       // ===== RESPONSE SLA =====
       if (perf.responseTimeMinutes != null) {
@@ -265,6 +278,9 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
         if (res <= sla.resolve) {
           resolveOnTime += 1;
         }
+      } else {
+        // unresolved ticket
+        resolveTotal += 1;
       }
     });
 
