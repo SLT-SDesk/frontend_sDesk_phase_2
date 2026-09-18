@@ -58,10 +58,7 @@ const UpdateStatus = forwardRef(({
   // so the technician is prompted to pick a valid Tier 3 category.
   // When deselected, restore the original incident category.
   useEffect(() => {
-    if (transferTo === 'tier3-auto') {
-      // Clear category — tech must select a Tier 3 one
-      setSelectedCategory({ name: '', number: '' });
-    } else if (incident && categoryDataset && categoryDataset.length > 0) {
+    if (incident && categoryDataset && categoryDataset.length > 0) {
       // Restore original incident category
       const categoryItem = categoryDataset.find((item) => item.category_code === incident.category);
       setSelectedCategory({
@@ -162,19 +159,18 @@ const UpdateStatus = forwardRef(({
             <Form.Group as={Col} md="3" controlId="category">
               <Form.Label>
                 <FaPlusSquare
-                  onClick={() => (loggedInUser?.role !== 'technician' || transferTo === 'tier3-auto') && setIsCategoryPopupOpen(true)}
-                  className={`me-1 ${loggedInUser?.role !== 'technician' || transferTo === 'tier3-auto' ? 'clickable-icon' : ''}`}
+                  onClick={() => (loggedInUser?.role !== 'technician') && setIsCategoryPopupOpen(true)}
+                  className={`me-1 ${loggedInUser?.role !== 'technician' ? 'clickable-icon' : ''}`}
                 />
                 Category
               </Form.Label>
               <Form.Control
                 type="text"
                 value={selectedCategory.name}
-                placeholder={transferTo === 'tier3-auto' && !selectedCategory.name ? '⚠ Select a Tier 3 category' : ''}
+                placeholder=""
                 readOnly
-                disabled={loggedInUser?.role === 'technician' && transferTo !== 'tier3-auto'}
-                onClick={() => (loggedInUser?.role !== 'technician' || transferTo === 'tier3-auto') && setIsCategoryPopupOpen(true)}
-                style={transferTo === 'tier3-auto' && !selectedCategory.name ? { borderColor: '#dc3545', color: '#dc3545' } : {}}
+                disabled={loggedInUser?.role === 'technician'}
+                onClick={() => (loggedInUser?.role !== 'technician') && setIsCategoryPopupOpen(true)}
               />
             </Form.Group>
 
@@ -285,8 +281,6 @@ const UpdateStatus = forwardRef(({
             onSelect={handleCategorySelect}
             onClose={() => setIsCategoryPopupOpen(false)}
             categoryDataset={categoryDataset}
-            showOnlyTier3={transferTo === 'tier3-auto'}
-            hideTier3={transferTo !== 'tier3-auto'}
           />
         </div>
       )}

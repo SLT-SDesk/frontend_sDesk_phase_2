@@ -156,9 +156,13 @@ const TechnicianMyAssignedIncidents = () => {
         return category ? category.name : categoryNumber;
     };
 
-    const getUserName = (serviceNumber) => {
-        if (!serviceNumber || String(serviceNumber).trim() === '') return 'Unassigned';
-        if (!Array.isArray(allUsers)) return serviceNumber;
+    const getUserName = (serviceNumber, status = null) => {
+        if (!serviceNumber || String(serviceNumber).trim() === '') {
+      if (status === "Pending Tier2 Assignment") return "Tier 2 Support";
+      if (status === "Pending Tier3 Assignment") return "Tier 3 Support";
+      return "Unassigned";
+    }
+    if (!Array.isArray(allUsers)) return serviceNumber;
         const foundUser = allUsers.find(
             (user) => String(user.service_number) === String(serviceNumber) || String(user.serviceNum) === String(serviceNumber)
         );

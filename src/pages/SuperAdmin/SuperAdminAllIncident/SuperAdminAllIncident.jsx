@@ -97,8 +97,12 @@ const SuperAdminAllIncident = () => {
     return category ? category.subCategory?.name || "Unknown" : "Unknown";
   };
 
-  const getUserName = (serviceNumber) => {
-    if (!serviceNumber || String(serviceNumber).trim() === '') return 'Unassigned';
+  const getUserName = (serviceNumber, status = null) => {
+    if (!serviceNumber || String(serviceNumber).trim() === '') {
+      if (status === "Pending Tier2 Assignment") return "Tier 2 Support";
+      if (status === "Pending Tier3 Assignment") return "Tier 3 Support";
+      return "Unassigned";
+    }
     if (!Array.isArray((users || []))) return serviceNumber;
     const foundUser = (users || []).find(
       (user) => String(user.service_number) === String(serviceNumber) || String(user.serviceNum) === String(serviceNumber)
@@ -209,7 +213,7 @@ const SuperAdminAllIncident = () => {
     // Table rows
     const tableRows = filteredData.map((item) => [
       item.refNo,
-      getUserName(item.assignedTo),
+      getUserName(item.assignedTo, item.status),
       getUserName(item.affectedUser),
       item.category,
       item.subcategory,
@@ -276,7 +280,7 @@ const SuperAdminAllIncident = () => {
             {row.refNo}
           </a>
         </td>
-        <td>{getUserName(row.assignedTo)}</td>
+        <td>{getUserName(row.assignedTo, row.status)}</td>
         <td>{getUserName(row.affectedUser)}</td>
         <td>{row.category}</td>
         <td>{row.mainCategory}</td>

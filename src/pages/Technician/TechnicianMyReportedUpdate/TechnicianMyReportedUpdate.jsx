@@ -61,7 +61,7 @@ const TechnicianMyReportedUpdate = () => {
         // Prepare history data if available
         if (fullIncident.history) {
           setHistoryData(fullIncident.history.map(item => ({
-            assignedTo: getUserName(item.handler) || 'Unassigned',
+            assignedTo: getUserName(item.handler, item.status) || 'Unassigned',
             updatedBy: getUserName(item.update_by) || 'System',
             updatedOn: item.update_on || new Date().toLocaleString(),
             status: item.status || 'Pending',
@@ -88,7 +88,7 @@ const TechnicianMyReportedUpdate = () => {
     setIsLoading(false);
   }, [location.state]);
 
-  const getUserName = (serviceNumber) => {
+  const getUserName = (serviceNumber, status = null) => {
     const user = sDesk_t2_users_dataset.find(user => user.service_number === serviceNumber);
     return user ? user.user_name : serviceNumber;
   };
