@@ -25,8 +25,12 @@ const IncidentHistory = ({ refNo, category, location, priority, historyData, use
         return foundLocation ? (foundLocation.name || foundLocation.loc_name) : locationId || 'N/A';
     };
 
-    const getUserName = (serviceNumber) => {
-    if (!serviceNumber || String(serviceNumber).trim() === '') return 'Unassigned';
+    const getUserName = (serviceNumber, status = null) => {
+    if (!serviceNumber || String(serviceNumber).trim() === '') {
+      if (status === "Pending Tier2 Assignment") return "Tier 2 Support";
+      if (status === "Pending Tier3 Assignment") return "Tier 3 Support";
+      return "Unassigned";
+    }
     if (!Array.isArray(users)) return serviceNumber;
     const foundUser = users.find(
       (user) => String(user.service_number) === String(serviceNumber) || String(user.serviceNum) === String(serviceNumber)

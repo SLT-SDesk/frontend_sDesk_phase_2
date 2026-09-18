@@ -102,7 +102,7 @@ const AdminMyAssignedIncidents = () => {
         return category ? category.grandchild_category_name : categoryNumber;
     };
 
-    const getUserName = (serviceNumber) => {
+    const getUserName = (serviceNumber, status = null) => {
         if (!Array.isArray(allUsers)) return serviceNumber;
         const user = allUsers.find(u => u.service_number === serviceNumber || u.serviceNum === serviceNumber);
         return user ? (user.display_name || user.user_name || user.name) : serviceNumber;
