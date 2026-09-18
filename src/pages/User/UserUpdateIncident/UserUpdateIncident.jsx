@@ -42,7 +42,7 @@ const UserUpdateIncident = ({ incidentData, isPopup, onClose, loggedInUser }) =>
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const getUserName = (serviceNumber) => {
+  const getUserName = (serviceNumber, status = null) => {
     const user = allUsers.find(u => u.service_number === serviceNumber || u.serviceNum === serviceNumber);
     return user ? user.display_name || user.user_name || user.name : serviceNumber;
   };
@@ -105,7 +105,7 @@ const UserUpdateIncident = ({ incidentData, isPopup, onClose, loggedInUser }) =>
         location: currentIncident.location,
         priority: currentIncident.priority,
         status: currentIncident.status,
-        assignedTo: getUserName(currentIncident.handler),
+        assignedTo: getUserName(currentIncident.handler, currentIncident.status),
         updateBy: getUserName(currentIncident.update_by),
         updatedOn: currentIncident.update_on || new Date().toLocaleString(),
         comments: currentIncident.description || 'No comments'

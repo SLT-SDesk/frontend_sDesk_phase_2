@@ -59,8 +59,12 @@ const AdminViewIncident = () => {
     return category ? category.grandchild_category_name : categoryNumber;
   };
 
-  const getUserName = (serviceNumber) => {
-    if (!serviceNumber || String(serviceNumber).trim() === '') return 'Unassigned';
+  const getUserName = (serviceNumber, status = null) => {
+    if (!serviceNumber || String(serviceNumber).trim() === '') {
+      if (status === "Pending Tier2 Assignment") return "Tier 2 Support";
+      if (status === "Pending Tier3 Assignment") return "Tier 3 Support";
+      return "Unassigned";
+    }
     if (!Array.isArray(users)) return serviceNumber;
     const foundUser = users.find(
       (user) => String(user.service_number) === String(serviceNumber) || String(user.serviceNum) === String(serviceNumber)
@@ -139,7 +143,7 @@ const AdminViewIncident = () => {
             </div>
             <div className="info-row">
               <span className="label">Assigned To:</span>
-              <span className="value">{getUserName(currentIncident.handler)}</span>
+              <span className="value">{getUserName(currentIncident.handler, currentIncident.status)}</span>
             </div>
             <div className="info-row">
               <span className="label">Category:</span>
