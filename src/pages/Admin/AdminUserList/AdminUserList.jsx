@@ -61,7 +61,7 @@ function AdminUserList() {
 
     const handleStatusChange = ({ serviceNum, active }) => {
       // 1. Update the online flag in Redux
-      dispatch(updateTechnicianOnlineStatus({ serviceNum, active }));
+      dispatch(updateTechnicianOnlineStatus({ serviceNum, isOnline: active }));
 
       // 2. Optionally refetch list so we don't rely on old cached data
       dispatch(fetchTechniciansRequest());
@@ -121,7 +121,7 @@ function AdminUserList() {
           cat3: getSubCategoryName(user.cat3),
           cat4: getSubCategoryName(user.cat4),
           active: Boolean(user.active),
-          isOnline: user.active,
+          isOnline: Boolean(user.isOnline),
 
           id: user.id,
         })),
@@ -321,7 +321,7 @@ function AdminUserList() {
                         style={{
                           height: "10px",
                           width: "10px",
-                          backgroundColor: user.isOnline
+                          backgroundColor: user.active
                             ? "#2de37d"
                             : "#ff4d4d",
                           borderRadius: "50%",
