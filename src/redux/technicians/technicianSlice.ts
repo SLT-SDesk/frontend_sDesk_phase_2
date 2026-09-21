@@ -7,7 +7,7 @@ const initialState = {
   activeTechnicians: [] as Technician[],
   technicianSessions: null as TechnicianSession | null,
   teamTechnicianSessions: [] as TeamTechnicianSessions[],
-   
+
   loading: false,
   error: null as string | null,
 };
@@ -18,42 +18,42 @@ const technicianSlice = createSlice({
   reducers: {
 
     // =====================
-// Technician Sessions
-// =====================
+    // Technician Sessions
+    // =====================
 
-fetchTechnicianSessionsRequest(state, action) {
-  state.loading = true;
-  state.error = null;
-},
+    fetchTechnicianSessionsRequest(state, action) {
+      state.loading = true;
+      state.error = null;
+    },
 
-fetchTechnicianSessionsSuccess(state, action) {
-  state.loading = false;
-  state.technicianSessions = action.payload;
-},
+    fetchTechnicianSessionsSuccess(state, action) {
+      state.loading = false;
+      state.technicianSessions = action.payload;
+    },
 
-fetchTechnicianSessionsFailure(state, action) {
-  state.loading = false;
-  state.error = action.payload;
-},
+    fetchTechnicianSessionsFailure(state, action) {
+      state.loading = false;
+      state.error = action.payload;
+    },
 
-// =====================
-// Team Sessions
-// =====================
+    // =====================
+    // Team Sessions
+    // =====================
 
-fetchTeamSessionsRequest(state, action) {
-  state.loading = true;
-  state.error = null;
-},
+    fetchTeamSessionsRequest(state, action) {
+      state.loading = true;
+      state.error = null;
+    },
 
-fetchTeamSessionsSuccess(state, action) {
-  state.loading = false;
-  state.teamTechnicianSessions = action.payload;
-},
+    fetchTeamSessionsSuccess(state, action) {
+      state.loading = false;
+      state.teamTechnicianSessions = action.payload;
+    },
 
-fetchTeamSessionsFailure(state, action) {
-  state.loading = false;
-  state.error = action.payload;
-},
+    fetchTeamSessionsFailure(state, action) {
+      state.loading = false;
+      state.error = action.payload;
+    },
 
     fetchTechniciansRequest(state, action) {
       state.loading = true;
@@ -114,26 +114,26 @@ fetchTeamSessionsFailure(state, action) {
       state.loading = false;
       state.error = action.payload;
     },
-     checkTechnicianStatusRequest(state) {
-    state.loading = true;
-    state.error = null;
-  },
-  checkTechnicianStatusSuccess(state, action) {
-    state.loading = false;
-    state.error = null;
-    // Optional: handle response if needed
-  },
-  checkTechnicianStatusFailure(state, action) {
-    state.loading = false;
-    state.error = action.payload;
-  },
-  
+    checkTechnicianStatusRequest(state) {
+      state.loading = true;
+      state.error = null;
+    },
+    checkTechnicianStatusSuccess(state, action) {
+      state.loading = false;
+      state.error = null;
+      // Optional: handle response if needed
+    },
+    checkTechnicianStatusFailure(state, action) {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
     // Re-add fetchActiveTechniciansRequest and related actions
     fetchActiveTechniciansRequest(state) {
       state.loading = true;
       state.error = null;
     },
-    fetchActiveTechniciansSuccess (state, action) {
+    fetchActiveTechniciansSuccess(state, action) {
       state.loading = false;
       state.error = null;
       state.activeTechnicians = action.payload;
@@ -146,9 +146,9 @@ fetchTeamSessionsFailure(state, action) {
     // NEW: Socket-based technician status management
     updateTechnicianOnlineStatus(state, action) {
       const { serviceNum, isOnline } = action.payload;
-      state.technicians = state.technicians.map(tech => 
-        tech.serviceNum === serviceNum 
-          ? { ...tech, active: isOnline }
+      state.technicians = state.technicians.map(tech =>
+        tech.serviceNum === serviceNum
+          ? { ...tech, isOnline }
           : tech
       );
     },
@@ -159,11 +159,11 @@ fetchTeamSessionsFailure(state, action) {
     forceLogoutTechnicianSuccess(state, action) {
       state.loading = false;
       state.error = null;
-      // Mark technician as inactive
+      // Mark technician as offline
       const { serviceNum } = action.payload;
-      state.technicians = state.technicians.map(tech => 
-        tech.serviceNum === serviceNum 
-          ? { ...tech, active: false }
+      state.technicians = state.technicians.map(tech =>
+        tech.serviceNum === serviceNum
+          ? { ...tech, isOnline: false }
           : tech
       );
     },
@@ -176,11 +176,11 @@ fetchTeamSessionsFailure(state, action) {
 
 export const {
   fetchTechnicianSessionsRequest,
-fetchTechnicianSessionsSuccess,
-fetchTechnicianSessionsFailure,
-fetchTeamSessionsRequest,
-fetchTeamSessionsSuccess,
-fetchTeamSessionsFailure,
+  fetchTechnicianSessionsSuccess,
+  fetchTechnicianSessionsFailure,
+  fetchTeamSessionsRequest,
+  fetchTeamSessionsSuccess,
+  fetchTeamSessionsFailure,
   fetchTechniciansRequest,
   fetchTechniciansSuccess,
   fetchTechniciansFailure,

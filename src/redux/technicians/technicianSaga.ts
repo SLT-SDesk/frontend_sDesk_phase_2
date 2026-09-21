@@ -82,6 +82,17 @@ function* handleFetchActiveTechnicians() {
 function* handleCreateTechnician(action: PayloadAction<Partial<Technician>>) {
     try {
         const response = yield call(createTechnician, action.payload);
+
+        // Workaround for backend POST ignoring the active field for new users.
+        // We do a PUT right after to ensure the status is properly set.
+        if (action.payload.serviceNum && action.payload.active !== undefined) {
+            try {
+                yield call(updateTechnician, action.payload.serviceNum, { active: action.payload.active });
+            } catch (updateError) {
+                console.warn("Failsafe to apply active status to new technician failed", updateError);
+            }
+        }
+
         yield put(createTechnicianSuccess({ ...response.data, ...action.payload }));
     } catch (error: any) {
         yield put(createTechnicianFailure(error.message));
