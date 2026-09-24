@@ -12,6 +12,7 @@ import TechnicianPerformance from "../../../components/TechnicianPerformance/Tec
 
 // popup
 import TechnicianDetailsPopup from "../../../components/Technician_details_popup/TechnicianPopup";
+import { ErrorBoundary } from "../../../components/ErrorBoundary";
 
 //incident slice
 import {
@@ -319,15 +320,17 @@ const SlaSettings = () => {
         <TechnicianPerformance dateRange={range} onRowClick={handleRowClick} />
 
         {/* Popup */}
-        <TechnicianDetailsPopup
-          isOpen={popupOpen}
-          onClose={() => {
-            console.log("Closing popup");
-            setPopupOpen(false);
-            setSelectedTechnician(null);
-          }}
-          technician={selectedTechnician}
-        />
+        <ErrorBoundary>
+          <TechnicianDetailsPopup
+            isOpen={popupOpen}
+            onClose={() => {
+              console.log("Closing popup");
+              setPopupOpen(false);
+              setSelectedTechnician(null);
+            }}
+            technician={selectedTechnician}
+          />
+        </ErrorBoundary>
       </div>
     </div>
   );
