@@ -19,6 +19,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   const [popupIncidents, setPopupIncidents] = useState([]);
   const [popupPerformances, setPopupPerformances] = useState([]);
   const [popupSessions, setPopupSessions] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const technicianServiceNumber = technician?.serviceNum || technician?.serviceNumber || null;
 
@@ -57,11 +58,11 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
   const filteredIncidents = useMemo(() => {
     return allAssignedIncidents.filter((incident) => {
       const incidentDateRaw =
-        incident.updatedAt ||
-        incident.updated_at ||
-        incident.update_on ||
-        incident.createdAt ||
-        incident.created_at;
+        incident?.updatedAt ||
+        incident?.updated_at ||
+        incident?.update_on ||
+        incident?.createdAt ||
+        incident?.created_at;
 
       if (!incidentDateRaw) return false;
 
@@ -79,6 +80,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
     let cancelled = false;
 
     const poll = async () => {
+      setLoading(true);
       try {
         const [incidentRes, perfRes, sessionRes] = await Promise.all([
           getIncidentsAssignedToMe(technicianServiceNumber),
@@ -94,6 +96,8 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
         }
       } catch (err) {
         console.error('Popup poll error:', err);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     };
 
@@ -218,7 +222,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
       selectedPriority === 'all'
         ? allAssignedIncidents
         : allAssignedIncidents.filter(
-          i => String(i.priority).toLowerCase() === selectedPriority
+          i => String(i?.priority || '').toLowerCase() === selectedPriority
         );
 
     let responseOnTime = 0;
@@ -230,14 +234,14 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
     let resolveMinutesSum = 0;
 
     incidentsToUse.forEach((incident) => {
-      const priority = incident.priority?.toLowerCase();
+      const priority = incident?.priority?.toLowerCase();
       const sla = SLA[priority];
       if (!sla) return;
 
-      let perf = performanceMap[incident.incident_number || incident.incidentNumber];
+      let perf = performanceMap[incident?.incident_number || incident?.incidentNumber];
 
       // Fallback
-      if (!perf && incident.responseTimeMinutes !== undefined) {
+      if (!perf && incident?.responseTimeMinutes !== undefined) {
         perf = {
           responseTimeMinutes: incident.responseTimeMinutes,
           resolutionTimeMinutes: incident.resolveTimeMinutes
@@ -320,9 +324,10 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
 
 
   const getInitials = (name) => {
-    return name
+    if (!name) return '';
+    return String(name)
       .split(' ')
-      .map(n => n[0])
+      .map(n => n[0] || '')
       .join('')
       .toUpperCase()
       .slice(0, 2);
@@ -468,7 +473,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                     <p className="mb-3 text-sm font-semibold text-gray-700">Critical</p>
                     <div className="flex items-center justify-center mx-auto text-lg font-bold text-white bg-red-500 rounded-full w-11 h-11">
                       {allAssignedIncidents.filter(
-                        i => String(i.priority).toLowerCase() === 'critical'
+                        i => String(i?.priority || '').toLowerCase() === 'critical'
                       ).length
                       }
                     </div>
@@ -481,7 +486,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                     <p className="mb-3 text-sm font-semibold text-gray-700">High</p>
                     <div className="flex items-center justify-center mx-auto text-lg font-bold text-white bg-orange-500 rounded-full w-11 h-11">
                       {allAssignedIncidents.filter(
-                        i => String(i.priority).toLowerCase() === 'high'
+                        i => String(i?.priority || '').toLowerCase() === 'high'
                       ).length}
                     </div>
                   </div>
@@ -493,7 +498,7 @@ const TechnicianDetailsPopup = ({ isOpen, onClose, technician }) => {
                     <p className="mb-3 text-sm font-semibold text-gray-700">Medium</p>
                     <div className="flex items-center justify-center mx-auto text-lg font-bold text-white bg-yellow-500 rounded-full w-11 h-11">
                       {allAssignedIncidents.filter(
-                        i => String(i.priority).toLowerCase() === 'medium'
+                        i => String(i?.priority || '').toLowerCase() === 'medium'
                       ).length}
                     </div>
                   </div>
