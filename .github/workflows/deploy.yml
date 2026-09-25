@@ -97,7 +97,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 3251
           script: |
-            BASE_DIR="/var/www/sdesk_new/frontend_sDesk_phase_2"
+            BASE_DIR="/opt/sdesk_new"
             TMP_SRC="/home/${{ secrets.SSH_USERNAME }}/sdesk_frontend_tmp"
 
             echo "Deploying new version to: $BASE_DIR"
