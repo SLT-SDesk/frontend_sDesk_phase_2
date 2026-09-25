@@ -1,4 +1,4 @@
-import { call, put, takeLatest } from "redux-saga/effects";
+import { call, put, takeLatest, delay } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 import {
     fetchTechnicianSessionsRequest,
@@ -87,6 +87,7 @@ function* handleCreateTechnician(action: PayloadAction<Partial<Technician>>) {
         // We do a PUT right after to ensure the status is properly set.
         if (action.payload.serviceNum && action.payload.active !== undefined) {
             try {
+                yield delay(1500); // Wait for the backend DB to fully commit the user creation
                 yield call(updateTechnician, action.payload.serviceNum, { active: action.payload.active });
             } catch (updateError) {
                 console.warn("Failsafe to apply active status to new technician failed", updateError);
