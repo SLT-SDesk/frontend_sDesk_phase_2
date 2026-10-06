@@ -170,7 +170,7 @@ function AdminUserList() {
       "Team": user.team,
       "Active": user.active ? "True" : "False",
       "Tier": user.tier,
-      "Position": user.position,
+      "Position": user.position === 'technician' ? 'Technical Officer' : user.position,
     }));
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
@@ -332,7 +332,7 @@ function AdminUserList() {
                       {user.active ? "True" : "False"}
                     </td>
                     <td>{user.tier}</td>
-                    <td>{user.position}</td>
+                    <td>{user.position === 'technician' ? 'Technical Officer' : user.position}</td>
                     <td>
                       <button
                         className="AdminUserList-table-edit-btn"

@@ -65,7 +65,7 @@ const Roster = () => {
     <div className="roster-container">
       <div className="roster-header">
         <div className="roster-title-section">
-          <h1><FaUsers className="title-icon" /> Technician Roster</h1>
+          <h1><FaUsers className="title-icon" /> Technical Officer Roster</h1>
           <p className="subtitle">Real-time status and availability of all technical officers</p>
         </div>
 
@@ -132,7 +132,7 @@ const Roster = () => {
           ))
         ) : (
           <div className="no-results">
-            <p>No technicians found matching your criteria.</p>
+            <p>No technical officers found matching your criteria.</p>
           </div>
         )}
       </div>
