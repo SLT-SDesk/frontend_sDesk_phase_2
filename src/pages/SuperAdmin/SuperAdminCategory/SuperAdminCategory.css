@@ -1,0 +1,207 @@
+.SuperAdminCategory-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 90vh;
+    background-color: #f3f4f6; /* light grey background */
+  }
+  
+  .SuperAdminCategory-direction-bar {
+    display: flex;
+    align-items: center;
+    background: #3f51b5; /* solid blue as per screenshot */
+    color: #e0e7ff; /* light text */
+    height: 48px;
+    padding-left: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0px 0px 20px 0px;
+  }
+  
+  .SuperAdminCategory-direction-bar strong {
+    color: white;
+    margin-left: 5px;
+  }
+  
+  .SuperAdminCategory-content2 {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+    background-color: white;
+    border-radius: 8px;
+    margin: 0 20px 20px 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .SuperAdminCategory-TitleBar {
+    display: flex;
+    flex-direction: row;
+    height: 70px;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .SuperAdminCategory-TitleBar-NameAndIcon {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: 24px;
+    gap: 12px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+  }
+  
+  .SuperAdminCategory-icon-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: #e0e7ff;
+    color: #4f46e5;
+    border-radius: 8px;
+  }
+  
+  .SuperAdminCategory-TitleBar-buttons-AddUser {
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+    border: none;
+    padding: 8px 16px;
+    margin-right: 24px;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    background-color: #ef4444; /* red color */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .SuperAdminCategory-TitleBar-buttons-AddUser:hover {
+    background-color: #dc2626;
+  }
+  
+  .SuperAdminCategory-controls {
+    display: flex;
+    flex-direction: row;
+    height: 60px;
+    align-items: center;
+    width: 100%;
+    background-color: white;
+    justify-content: space-between;
+    padding: 0 24px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .SuperAdminCategory-filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+  }
+  
+  .SuperAdminCategory-filters select {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background-color: white;
+    color: #111827;
+    font-size: 14px;
+    outline: none;
+    min-width: 100px;
+  }
+  
+  .SuperAdminCategory-search {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 6px 12px;
+    width: 250px;
+  }
+  
+  .SuperAdminCategory-search svg {
+    color: #9ca3af;
+    margin-right: 8px;
+  }
+  
+  .SuperAdminCategory-search input {
+    border: none;
+    outline: none;
+    font-size: 14px;
+    width: 100%;
+    color: #111827;
+  }
+  
+  .SuperAdminCategory-table-wrapper {
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .SuperAdminCategory-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+  
+  .SuperAdminCategory-table th {
+    background-color: #f3f4f6;
+    padding: 12px 24px;
+    font-weight: 600;
+    font-size: 13px;
+    color: #374151;
+    border-bottom: 2px solid #e5e7eb;
+  }
+  
+  .SuperAdminCategory-table td {
+    padding: 12px 24px;
+    font-size: 14px;
+    color: #4b5563;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .cat-id {
+    color: #2563eb;
+    font-weight: 600;
+  }
+  
+  .SuperAdminCategory-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 12px;
+    padding: 4px;
+  }
+  
+  .edit-btn {
+    color: #3b82f6;
+  }
+  
+  .edit-btn:hover {
+    color: #2563eb;
+  }
+  
+  .delete-btn {
+    color: #ef4444;
+  }
+  
+  .delete-btn:hover {
+    color: #dc2626;
+  }
+  
+  .SuperAdminCategory-footer {
+    padding: 16px 24px;
+    font-size: 13px;
+    color: #6b7280;
+    border-top: 1px solid #e5e7eb;
+    background-color: white;
+  }
