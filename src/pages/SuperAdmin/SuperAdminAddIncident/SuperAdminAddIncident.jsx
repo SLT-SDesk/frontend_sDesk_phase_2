@@ -197,11 +197,7 @@ const SuperAdminAddIncident = () => {
       return;
     }
 
-    // Generate unique incident number
-    const incidentNumber = `INC-${Date.now()}`;
-
     const incidentData = {
-      incident_number: incidentNumber,
       informant: formData.serviceNo, // Affected User's service number
       location: formData.location.name, // Use location name, not number
       handler: formData.serviceNo, // Affected User's service number as handler
