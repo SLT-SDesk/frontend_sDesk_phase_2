@@ -1,259 +1,327 @@
 import React, { useState } from "react";
 import "./AdminCategory.css";
-import { FaEdit, FaTrash, FaSearch } from "react-icons/fa";
-import { FaClipboardList } from "react-icons/fa";
-import { TiExportOutline } from "react-icons/ti";
-import { IoIosAddCircleOutline } from "react-icons/io";
-import AdminAddCategory from "../../../components/AdminAddCategory/AdminAddCategory";
-import ConfirmPopup from "../../../components/ConfirmPopup/ConfirmPopup";
-import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchCategoryItemsRequest,
-  deleteCategoryItemRequest,
-  fetchMainCategoriesRequest,
-} from "../../../redux/categories/categorySlice";
-import * as XLSX from "xlsx";
+  initialCategories,
+  defaultParentCategoryOptions,
+  defaultSubCategoryNameOptions,
+} from "./mockCategoryData";
+import CategoryListTable from "./CategoryListTable";
+import SubCategoryListTable from "./SubCategoryListTable";
+import EditCategoryModal from "./EditCategoryModal";
+import EditSubCategoryModal from "./EditSubCategoryModal";
+import DeleteCategoryModal from "./DeleteCategoryModal";
+import AddCategoryModal from "./AddCategoryModal";
+import AddSubCategoryModal from "./AddSubCategoryModal";
 
 const AdminCategory = () => {
-  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+  // Main Categories State
+  const [categories, setCategories] = useState(initialCategories);
+
+  // Active Category for Drill Down (Sub Categories view)
+  const [activeCategory, setActiveCategory] = useState(null);
+
+  // Modal States
   const [isEditCategoryOpen, setIsEditCategoryOpen] = useState(false);
-  const [editCategory, setEditCategory] = useState(null);
-  const [deleteConfirmPopup, setDeleteConfirmPopup] = useState(false);
-  const [deleteTargetID, setDeleteTargetID] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectShowOption, setSelectShowOption] = useState("All");
-  const [successMessage, setSuccessMessage] = useState("");
+  const [categoryToEdit, setCategoryToEdit] = useState(null);
 
-  const dispatch = useDispatch();
-  const categoryItems = useSelector((state) => state.categories.categoryItems);
-  const mainCategories = useSelector(
-    (state) => state.categories.mainCategories
+  const [isEditSubCategoryOpen, setIsEditSubCategoryOpen] = useState(false);
+  const [subCategoryToEdit, setSubCategoryToEdit] = useState(null);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null); // { type: 'category' | 'subcategory', data: ... }
+
+  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+  const [isAddSubCategoryOpen, setIsAddSubCategoryOpen] = useState(false);
+
+  // Toast / Feedback message
+  const [notification, setNotification] = useState(null);
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification(null);
+    }, 3500);
+  };
+
+  // Derive all unique parent category options
+  const parentOptions = Array.from(
+    new Set([
+      ...defaultParentCategoryOptions,
+      ...categories.map((c) => c.parentName).filter(Boolean),
+    ])
   );
 
-  React.useEffect(() => {
-    dispatch(fetchCategoryItemsRequest());
-    dispatch(fetchMainCategoriesRequest());
-  }, [dispatch]);
+  // --- Handlers for Main Category ---
+  const handleSelectCategory = (cat) => {
+    setActiveCategory(cat);
+  };
 
-  // Transform categoryItems for table display
-  const categories = categoryItems.map((item) => ({
-    catID: item.category_code,
-    categoryName: item.name,
-    subCategoryName: item.subCategory?.name || "",
-    parentCategoryName: item.subCategory?.mainCategory?.name || "",
-  }));
+  const handleBackToCategories = () => {
+    setActiveCategory(null);
+  };
 
-  // Get unique parent category names for dropdown (from mainCategories)
-  const parentCategoryOptions = Array.from(
-    new Set(mainCategories.map((cat) => cat.name).filter(Boolean))
-  );
+  const handleOpenEditCategory = (cat) => {
+    setCategoryToEdit(cat);
+    setIsEditCategoryOpen(true);
+  };
 
-  const handleEdit = (catID) => {
-    // Only allow editing for grandchild/category-item
-    const item = categoryItems.find((item) => item.category_code === catID);
-    if (item) {
-      setEditCategory({
-        id: item.id,
-        name: item.name,
-        parent: item.subCategory?.mainCategory?.id || "",
-        sub: item.subCategory?.id || "",
-        type: "grandchild",
-      });
-      setIsEditCategoryOpen(true);
+  const handleSaveEditCategory = (updatedData) => {
+    setCategories((prev) =>
+      prev.map((cat) =>
+        cat.id === categoryToEdit.id
+          ? { ...cat, id: updatedData.id, parentName: updatedData.parentName }
+          : cat
+      )
+    );
+
+    // If active category was edited, update activeCategory as well
+    if (activeCategory && activeCategory.id === categoryToEdit.id) {
+      setActiveCategory((prev) => ({
+        ...prev,
+        id: updatedData.id,
+        parentName: updatedData.parentName,
+      }));
     }
+
+    setIsEditCategoryOpen(false);
+    setCategoryToEdit(null);
+    showNotification("Category updated successfully!");
   };
 
-  const handleDelete = (catID) => {
-    setDeleteTargetID(catID);
-    setDeleteConfirmPopup(true);
+  const handleOpenDeleteCategory = (cat) => {
+    setDeleteTarget({ type: "category", data: cat });
+    setIsDeleteModalOpen(true);
   };
 
-  const confirmDelete = () => {
-    if (deleteTargetID) {
-      // Find the item by catID to get its DB id
-      const item = categoryItems.find(
-        (item) => item.category_code === deleteTargetID
-      );
-      if (item && item.id) {
-        dispatch(deleteCategoryItemRequest(item.id));
-        setSuccessMessage("Category item deleted successfully!");
-        setTimeout(() => setSuccessMessage(""), 3000);
+  const handleAddCategory = (newCat) => {
+    setCategories((prev) => [...prev, newCat]);
+    setIsAddCategoryOpen(false);
+    showNotification(`Category ${newCat.id} added successfully!`);
+  };
+
+  // --- Handlers for Sub Category ---
+  const handleOpenEditSubCategory = (subCat) => {
+    setSubCategoryToEdit(subCat);
+    setIsEditSubCategoryOpen(true);
+  };
+
+  const handleSaveEditSubCategory = (updatedData) => {
+    if (!activeCategory) return;
+
+    const updatedSubCategories = (activeCategory.subCategories || []).map(
+      (sub) =>
+        sub.id === subCategoryToEdit.id
+          ? { ...sub, id: updatedData.id, name: updatedData.name }
+          : sub
+    );
+
+    const updatedParent = {
+      ...activeCategory,
+      subCategories: updatedSubCategories,
+    };
+
+    setActiveCategory(updatedParent);
+    setCategories((prev) =>
+      prev.map((cat) => (cat.id === activeCategory.id ? updatedParent : cat))
+    );
+
+    setIsEditSubCategoryOpen(false);
+    setSubCategoryToEdit(null);
+    showNotification("Sub-category updated successfully!");
+  };
+
+  const handleOpenDeleteSubCategory = (subCat) => {
+    setDeleteTarget({ type: "subcategory", data: subCat });
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleAddSubCategory = (newSubCat) => {
+    if (!activeCategory) return;
+
+    const updatedSubCategories = [
+      ...(activeCategory.subCategories || []),
+      newSubCat,
+    ];
+
+    const updatedParent = {
+      ...activeCategory,
+      subCategories: updatedSubCategories,
+    };
+
+    setActiveCategory(updatedParent);
+    setCategories((prev) =>
+      prev.map((cat) => (cat.id === activeCategory.id ? updatedParent : cat))
+    );
+
+    setIsAddSubCategoryOpen(false);
+    showNotification(`Sub-category ${newSubCat.id} added successfully!`);
+  };
+
+  // --- Confirm Delete Handler ---
+  const handleConfirmDelete = () => {
+    if (!deleteTarget) return;
+
+    if (deleteTarget.type === "category") {
+      const targetId = deleteTarget.data.id;
+      setCategories((prev) => prev.filter((c) => c.id !== targetId));
+      if (activeCategory && activeCategory.id === targetId) {
+        setActiveCategory(null);
       }
+      showNotification("Category deleted successfully!");
+    } else if (deleteTarget.type === "subcategory") {
+      const subTargetId = deleteTarget.data.id;
+      if (activeCategory) {
+        const updatedSubs = (activeCategory.subCategories || []).filter(
+          (s) => s.id !== subTargetId
+        );
+        const updatedParent = {
+          ...activeCategory,
+          subCategories: updatedSubs,
+        };
+        setActiveCategory(updatedParent);
+        setCategories((prev) =>
+          prev.map((cat) =>
+            cat.id === activeCategory.id ? updatedParent : cat
+          )
+        );
+      }
+      showNotification("Sub-category deleted successfully!");
     }
-    setDeleteConfirmPopup(false);
-    setDeleteTargetID(null);
+
+    setIsDeleteModalOpen(false);
+    setDeleteTarget(null);
   };
 
-  const handleChange = (e) => {
-    setSelectShowOption(e.target.value);
-  };
-
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handleExport = () => {
-    // Prepare data for export (use filteredCategories for current view, or categories for all)
-    const exportData = filteredCategories.map((row) => ({
-      "CAT ID": row.catID,
-      "Category Name": row.categoryName,
-      "Sub Category Name": row.subCategoryName,
-      "Parent Category Name": row.parentCategoryName,
-    }));
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Categories");
-    XLSX.writeFile(workbook, "categories.xlsx");
-  };
-
-  const filteredCategories = categories.filter((category) => {
-    const matchesSearch =
-      category.catID.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      category.categoryName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      category.subCategoryName
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      category.parentCategoryName
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-    const matchesFilter =
-      selectShowOption === "All" ||
-      category.parentCategoryName === selectShowOption;
-    return matchesSearch && matchesFilter;
-  });
+  // Compute next suggested IDs
+  const nextCategoryId = `CAT${String(categories.length + 4).padStart(3, "0")}`;
+  const nextSubCategoryId = activeCategory
+    ? `${activeCategory.id}#${(activeCategory.subCategories?.length || 0) + 1}`
+    : "CAT004#1";
 
   return (
-    <div className="AdminCategory-main-content">
-      <div className="AdminCategory-direction-bar">Category List</div>
-      <div className="AdminCategory-content2">
-        <div className="AdminCategory-TitleBar">
-          <div className="AdminCategory-TitleBar-NameAndIcon">
-            <FaClipboardList size={20} />
-            Category List
-          </div>
-          <div className="AdminCategory-TitleBar-buttons">
-            <button
-              className="AdminCategory-TitleBar-buttons-AddUser"
-              onClick={() => setIsAddCategoryOpen(true)}
-            >
-              <IoIosAddCircleOutline />
-              Add Category
-            </button>
-            <button
-              className="AdminCategory-TitleBar-buttons-ExportData"
-              onClick={handleExport}
-            >
-              <TiExportOutline />
-              Export Data
-            </button>
-          </div>
-        </div>
-        <div className="AdminCategory-showSearchBar">
-          <div className="AdminCategory-showSearchBar-Show">
-            Show
-            <select
-              className="AdminCategory-showSearchBar-Show-select"
-              value={selectShowOption}
-              onChange={handleChange}
-            >
-              <option value="All">All</option>
-              {parentCategoryOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="AdminCategory-showSearchBar-SearchBar">
-            <FaSearch />
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={handleSearch}
-              className="AdminCategory-showSearchBar-SearchBar-input"
-            />
-          </div>
-        </div>
-        <div className="AdminCategory-table">
-          <table>
-            <thead>
-              <tr>
-                <th>CAT ID</th>
-                <th>Category Name</th>
-                <th>Sub Category Name</th>
-                <th>Parent Category Name</th>
-                <th>Options</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCategories.length > 0 ? (
-                filteredCategories.map((category) => (
-                  <tr key={category.catID}>
-                    <td>{category.catID}</td>
-                    <td>{category.categoryName}</td>
-                    <td>{category.subCategoryName}</td>
-                    <td>{category.parentCategoryName}</td>
-                    <td>
-                      <button
-                        className="AdminCategory-table-edit-btn"
-                        onClick={() => handleEdit(category.catID)}
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        className="AdminCategory-table-delete-btn"
-                        onClick={() => handleDelete(category.catID)}
-                      >
-                        <FaTrash />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" style={{ textAlign: "center" }}>
-                    No categories found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+    <div className="AdminCategory-main-wrapper">
+      {/* Direction Bar matching Figma */}
+      <div className="AdminCategory-direction-bar">
+        <span
+          className="breadcrumb-parent"
+          onClick={handleBackToCategories}
+        >
+          Home
+        </span>
+        <span>&gt;</span>
+        <span
+          className={activeCategory ? "breadcrumb-parent" : "breadcrumb-current"}
+          onClick={handleBackToCategories}
+        >
+          Category List
+        </span>
+        {activeCategory && (
+          <>
+            <span>&gt;</span>
+            <span className="breadcrumb-current">
+              {activeCategory.parentName}
+            </span>
+          </>
+        )}
       </div>
-      {isAddCategoryOpen && (
-        <AdminAddCategory
-          onClose={() => setIsAddCategoryOpen(false)}
-          onSubmit={() => {
-            // TODO: handle new category with real data
-            setSuccessMessage("Parent category added successfully!");
-            setTimeout(() => setSuccessMessage(""), 3000);
-          }}
-        />
-      )}
-      {isEditCategoryOpen && (
-        <AdminAddCategory
-          isEdit
-          editCategory={editCategory}
-          onClose={() => setIsEditCategoryOpen(false)}
-          onSubmit={() => {
-            setIsEditCategoryOpen(false);
-          }}
-        />
-      )}
-      {deleteConfirmPopup && (
-        <ConfirmPopup
-          message={`Are you sure you want to delete this category?`}
-          onConfirm={confirmDelete}
-          onCancel={() => {
-            setDeleteConfirmPopup(false);
-            setDeleteTargetID(null);
-          }}
-        />
-      )}
-      {successMessage && (
-        <div className="AdminCategory-success-message">{successMessage}</div>
-      )}
+
+      <div className="AdminCategory-content-container">
+        {/* Toast Notification */}
+        {notification && (
+          <div className="fixed top-14 right-6 z-60 animate-toast">
+            <div className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2.5 rounded-lg shadow-lg text-sm font-medium">
+              <span>✓</span>
+              <span>{notification.message}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Views */}
+        {!activeCategory ? (
+          /* Main Category View (Image 1) */
+          <CategoryListTable
+            categories={categories}
+            parentOptions={parentOptions}
+            onSelectCategory={handleSelectCategory}
+            onEditCategory={handleOpenEditCategory}
+            onDeleteCategory={handleOpenDeleteCategory}
+            onAddCategory={() => setIsAddCategoryOpen(true)}
+          />
+        ) : (
+          /* Sub Category View (Image 4) */
+          <SubCategoryListTable
+            parentCategory={activeCategory}
+            onBack={handleBackToCategories}
+            onEditSubCategory={handleOpenEditSubCategory}
+            onDeleteSubCategory={handleOpenDeleteSubCategory}
+            onAddSubCategory={() => setIsAddSubCategoryOpen(true)}
+          />
+        )}
+      </div>
+
+      {/* Edit Category Modal (Image 2) */}
+      <EditCategoryModal
+        isOpen={isEditCategoryOpen}
+        onClose={() => {
+          setIsEditCategoryOpen(false);
+          setCategoryToEdit(null);
+        }}
+        category={categoryToEdit}
+        parentOptions={parentOptions}
+        onSave={handleSaveEditCategory}
+      />
+
+      {/* Edit Sub Category Modal (Image 5) */}
+      <EditSubCategoryModal
+        isOpen={isEditSubCategoryOpen}
+        onClose={() => {
+          setIsEditSubCategoryOpen(false);
+          setSubCategoryToEdit(null);
+        }}
+        parentCategoryName={activeCategory?.parentName || "IT Help Desk"}
+        subCategory={subCategoryToEdit}
+        subCategoryOptions={defaultSubCategoryNameOptions}
+        onSave={handleSaveEditSubCategory}
+      />
+
+      {/* Delete Confirmation Modal (Image 3) */}
+      <DeleteCategoryModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeleteTarget(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title={
+          deleteTarget?.type === "subcategory"
+            ? "Delete Category?"
+            : "Delete Category?"
+        }
+        message={
+          deleteTarget?.type === "subcategory"
+            ? "Are you sure you want to delete this category? This action cannot be undone."
+            : "Are you sure you want to delete this category? This action cannot be undone."
+        }
+      />
+
+      {/* Add Category Modal */}
+      <AddCategoryModal
+        isOpen={isAddCategoryOpen}
+        onClose={() => setIsAddCategoryOpen(false)}
+        parentOptions={parentOptions}
+        onAdd={handleAddCategory}
+        suggestedId={nextCategoryId}
+      />
+
+      {/* Add Sub Category Modal */}
+      <AddSubCategoryModal
+        isOpen={isAddSubCategoryOpen}
+        onClose={() => setIsAddSubCategoryOpen(false)}
+        parentCategoryName={activeCategory?.parentName || "IT Help Desk"}
+        onAdd={handleAddSubCategory}
+        suggestedId={nextSubCategoryId}
+        options={defaultSubCategoryNameOptions}
+      />
     </div>
   );
 };
