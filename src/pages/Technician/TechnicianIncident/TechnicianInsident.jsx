@@ -286,54 +286,100 @@ const TechnicianInsident = ({
 
 
 
-    // Create FormData for multipart form submission
-    const formData = new FormData();
+    const statusValue = updateStatusData.status || currentIncident.status;
+    const priorityValue = updateStatusData.priority || currentIncident.priority;
+    const informantValue = currentIncident.informant;
+    const locationValue = updateStatusData.location || currentIncident.location;
+    const categoryValue = updateStatusData.category || currentIncident.category;
 
-    // Add incident data
-    if (updateStatusData.category) formData.append('category', updateStatusData.category);
-    if (updateStatusData.location) formData.append('location', updateStatusData.location);
-    if (updateStatusData.priority) formData.append('priority', updateStatusData.priority);
-    if (updateStatusData.status) formData.append('status', updateStatusData.status);
+    if (!updateStatusData.selectedFile) {
+      // No attachment, send as JSON
+      const jsonPayload = {};
+      if (categoryValue) jsonPayload.category = categoryValue;
+      if (locationValue) jsonPayload.location = locationValue;
 
-    // Handle transfer logics
-    if (updateStatusData.transferTo) {
-      if (updateStatusData.transferTo === 'tier2-auto') {
-        // Set the automaticallyAssignForTier2 flag for backend
-        formData.append('automaticallyAssignForTier2', 'true');
-      } else if (updateStatusData.transferTo === 'tier3-auto') {
-        // Set the automaticallyAssignForTier3 flag for backend
-        formData.append('automaticallyAssignForTier3', 'true');
-      } else if (updateStatusData.transferTo === 'teamadmin') {
-        // Set the assignForTeamAdmin flag for backend
-        formData.append('assignForTeamAdmin', 'true');
-      } else {
-        // Set specific technician as handler
-        formData.append('handler', updateStatusData.transferTo);
+      jsonPayload.priority = priorityValue;
+      jsonPayload.status = statusValue;
+      if (informantValue) {
+        jsonPayload.informant = informantValue;
       }
-    }
 
-    if (updateStatusData.description) formData.append('description', updateStatusData.description);
-    if (updateStatusData.updatedBy) formData.append('update_by', updateStatusData.updatedBy);
+      // Handle transfer logics
+      if (updateStatusData.transferTo) {
+        if (updateStatusData.transferTo === 'tier2-auto') {
+          jsonPayload.automaticallyAssignForTier2 = true;
+        } else if (updateStatusData.transferTo === 'tier3-auto') {
+          jsonPayload.automaticallyAssignForTier3 = true;
+        } else if (updateStatusData.transferTo === 'teamadmin') {
+          jsonPayload.assignForTeamAdmin = true;
+        } else {
+          jsonPayload.handler = updateStatusData.transferTo;
+        }
+      }
 
-    // Add attachment if present
-    if (updateStatusData.selectedFile) {
+      if (updateStatusData.description) jsonPayload.description = updateStatusData.description;
+      if (updateStatusData.updatedBy) jsonPayload.update_by = updateStatusData.updatedBy;
+
+      console.log("TechnicianInsident: Dispatching JSON update for incident_number:", currentIncident.incident_number, jsonPayload);
+
+      dispatch({
+        type: "incident/updateIncidentRequest",
+        payload: {
+          incident_number: currentIncident.incident_number,
+          data: jsonPayload,
+        },
+      });
+    } else {
+      // Create FormData for multipart form submission
+      const formData = new FormData();
+
+      // Add incident data
+      if (categoryValue) formData.append('category', categoryValue);
+      if (locationValue) formData.append('location', locationValue);
+
+      formData.append('priority', priorityValue);
+      formData.append('status', statusValue);
+      if (informantValue) {
+        formData.append('informant', informantValue);
+      }
+
+      // Handle transfer logics
+      if (updateStatusData.transferTo) {
+        if (updateStatusData.transferTo === 'tier2-auto') {
+          // Set the automaticallyAssignForTier2 flag for backend
+          formData.append('automaticallyAssignForTier2', 'true');
+        } else if (updateStatusData.transferTo === 'tier3-auto') {
+          // Set the automaticallyAssignForTier3 flag for backend
+          formData.append('automaticallyAssignForTier3', 'true');
+        } else if (updateStatusData.transferTo === 'teamadmin') {
+          // Set the assignForTeamAdmin flag for backend
+          formData.append('assignForTeamAdmin', 'true');
+        } else {
+          // Set specific technician as handler
+          formData.append('handler', updateStatusData.transferTo);
+        }
+      }
+
+      if (updateStatusData.description) formData.append('description', updateStatusData.description);
+      if (updateStatusData.updatedBy) formData.append('update_by', updateStatusData.updatedBy);
+
       formData.append('file', updateStatusData.selectedFile);
-    }
 
-    console.log("TechnicianInsident: Dispatching update for incident_number:", currentIncident.incident_number);
-    // Log formData contents
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ', ' + pair[1]);
-    }
+      console.log("TechnicianInsident: Dispatching FormData update for incident_number:", currentIncident.incident_number);
+      // Log formData contents
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ', ' + pair[1]);
+      }
 
-    // Dispatch Redux action to update incident with attachment
-    dispatch({
-      type: "incident/updateIncidentWithAttachmentRequest",
-      payload: {
-        incident_number: currentIncident.incident_number,
-        formData: formData,
-      },
-    });
+      // Dispatch Redux action to update incident with attachment
+      dispatch({
+        type: "incident/updateIncidentWithAttachmentRequest",
+        payload: {
+          incident_number: currentIncident.incident_number,
+          formData: formData,
+        },
+      });
+    }
 
     // Track if the update was a transfer
     setLastUpdateWasTransfer(!!updateStatusData.transferTo);
