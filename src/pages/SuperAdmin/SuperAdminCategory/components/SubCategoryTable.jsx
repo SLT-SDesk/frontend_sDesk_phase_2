@@ -11,10 +11,8 @@ import {
 /**
  * SubCategoryTable - Child component rendering table headers and list of subcategories
  * @param {Array} items - List of subcategories
- * @param {function} onEdit - Edit handler passed down to row
- * @param {function} onDelete - Delete handler passed down to row
  */
-const SubCategoryTable = ({ items = [], onEdit, onDelete }) => {
+const SubCategoryTable = ({ items = [] }) => {
     return (
         <TableWrapper>
             <Table>
@@ -31,8 +29,6 @@ const SubCategoryTable = ({ items = [], onEdit, onDelete }) => {
                             <SubCategoryRow
                                 key={subCat.id}
                                 item={subCat}
-                                onEdit={onEdit}
-                                onDelete={onDelete}
                             />
                         ))
                     ) : (

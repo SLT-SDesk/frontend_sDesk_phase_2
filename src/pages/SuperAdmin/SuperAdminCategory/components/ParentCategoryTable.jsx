@@ -14,8 +14,8 @@ import {
  * ParentCategoryTable - Child component for displaying parent categories list
  * @param {Array} items - List of parent categories
  * @param {function} onSelectParent - Callback when clicking a parent category to drilldown
- * @param {function} onEdit - Edit handler
- * @param {function} onDelete - Delete handler
+ * @param {function} onEdit - Callback when clicking edit icon
+ * @param {function} onDelete - Callback when clicking delete icon
  */
 const ParentCategoryTable = ({
     items = [],
@@ -57,7 +57,7 @@ const ParentCategoryTable = ({
                                         title="Edit Category"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            onEdit && onEdit(cat);
+                                            if (onEdit) onEdit(cat);
                                         }}
                                     >
                                         <FiEdit2 strokeWidth={2.5} size={15} />
@@ -67,7 +67,7 @@ const ParentCategoryTable = ({
                                         title="Delete Category"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            onDelete && onDelete(cat);
+                                            if (onDelete) onDelete(cat);
                                         }}
                                     >
                                         <FiTrash2 strokeWidth={2.5} size={15} />

@@ -13,6 +13,7 @@ import SubCategoryTable from "./components/SubCategoryTable";
 import ParentCategoryTable from "./components/ParentCategoryTable";
 import CategoryFooter from "./components/CategoryFooter";
 import SubCategoryModal from "./components/SubCategoryModal";
+import EditCategoryModal from "./components/EditCategoryModal";
 
 // Initial mock dataset matching user's design & dataset
 const INITIAL_PARENT_CATEGORIES = [
@@ -73,6 +74,8 @@ const SuperAdminCategory = () => {
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingSubCategory, setEditingSubCategory] = useState(null);
+    const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
+    const [editingCategory, setEditingCategory] = useState(null);
 
     // Current selected parent object
     const currentParent = useMemo(() => {
@@ -194,6 +197,23 @@ const SuperAdminCategory = () => {
         });
     };
 
+    // Handler: Open Edit Category Modal
+    const handleOpenEditCategory = (category) => {
+        setEditingCategory(category);
+        setIsEditCategoryModalOpen(true);
+    };
+
+    // Handler: Save Edited Category
+    const handleSaveEditedCategory = (updatedCat) => {
+        setParentCategories((prev) =>
+            prev.map((c) =>
+                c.id === (editingCategory?.id || updatedCat.id)
+                    ? { ...c, id: updatedCat.id, name: updatedCat.name }
+                    : c
+            )
+        );
+    };
+
     return (
         <CategoryContainer>
             {/* Direction Bar / Breadcrumbs */}
@@ -243,15 +263,12 @@ const SuperAdminCategory = () => {
                 {isSubCategoryView ? (
                     <SubCategoryTable
                         items={displayedSubCategories}
-                        onEdit={handleEditClick}
-                        onDelete={handleDeleteClick}
                     />
                 ) : (
                     <ParentCategoryTable
                         items={displayedParentCategories}
                         onSelectParent={handleSelectParentRow}
-                        onEdit={(cat) => alert(`Edit parent category: ${cat.name}`)}
-                        onDelete={(cat) => alert(`Delete parent category: ${cat.name}`)}
+                        onEdit={handleOpenEditCategory}
                     />
                 )}
 
@@ -278,6 +295,15 @@ const SuperAdminCategory = () => {
                 onSave={handleSaveSubCategory}
                 parentCategoryName={currentParent ? currentParent.name : ""}
                 initialData={editingSubCategory}
+            />
+
+            {/* Child Component: Edit Parent Category Modal matching screenshot */}
+            <EditCategoryModal
+                isOpen={isEditCategoryModalOpen}
+                onClose={() => setIsEditCategoryModalOpen(false)}
+                onSave={handleSaveEditedCategory}
+                category={editingCategory}
+                parentOptions={["IT Help Desk", "Facilities", "HR Services", "OLD Categories"]}
             />
         </CategoryContainer>
     );
