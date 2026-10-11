@@ -14,6 +14,8 @@ import ParentCategoryTable from "./components/ParentCategoryTable";
 import CategoryFooter from "./components/CategoryFooter";
 import SubCategoryModal from "./components/SubCategoryModal";
 import EditCategoryModal from "./components/EditCategoryModal";
+import DeleteCategoryModal from "./components/DeleteCategoryModal";
+import ParentCategoryDeleteErrorModal from "./components/ParentCategoryDeleteErrorModal";
 
 // Initial mock dataset matching user's design & dataset
 const INITIAL_PARENT_CATEGORIES = [
@@ -68,7 +70,7 @@ const SuperAdminCategory = () => {
     // or can be switched to any parent category / all categories
     const [parentCategories, setParentCategories] = useState(INITIAL_PARENT_CATEGORIES);
     const [subCategoriesMap, setSubCategoriesMap] = useState(INITIAL_SUBCATEGORIES_MAP);
-    const [selectedParentId, setSelectedParentId] = useState("CAT004"); // Default: IT Help Desk
+    const [selectedParentId, setSelectedParentId] = useState(null); // Default: null (shows Category List)
     const [searchQuery, setSearchQuery] = useState("");
 
     // Modal State
@@ -76,6 +78,9 @@ const SuperAdminCategory = () => {
     const [editingSubCategory, setEditingSubCategory] = useState(null);
     const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
+    const [isDeleteCategoryModalOpen, setIsDeleteCategoryModalOpen] = useState(false);
+    const [isDeleteErrorModalOpen, setIsDeleteErrorModalOpen] = useState(false);
+    const [categoryToDelete, setCategoryToDelete] = useState(null);
 
     // Current selected parent object
     const currentParent = useMemo(() => {
@@ -214,6 +219,18 @@ const SuperAdminCategory = () => {
         );
     };
 
+    // Handler: Open Delete Category Modal (Step 1: Confirmation)
+    const handleOpenDeleteCategory = (category) => {
+        setCategoryToDelete(category);
+        setIsDeleteCategoryModalOpen(true);
+    };
+
+    // Handler: Confirm Delete Category (Step 2: Trigger Delete Unsuccessful popup)
+    const handleConfirmDeleteCategory = (category) => {
+        setIsDeleteCategoryModalOpen(false);
+        setIsDeleteErrorModalOpen(true);
+    };
+
     return (
         <CategoryContainer>
             {/* Direction Bar / Breadcrumbs */}
@@ -269,6 +286,7 @@ const SuperAdminCategory = () => {
                         items={displayedParentCategories}
                         onSelectParent={handleSelectParentRow}
                         onEdit={handleOpenEditCategory}
+                        onDelete={handleOpenDeleteCategory}
                     />
                 )}
 
@@ -304,6 +322,22 @@ const SuperAdminCategory = () => {
                 onSave={handleSaveEditedCategory}
                 category={editingCategory}
                 parentOptions={["IT Help Desk", "Facilities", "HR Services", "OLD Categories"]}
+            />
+
+            {/* Child Component: Delete Parent Category Modal matching screenshot */}
+            <DeleteCategoryModal
+                isOpen={isDeleteCategoryModalOpen}
+                onClose={() => setIsDeleteCategoryModalOpen(false)}
+                onConfirm={handleConfirmDeleteCategory}
+                category={categoryToDelete}
+            />
+
+            {/* Child Component: Parent Category Delete Unsuccessfully Modal matching screenshot */}
+            <ParentCategoryDeleteErrorModal
+                isOpen={isDeleteErrorModalOpen}
+                onClose={() => setIsDeleteErrorModalOpen(false)}
+                title="Parent Category Delete Unsuccessfully"
+                message="The Parent Category could not be deleted."
             />
         </CategoryContainer>
     );
