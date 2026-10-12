@@ -1,11 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./AdminCategory.css";
 import { FaEdit, FaTrash, FaSearch } from "react-icons/fa";
 import { FaClipboardList } from "react-icons/fa";
 import { TiExportOutline } from "react-icons/ti";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import AdminAddCategory from "../../../components/AdminAddCategory/AdminAddCategory";
-import ConfirmPopup from "../../../components/ConfirmPopup/ConfirmPopup";
+import SubCategoryDeleteModal from "../../SuperAdmin/SubCategory/SubCategoryDeleteModal";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchCategoryItemsRequest,
@@ -15,6 +16,7 @@ import {
 import * as XLSX from "xlsx";
 
 const AdminCategory = () => {
+  const navigate = useNavigate();
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [isEditCategoryOpen, setIsEditCategoryOpen] = useState(false);
   const [editCategory, setEditCategory] = useState(null);
@@ -190,7 +192,16 @@ const AdminCategory = () => {
               {filteredCategories.length > 0 ? (
                 filteredCategories.map((category) => (
                   <tr key={category.catID}>
-                    <td>{category.catID}</td>
+                    <td
+                      style={{ cursor: "pointer", color: "#2563EB" }}
+                      onClick={() =>
+                        navigate("/superAdmin/SubCategory", {
+                          state: { parentCategory: category.parentCategoryName || category.categoryName },
+                        })
+                      }
+                    >
+                      {category.catID}
+                    </td>
                     <td>{category.categoryName}</td>
                     <td>{category.subCategoryName}</td>
                     <td>{category.parentCategoryName}</td>
@@ -241,16 +252,15 @@ const AdminCategory = () => {
           }}
         />
       )}
-      {deleteConfirmPopup && (
-        <ConfirmPopup
-          message={`Are you sure you want to delete this category?`}
-          onConfirm={confirmDelete}
-          onCancel={() => {
-            setDeleteConfirmPopup(false);
-            setDeleteTargetID(null);
-          }}
-        />
-      )}
+      <SubCategoryDeleteModal
+        open={deleteConfirmPopup}
+        onClose={() => {
+          setDeleteConfirmPopup(false);
+          setDeleteTargetID(null);
+        }}
+        onConfirm={confirmDelete}
+        categoryName={deleteTargetID}
+      />
       {successMessage && (
         <div className="AdminCategory-success-message">{successMessage}</div>
       )}
