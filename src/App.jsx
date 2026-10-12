@@ -42,6 +42,8 @@ import MainDashboard from "./pages/MainDashboard/MainDashboard.jsx";
 import KPIReport from "./pages/Admin/KPIHelpdesk/KPIReport.jsx";
 import SlaSettings from './pages/Admin/SlaSettings/SlaSettings.jsx';
 import Roster from "./pages/Admin/Roster/Roster.jsx";
+import SubCategory from "./pages/SuperAdmin/SubCategory/SubCategory.jsx";
+
 
 
 
@@ -127,6 +129,8 @@ function App() {
               />
               <Route path="sla-settings" element={<SlaSettings />} />
               <Route path="roster" element={<Roster />} />
+              <Route path="SubCategory" element={<SubCategory />} />
+
             </Route>
           </Route>
 
