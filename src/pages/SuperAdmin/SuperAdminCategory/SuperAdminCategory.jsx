@@ -11,11 +11,18 @@ import CategoryTitleBar from "./components/CategoryTitleBar";
 import CategoryControls from "./components/CategoryControls";
 import SubCategoryTable from "./components/SubCategoryTable";
 import ParentCategoryTable from "./components/ParentCategoryTable";
+import CategoryItemTable from "./components/CategoryItemTable";
 import CategoryFooter from "./components/CategoryFooter";
 import SubCategoryModal from "./components/SubCategoryModal";
 import EditCategoryModal from "./components/EditCategoryModal";
 import DeleteCategoryModal from "./components/DeleteCategoryModal";
 import ParentCategoryDeleteErrorModal from "./components/ParentCategoryDeleteErrorModal";
+import EditSubCategoryModal from "./components/EditSubCategoryModal";
+import DeleteSubCategoryModal from "./components/DeleteSubCategoryModal";
+import AddSubCategoryModal from "./components/AddSubCategoryModal";
+import EditCategoryItemModal from "./components/EditCategoryItemModal";
+import DeleteCategoryItemModal from "./components/DeleteCategoryItemModal";
+import AddCategoryItemModal from "./components/AddCategoryItemModal";
 
 // Initial mock dataset matching user's design & dataset
 const INITIAL_PARENT_CATEGORIES = [
@@ -60,6 +67,41 @@ const INITIAL_SUBCATEGORIES_MAP = {
     ],
 };
 
+const INITIAL_CATEGORY_ITEMS_MAP = {
+    "CAT004#1": [
+        { id: "CAT004#1/1", name: "E-Mail Not Receiving" },
+        { id: "CAT004#1/2", name: "E-Mail Backup Required" },
+        { id: "CAT004#1/3", name: "E-Mail Common Account password" },
+        { id: "CAT004#1/4", name: "E-Mail Lost" },
+        { id: "CAT004#1/5", name: "MailBox Filled" },
+        { id: "CAT004#1/6", name: "New Email Account" },
+        { id: "CAT004#1/7", name: "Email-TAB/Phone Configuration" },
+        { id: "CAT004#1/8", name: "Outlook Patch Update" },
+        { id: "CAT004#1/9", name: "Email Not Working" },
+    ],
+    "CAT004#2": [
+        { id: "CAT004#2/1", name: "Cashiering System Login" },
+        { id: "CAT004#2/2", name: "Cashiering Hardware Issue" },
+        { id: "CAT004#2/3", name: "Cashiering Software Error" },
+    ],
+    "CAT004#3": [
+        { id: "CAT004#3/1", name: "Laptop Issue" },
+        { id: "CAT004#3/2", name: "Desktop Issue" },
+        { id: "CAT004#3/3", name: "Printer Issue" },
+        { id: "CAT004#3/4", name: "Monitor Issue" },
+    ],
+    "CAT004#4": [
+        { id: "CAT004#4/1", name: "Software Installation" },
+        { id: "CAT004#4/2", name: "Software Update" },
+        { id: "CAT004#4/3", name: "License Issue" },
+    ],
+    "CAT004#5": [
+        { id: "CAT004#5/1", name: "Network Down" },
+        { id: "CAT004#5/2", name: "Slow Internet" },
+        { id: "CAT004#5/3", name: "Wi-Fi Not Working" },
+    ],
+};
+
 /**
  * SuperAdminCategory - Parent Component
  * Coordinates state management, filtering, and props passing to child components.
@@ -70,11 +112,25 @@ const SuperAdminCategory = () => {
     // or can be switched to any parent category / all categories
     const [parentCategories, setParentCategories] = useState(INITIAL_PARENT_CATEGORIES);
     const [subCategoriesMap, setSubCategoriesMap] = useState(INITIAL_SUBCATEGORIES_MAP);
+    const [categoryItemsMap, setCategoryItemsMap] = useState(INITIAL_CATEGORY_ITEMS_MAP);
     const [selectedParentId, setSelectedParentId] = useState(null); // Default: null (shows Category List)
+    const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null); // Tracks 3rd level drill-down
     const [searchQuery, setSearchQuery] = useState("");
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isAddSubCategoryModalOpen, setIsAddSubCategoryModalOpen] = useState(false);
+    const [isAddCategoryItemModalOpen, setIsAddCategoryItemModalOpen] = useState(false);
+    const [isEditCategoryItemModalOpen, setIsEditCategoryItemModalOpen] = useState(false);
+    const [editingCategoryItem, setEditingCategoryItem] = useState(null);
+    const [isDeleteCategoryItemModalOpen, setIsDeleteCategoryItemModalOpen] = useState(false);
+    const [categoryItemToDelete, setCategoryItemToDelete] = useState(null);
+    const [isDeleteCategoryItemErrorModalOpen, setIsDeleteCategoryItemErrorModalOpen] = useState(false);
+    const [isEditSubCategoryModalOpen, setIsEditSubCategoryModalOpen] = useState(false);
+    const [editingSubCategoryItem, setEditingSubCategoryItem] = useState(null);
+    const [isDeleteSubCategoryModalOpen, setIsDeleteSubCategoryModalOpen] = useState(false);
+    const [subCategoryToDelete, setSubCategoryToDelete] = useState(null);
+    const [isDeleteSubCategoryErrorModalOpen, setIsDeleteSubCategoryErrorModalOpen] = useState(false);
     const [editingSubCategory, setEditingSubCategory] = useState(null);
     const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
@@ -87,7 +143,15 @@ const SuperAdminCategory = () => {
         return parentCategories.find((c) => c.id === selectedParentId) || null;
     }, [parentCategories, selectedParentId]);
 
-    const isSubCategoryView = Boolean(currentParent);
+    // Current selected subcategory object
+    const currentSubCategory = useMemo(() => {
+        if (!currentParent || !selectedSubCategoryId) return null;
+        const subList = subCategoriesMap[currentParent.id] || [];
+        return subList.find((s) => s.id === selectedSubCategoryId) || null;
+    }, [currentParent, subCategoriesMap, selectedSubCategoryId]);
+
+    const isSubCategoryView = Boolean(currentParent) && !currentSubCategory;
+    const isCategoryItemView = Boolean(currentParent) && Boolean(currentSubCategory);
 
     // Filtered Subcategories based on search
     const displayedSubCategories = useMemo(() => {
@@ -102,6 +166,20 @@ const SuperAdminCategory = () => {
                 item.name.toLowerCase().includes(query)
         );
     }, [currentParent, subCategoriesMap, searchQuery]);
+
+    // Filtered Category Items based on search
+    const displayedCategoryItems = useMemo(() => {
+        if (!currentSubCategory) return [];
+        const list = categoryItemsMap[currentSubCategory.id] || [];
+        if (!searchQuery.trim()) return list;
+
+        const query = searchQuery.toLowerCase().trim();
+        return list.filter(
+            (item) =>
+                item.id.toLowerCase().includes(query) ||
+                item.name.toLowerCase().includes(query)
+        );
+    }, [currentSubCategory, categoryItemsMap, searchQuery]);
 
     // Filtered Parent Categories based on search
     const displayedParentCategories = useMemo(() => {
@@ -138,19 +216,73 @@ const SuperAdminCategory = () => {
     // Handler: Selecting Parent Category by clicking row
     const handleSelectParentRow = (parentCategory) => {
         setSelectedParentId(parentCategory.id);
+        setSelectedSubCategoryId(null);
         setSearchQuery("");
+    };
+
+    // Handler: Selecting SubCategory by clicking row (drills to category items)
+    const handleSelectSubCategoryRow = (subCategory) => {
+        setSelectedSubCategoryId(subCategory.id);
+        setSearchQuery("");
+    };
+
+    // Handler: Open Edit SubCategory Modal
+    const handleEditSubCategoryClick = (subCategory) => {
+        setEditingSubCategoryItem(subCategory);
+        setIsEditSubCategoryModalOpen(true);
+    };
+
+    // Handler: Save Edited SubCategory
+    const handleSaveEditedSubCategory = ({ id, name }) => {
+        if (!currentParent) return;
+        setSubCategoriesMap((prev) => {
+            const parentList = prev[currentParent.id] || [];
+            return {
+                ...prev,
+                [currentParent.id]: parentList.map((item) =>
+                    item.id === (editingSubCategoryItem?.id || id)
+                        ? { ...item, name }
+                        : item
+                ),
+            };
+        });
     };
 
     // Handler: Return to All Categories
     const handleBackToAllCategories = () => {
         setSelectedParentId(null);
+        setSelectedSubCategoryId(null);
         setSearchQuery("");
     };
 
-    // Handler: Add Sub Category Button Click
+    // Handler: Return to Subcategories view
+    const handleBackToSubCategories = () => {
+        setSelectedSubCategoryId(null);
+        setSearchQuery("");
+    };
+
+    // Handler: Add Button Click — opens the correct add modal based on current view
     const handleAddClick = () => {
-        setEditingSubCategory(null);
-        setIsModalOpen(true);
+        if (isCategoryItemView) {
+            setIsAddCategoryItemModalOpen(true);
+        } else if (isSubCategoryView) {
+            setIsAddSubCategoryModalOpen(true);
+        } else {
+            setEditingSubCategory(null);
+            setIsModalOpen(true);
+        }
+    };
+
+    // Handler: Save New Category Item
+    const handleSaveNewCategoryItem = ({ id, name }) => {
+        if (!currentSubCategory) return;
+        setCategoryItemsMap((prev) => {
+            const subList = prev[currentSubCategory.id] || [];
+            return {
+                ...prev,
+                [currentSubCategory.id]: [...subList, { id, name }],
+            };
+        });
     };
 
     // Handler: Edit Sub Category Click
@@ -159,21 +291,50 @@ const SuperAdminCategory = () => {
         setIsModalOpen(true);
     };
 
-    // Handler: Delete Sub Category
+    // Handler: Delete Sub Category — opens confirmation modal
     const handleDeleteClick = (subCategory) => {
-        if (!currentParent) return;
-        const confirmed = window.confirm(
-            `Are you sure you want to delete sub category "${subCategory.name}" (${subCategory.id})?`
-        );
-        if (!confirmed) return;
+        setSubCategoryToDelete(subCategory);
+        setIsDeleteSubCategoryModalOpen(true);
+    };
 
-        setSubCategoriesMap((prev) => {
-            const parentList = prev[currentParent.id] || [];
+    // Handler: Confirm Delete Sub Category — shows error modal (matching parent category delete flow)
+    const handleConfirmDeleteSubCategory = () => {
+        setIsDeleteSubCategoryModalOpen(false);
+        setIsDeleteSubCategoryErrorModalOpen(true);
+    };
+
+    // Handler: Open Edit Category Item Modal
+    const handleEditCategoryItem = (item) => {
+        setEditingCategoryItem(item);
+        setIsEditCategoryItemModalOpen(true);
+    };
+
+    // Handler: Save Edited Category Item
+    const handleSaveEditedCategoryItem = ({ id, name }) => {
+        if (!currentSubCategory) return;
+        setCategoryItemsMap((prev) => {
+            const subList = prev[currentSubCategory.id] || [];
             return {
                 ...prev,
-                [currentParent.id]: parentList.filter((item) => item.id !== subCategory.id),
+                [currentSubCategory.id]: subList.map((item) =>
+                    item.id === (editingCategoryItem?.id || id)
+                        ? { ...item, name }
+                        : item
+                ),
             };
         });
+    };
+
+    // Handler: Open Delete Category Item Modal
+    const handleDeleteCategoryItem = (item) => {
+        setCategoryItemToDelete(item);
+        setIsDeleteCategoryItemModalOpen(true);
+    };
+
+    // Handler: Confirm Delete Category Item — shows error modal
+    const handleConfirmDeleteCategoryItem = () => {
+        setIsDeleteCategoryItemModalOpen(false);
+        setIsDeleteCategoryItemErrorModalOpen(true);
     };
 
     // Handler: Save Modal (Add or Edit)
@@ -231,22 +392,57 @@ const SuperAdminCategory = () => {
         setIsDeleteErrorModalOpen(true);
     };
 
+    // Determine the current navigation level for rendering
+    const getTitle = () => {
+        if (isCategoryItemView) {
+            return `${currentParent.name} > ${currentSubCategory.name} > Category Item`;
+        }
+        if (isSubCategoryView) {
+            return `${currentParent.name} > Sub Category`;
+        }
+        return "Category List";
+    };
+
+    const getButtonLabel = () => {
+        if (isCategoryItemView) return "+ Add Category Item";
+        if (isSubCategoryView) return "+ Add Sub Category";
+        return "+ Add Category";
+    };
+
+    const getBackHandler = () => {
+        if (isCategoryItemView) return handleBackToSubCategories;
+        if (isSubCategoryView) return handleBackToAllCategories;
+        return undefined;
+    };
+
     return (
         <CategoryContainer>
             {/* Direction Bar / Breadcrumbs */}
             <DirectionBar>
                 Home {"> "}
                 <BreadcrumbLink
-                    $clickable={isSubCategoryView}
-                    $active={!isSubCategoryView}
-                    onClick={isSubCategoryView ? handleBackToAllCategories : undefined}
+                    $clickable={isSubCategoryView || isCategoryItemView}
+                    $active={!isSubCategoryView && !isCategoryItemView}
+                    onClick={(isSubCategoryView || isCategoryItemView) ? handleBackToAllCategories : undefined}
                 >
                     Category List
                 </BreadcrumbLink>
-                {isSubCategoryView && (
+                {(isSubCategoryView || isCategoryItemView) && (
                     <>
                         {" > "}
-                        <strong>{currentParent.name}</strong>
+                        <BreadcrumbLink
+                            $clickable={isCategoryItemView}
+                            $active={isSubCategoryView}
+                            onClick={isCategoryItemView ? handleBackToSubCategories : undefined}
+                        >
+                            {currentParent.name}
+                        </BreadcrumbLink>
+                    </>
+                )}
+                {isCategoryItemView && (
+                    <>
+                        {" > "}
+                        <strong>{currentSubCategory.name}</strong>
                     </>
                 )}
             </DirectionBar>
@@ -255,15 +451,11 @@ const SuperAdminCategory = () => {
             <CardContainer>
                 {/* Child Component: Title Bar */}
                 <CategoryTitleBar
-                    title={
-                        isSubCategoryView
-                            ? `${currentParent.name} > Sub Category`
-                            : "Category List"
-                    }
-                    buttonLabel={isSubCategoryView ? "+ Add Sub Category" : "+ Add Category"}
+                    title={getTitle()}
+                    buttonLabel={getButtonLabel()}
                     onButtonClick={handleAddClick}
-                    showBack={isSubCategoryView}
-                    onBackClick={handleBackToAllCategories}
+                    showBack={isSubCategoryView || isCategoryItemView}
+                    onBackClick={getBackHandler()}
                 />
 
                 {/* Child Component: Controls (Dropdown & Search) */}
@@ -273,13 +465,22 @@ const SuperAdminCategory = () => {
                     onParentChange={handleDropdownChange}
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
-                    showParentFilter={true}
+                    showParentFilter={!isCategoryItemView}
                 />
 
                 {/* Child Component: Table */}
-                {isSubCategoryView ? (
+                {isCategoryItemView ? (
+                    <CategoryItemTable
+                        items={displayedCategoryItems}
+                        onEdit={handleEditCategoryItem}
+                        onDelete={handleDeleteCategoryItem}
+                    />
+                ) : isSubCategoryView ? (
                     <SubCategoryTable
                         items={displayedSubCategories}
+                        onSelectSubCategory={handleSelectSubCategoryRow}
+                        onEditSubCategory={handleEditSubCategoryClick}
+                        onDeleteSubCategory={handleDeleteClick}
                     />
                 ) : (
                     <ParentCategoryTable
@@ -293,26 +494,98 @@ const SuperAdminCategory = () => {
                 {/* Child Component: Footer */}
                 <CategoryFooter
                     currentCount={
-                        isSubCategoryView
-                            ? displayedSubCategories.length
-                            : displayedParentCategories.length
+                        isCategoryItemView
+                            ? displayedCategoryItems.length
+                            : isSubCategoryView
+                                ? displayedSubCategories.length
+                                : displayedParentCategories.length
                     }
                     totalCount={
-                        isSubCategoryView
-                            ? (subCategoriesMap[currentParent.id] || []).length
-                            : parentCategories.length
+                        isCategoryItemView
+                            ? (categoryItemsMap[currentSubCategory.id] || []).length
+                            : isSubCategoryView
+                                ? (subCategoriesMap[currentParent.id] || []).length
+                                : parentCategories.length
                     }
-                    itemType="categories"
+                    itemType={isCategoryItemView ? "category items" : "categories"}
                 />
             </CardContainer>
 
-            {/* Child Component: Modal */}
+            {/* Child Component: Add Sub Category Modal */}
+            <AddSubCategoryModal
+                isOpen={isAddSubCategoryModalOpen}
+                onClose={() => setIsAddSubCategoryModalOpen(false)}
+                onSave={handleSaveSubCategory}
+                parentCategoryName={currentParent ? currentParent.name : ""}
+            />
+
+            {/* Child Component: Add Category Item Modal */}
+            <AddCategoryItemModal
+                isOpen={isAddCategoryItemModalOpen}
+                onClose={() => setIsAddCategoryItemModalOpen(false)}
+                onSave={handleSaveNewCategoryItem}
+                parentCategoryName={currentParent ? currentParent.name : ""}
+                subCategoryName={currentSubCategory ? currentSubCategory.name : ""}
+            />
+
+            {/* Child Component: Edit Category Item Modal */}
+            <EditCategoryItemModal
+                isOpen={isEditCategoryItemModalOpen}
+                onClose={() => { setIsEditCategoryItemModalOpen(false); setEditingCategoryItem(null); }}
+                onSave={handleSaveEditedCategoryItem}
+                categoryItem={editingCategoryItem}
+                parentCategoryName={currentParent ? currentParent.name : ""}
+                subCategoryName={currentSubCategory ? currentSubCategory.name : ""}
+            />
+
+            {/* Child Component: Delete Category Item Modal */}
+            <DeleteCategoryItemModal
+                isOpen={isDeleteCategoryItemModalOpen}
+                onClose={() => { setIsDeleteCategoryItemModalOpen(false); setCategoryItemToDelete(null); }}
+                onConfirm={handleConfirmDeleteCategoryItem}
+                categoryItem={categoryItemToDelete}
+            />
+
+            {/* Child Component: Category Item Delete Unsuccessfully Modal */}
+            <ParentCategoryDeleteErrorModal
+                isOpen={isDeleteCategoryItemErrorModalOpen}
+                onClose={() => { setIsDeleteCategoryItemErrorModalOpen(false); setCategoryItemToDelete(null); }}
+                title="Category Item Delete Unsuccessfully"
+                message="The Category Item could not be deleted."
+            />
+
+            {/* Child Component: Modal (Add/Edit via old flow) */}
             <SubCategoryModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={handleSaveSubCategory}
                 parentCategoryName={currentParent ? currentParent.name : ""}
                 initialData={editingSubCategory}
+            />
+
+            {/* Child Component: Edit SubCategory Modal */}
+            <EditSubCategoryModal
+                isOpen={isEditSubCategoryModalOpen}
+                onClose={() => { setIsEditSubCategoryModalOpen(false); setEditingSubCategoryItem(null); }}
+                onSave={handleSaveEditedSubCategory}
+                subCategory={editingSubCategoryItem}
+                parentCategoryName={currentParent ? currentParent.name : ""}
+            />
+
+            {/* Child Component: Delete SubCategory Modal */}
+            <DeleteSubCategoryModal
+                isOpen={isDeleteSubCategoryModalOpen}
+                onClose={() => { setIsDeleteSubCategoryModalOpen(false); setSubCategoryToDelete(null); }}
+                onConfirm={handleConfirmDeleteSubCategory}
+                subCategory={subCategoryToDelete}
+            />
+
+            {/* Child Component: Sub Category Delete Unsuccessfully Modal */}
+            <ParentCategoryDeleteErrorModal
+                isOpen={isDeleteSubCategoryErrorModalOpen}
+                onClose={() => { setIsDeleteSubCategoryErrorModalOpen(false); setSubCategoryToDelete(null); }}
+                title="Sub Category Delete Unsuccessfully"
+                message="The Sub Category could not be deleted."
             />
 
             {/* Child Component: Edit Parent Category Modal matching screenshot */}
