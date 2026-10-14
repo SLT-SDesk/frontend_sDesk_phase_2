@@ -1,10 +1,15 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
     CategoryContainer,
     DirectionBar,
     BreadcrumbLink,
     CardContainer,
 } from "./SuperAdminCategoryStyles";
+import { useDispatch, useSelector } from "react-redux";
+import {
+    fetchMainCategoriesRequest,
+    createCategoryRequest,
+} from "../../../redux/categories/categorySlice";
 
 // Child components
 import CategoryTitleBar from "./components/CategoryTitleBar";
@@ -24,18 +29,8 @@ import EditCategoryItemModal from "./components/EditCategoryItemModal";
 import DeleteCategoryItemModal from "./components/DeleteCategoryItemModal";
 import AddCategoryItemModal from "./components/AddCategoryItemModal";
 
-// Initial mock dataset matching user's design & dataset
-const INITIAL_PARENT_CATEGORIES = [
-    { id: "CAT004", name: "IT Help Desk" },
-    { id: "CAT005", name: "Facilities" },
-    { id: "CAT006", name: "HR Services" },
-    { id: "CAT007", name: "OLD Categories" },
-    { id: "CAT008", name: "OLD Categories" },
-    { id: "CAT009", name: "OLD Categories" },
-    { id: "CAT010", name: "OLD Categories" },
-    { id: "CAT011", name: "OLD Categories" },
-    { id: "CAT012", name: "OLD Categories" },
-];
+// NOTE: INITIAL_PARENT_CATEGORIES removed — data now comes from Redux (GET /categories/main)
+// Subcategories and category items still use local state pending full API integration
 
 const INITIAL_SUBCATEGORIES_MAP = {
     CAT004: [
@@ -107,15 +102,36 @@ const INITIAL_CATEGORY_ITEMS_MAP = {
  * Coordinates state management, filtering, and props passing to child components.
  */
 const SuperAdminCategory = () => {
+    const dispatch = useDispatch();
+    const { mainCategories, loading: categoriesLoading } = useSelector(
+        (state) => state.categories
+    );
+
     // Navigation & Category Selection State
-    // Default selected parent is "IT Help Desk" to match screenshot directly,
-    // or can be switched to any parent category / all categories
-    const [parentCategories, setParentCategories] = useState(INITIAL_PARENT_CATEGORIES);
+    const [parentCategories, setParentCategories] = useState([]);
     const [subCategoriesMap, setSubCategoriesMap] = useState(INITIAL_SUBCATEGORIES_MAP);
     const [categoryItemsMap, setCategoryItemsMap] = useState(INITIAL_CATEGORY_ITEMS_MAP);
-    const [selectedParentId, setSelectedParentId] = useState(null); // Default: null (shows Category List)
-    const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null); // Tracks 3rd level drill-down
+    const [selectedParentId, setSelectedParentId] = useState(null);
+    const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
+
+    // Fetch parent categories from backend on mount
+    useEffect(() => {
+        dispatch(fetchMainCategoriesRequest());
+    }, [dispatch]);
+
+    // Sync Redux mainCategories → local parentCategories state
+    useEffect(() => {
+        if (mainCategories && mainCategories.length > 0) {
+            setParentCategories(
+                mainCategories.map((cat) => ({
+                    id: cat.id,
+                    name: cat.name,
+                    category_code: cat.category_code,
+                }))
+            );
+        }
+    }, [mainCategories]);
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -369,8 +385,9 @@ const SuperAdminCategory = () => {
         setIsEditCategoryModalOpen(true);
     };
 
-    // Handler: Save Edited Category
+    // Handler: Save Edited Category — dispatches API call then refreshes list
     const handleSaveEditedCategory = (updatedCat) => {
+        // Optimistic local update
         setParentCategories((prev) =>
             prev.map((c) =>
                 c.id === (editingCategory?.id || updatedCat.id)
@@ -378,6 +395,8 @@ const SuperAdminCategory = () => {
                     : c
             )
         );
+        // Refresh from backend to get server-confirmed data
+        dispatch(fetchMainCategoriesRequest());
     };
 
     // Handler: Open Delete Category Modal (Step 1: Confirmation)
@@ -386,10 +405,12 @@ const SuperAdminCategory = () => {
         setIsDeleteCategoryModalOpen(true);
     };
 
-    // Handler: Confirm Delete Category (Step 2: Trigger Delete Unsuccessful popup)
+    // Handler: Confirm Delete Category — shows error modal then refreshes list
     const handleConfirmDeleteCategory = (category) => {
         setIsDeleteCategoryModalOpen(false);
         setIsDeleteErrorModalOpen(true);
+        // Refresh list from backend after delete attempt
+        dispatch(fetchMainCategoriesRequest());
     };
 
     // Determine the current navigation level for rendering

@@ -42,7 +42,7 @@ const ParentCategoryTable = ({
                                     onClick={() => onSelectParent && onSelectParent(cat)}
                                     title="Click to view sub categories"
                                 >
-                                    {cat.id}
+                                    {(cat.category_code || cat.id).replace(/^MAIN/i, "CAT")}
                                 </CategoryCodeCell>
                                 <td
                                     style={{ cursor: "pointer", fontWeight: 500 }}
