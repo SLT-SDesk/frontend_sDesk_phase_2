@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
     CategoryContainer,
     DirectionBar,
@@ -17,222 +18,276 @@ import EditCategoryModal from "./components/EditCategoryModal";
 import DeleteCategoryModal from "./components/DeleteCategoryModal";
 import ParentCategoryDeleteErrorModal from "./components/ParentCategoryDeleteErrorModal";
 
-// Initial mock dataset matching user's design & dataset
-const INITIAL_PARENT_CATEGORIES = [
-    { id: "CAT004", name: "IT Help Desk" },
-    { id: "CAT005", name: "Facilities" },
-    { id: "CAT006", name: "HR Services" },
-    { id: "CAT007", name: "OLD Categories" },
-    { id: "CAT008", name: "OLD Categories" },
-    { id: "CAT009", name: "OLD Categories" },
-    { id: "CAT010", name: "OLD Categories" },
-    { id: "CAT011", name: "OLD Categories" },
-    { id: "CAT012", name: "OLD Categories" },
-];
-
-const INITIAL_SUBCATEGORIES_MAP = {
-    CAT004: [
-        { id: "CAT004#1", name: "Email" },
-        { id: "CAT004#2", name: "Cashiering" },
-        { id: "CAT004#3", name: "Hardware" },
-        { id: "CAT004#4", name: "Software" },
-        { id: "CAT004#5", name: "Network" },
-        { id: "CAT004#6", name: "Password Issues" },
-        { id: "CAT004#7", name: "VDI Issues" },
-        { id: "CAT004#8", name: "QMS" },
-        { id: "CAT004#9", name: "Operating System" },
-        { id: "CAT004#10", name: "Security" },
-        { id: "CAT004#11", name: "Tier 3 Support" },
-    ],
-    CAT005: [
-        { id: "CAT005#1", name: "Office Cleaning" },
-        { id: "CAT005#2", name: "AC Maintenance" },
-        { id: "CAT005#3", name: "Water Supply" },
-        { id: "CAT005#4", name: "Furniture Repair" },
-        { id: "CAT005#5", name: "Pest Control" },
-    ],
-    CAT006: [
-        { id: "CAT006#1", name: "Leave Application" },
-        { id: "CAT006#2", name: "Payslip Request" },
-        { id: "CAT006#3", name: "ID Card Issuance" },
-        { id: "CAT006#4", name: "Onboarding Query" },
-        { id: "CAT006#5", name: "Resignation Process" },
-    ],
-};
+// Redux actions
+import {
+    fetchMainCategoriesRequest,
+    fetchSubCategoriesByMainCategoryIdRequest,
+    createSubCategoryRequest,
+    updateSubCategoryRequest,
+    deleteSubCategoryRequest,
+    updateMainCategoryRequest,
+    deleteMainCategoryRequest,
+} from "../../../redux/categories/categorySlice";
 
 /**
- * SuperAdminCategory - Parent Component
- * Coordinates state management, filtering, and props passing to child components.
+ * SuperAdminCategory - Parent Component (API-connected)
+ * Coordinates Redux state, filtering, and props passing to child components.
  */
 const SuperAdminCategory = () => {
-    // Navigation & Category Selection State
-    // Default selected parent is "IT Help Desk" to match screenshot directly,
-    // or can be switched to any parent category / all categories
-    const [parentCategories, setParentCategories] = useState(INITIAL_PARENT_CATEGORIES);
-    const [subCategoriesMap, setSubCategoriesMap] = useState(INITIAL_SUBCATEGORIES_MAP);
-    const [selectedParentId, setSelectedParentId] = useState(null); // Default: null (shows Category List)
-    const [searchQuery, setSearchQuery] = useState("");
+    const dispatch = useDispatch();
 
-    // Modal State
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    // ── Redux state ────────────────────────────────────────────────────────────
+    const mainCategories = useSelector((state) => state.categories.mainCategories);
+    const mainCategoriesLoading = useSelector((state) => state.categories.loading);
+    const subCategories = useSelector((state) => state.categories.subCategories);
+    const subCategoriesLoading = useSelector((state) => state.categories.subCategoriesLoading);
+    const subCategoriesError = useSelector((state) => state.categories.subCategoriesError);
+    const createSubCategorySuccess = useSelector((state) => state.categories.createSubCategorySuccess);
+    const createSubCategoryError = useSelector((state) => state.categories.createSubCategoryError);
+    const updateSubCategorySuccess = useSelector((state) => state.categories.updateSubCategorySuccess);
+    const updateSubCategoryError = useSelector((state) => state.categories.updateSubCategoryError);
+    const deleteSubCategoryError = useSelector((state) => state.categories.deleteSubCategoryError);
+    const updateMainCategoryError = useSelector((state) => state.categories.updateMainCategoryError);
+    const deleteMainCategoryError = useSelector((state) => state.categories.deleteMainCategoryError);
+
+    // ── Local UI state ─────────────────────────────────────────────────────────
+    const [selectedParentId, setSelectedParentId] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [statusMessage, setStatusMessage] = useState(null); // { text, type: 'success'|'error' }
+
+    // Subcategory Add/Edit modal
+    const [isSubCategoryModalOpen, setIsSubCategoryModalOpen] = useState(false);
     const [editingSubCategory, setEditingSubCategory] = useState(null);
+
+    // Parent category modals
     const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
     const [isDeleteCategoryModalOpen, setIsDeleteCategoryModalOpen] = useState(false);
     const [isDeleteErrorModalOpen, setIsDeleteErrorModalOpen] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState(null);
 
+    // ── On mount: fetch main categories ───────────────────────────────────────
+    useEffect(() => {
+        dispatch(fetchMainCategoriesRequest());
+    }, [dispatch]);
+
+    // ── When selectedParentId changes: fetch its sub categories ───────────────
+    useEffect(() => {
+        if (selectedParentId) {
+            dispatch(fetchSubCategoriesByMainCategoryIdRequest(selectedParentId));
+        }
+    }, [dispatch, selectedParentId]);
+
+    // ── React to Redux async results (show toast-style status) ────────────────
+    useEffect(() => {
+        const err =
+            subCategoriesError ||
+            createSubCategoryError ||
+            updateSubCategoryError ||
+            deleteSubCategoryError ||
+            updateMainCategoryError ||
+            deleteMainCategoryError;
+        if (err) {
+            const msg = err === "DUPLICATE_NAME"
+                ? "A category with that name already exists."
+                : err;
+            showStatus(msg, "error");
+        }
+    }, [
+        subCategoriesError,
+        createSubCategoryError,
+        updateSubCategoryError,
+        deleteSubCategoryError,
+        updateMainCategoryError,
+        deleteMainCategoryError,
+    ]);
+
+    // ── Helpers ────────────────────────────────────────────────────────────────
+    const showStatus = (text, type = "success") => {
+        setStatusMessage({ text, type });
+        setTimeout(() => setStatusMessage(null), 3500);
+    };
+
     // Current selected parent object
-    const currentParent = useMemo(() => {
-        return parentCategories.find((c) => c.id === selectedParentId) || null;
-    }, [parentCategories, selectedParentId]);
+    const currentParent = useMemo(
+        () => mainCategories.find((c) => c.id === selectedParentId) || null,
+        [mainCategories, selectedParentId]
+    );
 
     const isSubCategoryView = Boolean(currentParent);
 
-    // Filtered Subcategories based on search
+    // Filtered subcategories (client-side search over the Redux list)
     const displayedSubCategories = useMemo(() => {
         if (!currentParent) return [];
-        const list = subCategoriesMap[currentParent.id] || [];
-        if (!searchQuery.trim()) return list;
-
-        const query = searchQuery.toLowerCase().trim();
-        return list.filter(
+        if (!searchQuery.trim()) return subCategories;
+        const q = searchQuery.toLowerCase().trim();
+        return subCategories.filter(
             (item) =>
-                item.id.toLowerCase().includes(query) ||
-                item.name.toLowerCase().includes(query)
+                (item.category_code || "").toLowerCase().includes(q) ||
+                item.name.toLowerCase().includes(q)
         );
-    }, [currentParent, subCategoriesMap, searchQuery]);
+    }, [currentParent, subCategories, searchQuery]);
 
-    // Filtered Parent Categories based on search
+    // Filtered parent categories (client-side search)
     const displayedParentCategories = useMemo(() => {
-        if (!searchQuery.trim()) return parentCategories;
-        const query = searchQuery.toLowerCase().trim();
-        return parentCategories.filter(
+        if (!searchQuery.trim()) return mainCategories;
+        const q = searchQuery.toLowerCase().trim();
+        return mainCategories.filter(
             (cat) =>
-                cat.id.toLowerCase().includes(query) ||
-                cat.name.toLowerCase().includes(query)
+                (cat.category_code || "").toLowerCase().includes(q) ||
+                cat.name.toLowerCase().includes(q)
         );
-    }, [parentCategories, searchQuery]);
+    }, [mainCategories, searchQuery]);
 
-    // Dropdown list options for CategoryControls
-    const dropdownOptions = useMemo(() => {
-        return [
-            { id: "ALL", name: "All Categories" },
-            ...parentCategories,
-        ];
-    }, [parentCategories]);
+    // Dropdown options for the CategoryControls filter
+    const dropdownOptions = useMemo(
+        () => [{ id: "ALL", name: "All Categories" }, ...mainCategories],
+        [mainCategories]
+    );
 
-    // Handler: Parent Category Dropdown Selection
+    // ── Handlers ───────────────────────────────────────────────────────────────
+
     const handleDropdownChange = (selectedName) => {
         if (selectedName === "All Categories" || selectedName === "ALL") {
             setSelectedParentId(null);
         } else {
-            const found = parentCategories.find((p) => p.name === selectedName || p.id === selectedName);
-            if (found) {
-                setSelectedParentId(found.id);
-            }
+            const found = mainCategories.find(
+                (p) => p.name === selectedName || p.id === selectedName
+            );
+            if (found) setSelectedParentId(found.id);
         }
         setSearchQuery("");
     };
 
-    // Handler: Selecting Parent Category by clicking row
     const handleSelectParentRow = (parentCategory) => {
         setSelectedParentId(parentCategory.id);
         setSearchQuery("");
     };
 
-    // Handler: Return to All Categories
     const handleBackToAllCategories = () => {
         setSelectedParentId(null);
         setSearchQuery("");
     };
 
-    // Handler: Add Sub Category Button Click
+    // ── SubCategory Modal handlers ─────────────────────────────────────────────
+
     const handleAddClick = () => {
         setEditingSubCategory(null);
-        setIsModalOpen(true);
+        setIsSubCategoryModalOpen(true);
     };
 
-    // Handler: Edit Sub Category Click
-    const handleEditClick = (subCategory) => {
+    const handleEditSubCategoryClick = (subCategory) => {
         setEditingSubCategory(subCategory);
-        setIsModalOpen(true);
+        setIsSubCategoryModalOpen(true);
     };
 
-    // Handler: Delete Sub Category
-    const handleDeleteClick = (subCategory) => {
+    const handleDeleteSubCategoryClick = (subCategory) => {
         if (!currentParent) return;
         const confirmed = window.confirm(
-            `Are you sure you want to delete sub category "${subCategory.name}" (${subCategory.id})?`
+            `Delete sub category "${subCategory.name}"? This cannot be undone.`
         );
         if (!confirmed) return;
-
-        setSubCategoriesMap((prev) => {
-            const parentList = prev[currentParent.id] || [];
-            return {
-                ...prev,
-                [currentParent.id]: parentList.filter((item) => item.id !== subCategory.id),
-            };
-        });
+        dispatch(
+            deleteSubCategoryRequest({
+                id: subCategory.id,
+                mainCategoryId: currentParent.id,
+            })
+        );
+        showStatus(`Sub category "${subCategory.name}" deleted.`);
     };
 
-    // Handler: Save Modal (Add or Edit)
-    const handleSaveSubCategory = ({ id, name }) => {
+    /** Called by SubCategoryModal on Save (add or edit) */
+    const handleSaveSubCategory = ({ name }) => {
         if (!currentParent) return;
 
-        setSubCategoriesMap((prev) => {
-            const parentList = prev[currentParent.id] || [];
-            if (editingSubCategory) {
-                // Edit mode
-                return {
-                    ...prev,
-                    [currentParent.id]: parentList.map((item) =>
-                        item.id === editingSubCategory.id ? { ...item, id: id || item.id, name } : item
-                    ),
-                };
-            } else {
-                // Add mode: generate next id if not provided
-                const nextId =
-                    id || `${currentParent.id}#${parentList.length + 1}`;
-                return {
-                    ...prev,
-                    [currentParent.id]: [...parentList, { id: nextId, name }],
-                };
-            }
-        });
+        if (editingSubCategory) {
+            // Edit mode
+            dispatch(
+                updateSubCategoryRequest({
+                    id: editingSubCategory.id,
+                    name,
+                    mainCategoryId: currentParent.id,
+                })
+            );
+            showStatus(`Sub category updated successfully.`);
+        } else {
+            // Add mode
+            dispatch(
+                createSubCategoryRequest({
+                    name,
+                    mainCategoryId: currentParent.id,
+                })
+            );
+            showStatus(`Sub category "${name}" created.`);
+        }
     };
 
-    // Handler: Open Edit Category Modal
+    // ── Parent Category Modal handlers ─────────────────────────────────────────
+
     const handleOpenEditCategory = (category) => {
         setEditingCategory(category);
         setIsEditCategoryModalOpen(true);
     };
 
-    // Handler: Save Edited Category
     const handleSaveEditedCategory = (updatedCat) => {
-        setParentCategories((prev) =>
-            prev.map((c) =>
-                c.id === (editingCategory?.id || updatedCat.id)
-                    ? { ...c, id: updatedCat.id, name: updatedCat.name }
-                    : c
-            )
+        dispatch(
+            updateMainCategoryRequest({
+                id: updatedCat.id || editingCategory?.id,
+                name: updatedCat.name,
+            })
         );
+        showStatus(`Category "${updatedCat.name}" updated.`);
     };
 
-    // Handler: Open Delete Category Modal (Step 1: Confirmation)
     const handleOpenDeleteCategory = (category) => {
         setCategoryToDelete(category);
         setIsDeleteCategoryModalOpen(true);
     };
 
-    // Handler: Confirm Delete Category (Step 2: Trigger Delete Unsuccessful popup)
+    /** Step 2 from DeleteCategoryModal – attempt the API delete */
     const handleConfirmDeleteCategory = (category) => {
         setIsDeleteCategoryModalOpen(false);
-        setIsDeleteErrorModalOpen(true);
+        dispatch(deleteMainCategoryRequest(category.id));
+        // If the backend returns an error (e.g. has sub-categories), show error modal
+        // We use a short delay so the saga has time to dispatch failure if any
+        setTimeout(() => {
+            if (deleteMainCategoryError) {
+                setIsDeleteErrorModalOpen(true);
+            }
+        }, 800);
     };
 
+    // ── Parent category names for EditCategoryModal dropdown ───────────────────
+    const parentCategoryNames = useMemo(
+        () => mainCategories.map((c) => c.name),
+        [mainCategories]
+    );
+
+    // ── Render ─────────────────────────────────────────────────────────────────
     return (
         <CategoryContainer>
+            {/* Status toast */}
+            {statusMessage && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 20,
+                        right: 24,
+                        zIndex: 9999,
+                        padding: "10px 20px",
+                        borderRadius: 8,
+                        fontWeight: 500,
+                        fontSize: 14,
+                        background: statusMessage.type === "error" ? "#fef2f2" : "#f0fdf4",
+                        color: statusMessage.type === "error" ? "#dc2626" : "#16a34a",
+                        border: `1px solid ${statusMessage.type === "error" ? "#fca5a5" : "#86efac"}`,
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                    }}
+                >
+                    {statusMessage.text}
+                </div>
+            )}
+
             {/* Direction Bar / Breadcrumbs */}
             <DirectionBar>
                 Home {"> "}
@@ -253,7 +308,7 @@ const SuperAdminCategory = () => {
 
             {/* Main Card */}
             <CardContainer>
-                {/* Child Component: Title Bar */}
+                {/* Title Bar */}
                 <CategoryTitleBar
                     title={
                         isSubCategoryView
@@ -266,7 +321,7 @@ const SuperAdminCategory = () => {
                     onBackClick={handleBackToAllCategories}
                 />
 
-                {/* Child Component: Controls (Dropdown & Search) */}
+                {/* Controls (Dropdown & Search) */}
                 <CategoryControls
                     parentCategories={dropdownOptions}
                     selectedParent={currentParent ? currentParent.name : "All Categories"}
@@ -276,21 +331,25 @@ const SuperAdminCategory = () => {
                     showParentFilter={true}
                 />
 
-                {/* Child Component: Table */}
+                {/* Table */}
                 {isSubCategoryView ? (
                     <SubCategoryTable
                         items={displayedSubCategories}
+                        loading={subCategoriesLoading}
+                        onEdit={handleEditSubCategoryClick}
+                        onDelete={handleDeleteSubCategoryClick}
                     />
                 ) : (
                     <ParentCategoryTable
                         items={displayedParentCategories}
+                        loading={mainCategoriesLoading}
                         onSelectParent={handleSelectParentRow}
                         onEdit={handleOpenEditCategory}
                         onDelete={handleOpenDeleteCategory}
                     />
                 )}
 
-                {/* Child Component: Footer */}
+                {/* Footer */}
                 <CategoryFooter
                     currentCount={
                         isSubCategoryView
@@ -299,32 +358,32 @@ const SuperAdminCategory = () => {
                     }
                     totalCount={
                         isSubCategoryView
-                            ? (subCategoriesMap[currentParent.id] || []).length
-                            : parentCategories.length
+                            ? subCategories.length
+                            : mainCategories.length
                     }
                     itemType="categories"
                 />
             </CardContainer>
 
-            {/* Child Component: Modal */}
+            {/* SubCategory Add / Edit Modal */}
             <SubCategoryModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                isOpen={isSubCategoryModalOpen}
+                onClose={() => setIsSubCategoryModalOpen(false)}
                 onSave={handleSaveSubCategory}
                 parentCategoryName={currentParent ? currentParent.name : ""}
                 initialData={editingSubCategory}
             />
 
-            {/* Child Component: Edit Parent Category Modal matching screenshot */}
+            {/* Edit Parent Category Modal */}
             <EditCategoryModal
                 isOpen={isEditCategoryModalOpen}
                 onClose={() => setIsEditCategoryModalOpen(false)}
                 onSave={handleSaveEditedCategory}
                 category={editingCategory}
-                parentOptions={["IT Help Desk", "Facilities", "HR Services", "OLD Categories"]}
+                parentOptions={parentCategoryNames}
             />
 
-            {/* Child Component: Delete Parent Category Modal matching screenshot */}
+            {/* Delete Parent Category Confirmation Modal */}
             <DeleteCategoryModal
                 isOpen={isDeleteCategoryModalOpen}
                 onClose={() => setIsDeleteCategoryModalOpen(false)}
@@ -332,12 +391,12 @@ const SuperAdminCategory = () => {
                 category={categoryToDelete}
             />
 
-            {/* Child Component: Parent Category Delete Unsuccessfully Modal matching screenshot */}
+            {/* Delete Unsuccessful Modal (backend rejected delete) */}
             <ParentCategoryDeleteErrorModal
                 isOpen={isDeleteErrorModalOpen}
                 onClose={() => setIsDeleteErrorModalOpen(false)}
-                title="Parent Category Delete Unsuccessfully"
-                message="The Parent Category could not be deleted."
+                title="Parent Category Delete Unsuccessful"
+                message="The Parent Category could not be deleted. It may still have sub categories linked to it."
             />
         </CategoryContainer>
     );

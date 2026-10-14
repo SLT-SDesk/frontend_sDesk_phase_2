@@ -10,9 +10,12 @@ import {
 
 /**
  * SubCategoryTable - Child component rendering table headers and list of subcategories
- * @param {Array} items - List of subcategories
+ * @param {Array}    items    - List of subcategories from Redux
+ * @param {boolean}  loading  - Loading state
+ * @param {function} onEdit   - Callback when Edit button is clicked on a row
+ * @param {function} onDelete - Callback when Delete button is clicked on a row
  */
-const SubCategoryTable = ({ items = [] }) => {
+const SubCategoryTable = ({ items = [], loading = false, onEdit, onDelete }) => {
     return (
         <TableWrapper>
             <Table>
@@ -24,11 +27,17 @@ const SubCategoryTable = ({ items = [] }) => {
                     </tr>
                 </TableHead>
                 <TableBody>
-                    {items.length > 0 ? (
+                    {loading ? (
+                        <tr>
+                            <EmptyRowCell colSpan="3">Loading...</EmptyRowCell>
+                        </tr>
+                    ) : items.length > 0 ? (
                         items.map((subCat) => (
                             <SubCategoryRow
                                 key={subCat.id}
                                 item={subCat}
+                                onEdit={onEdit}
+                                onDelete={onDelete}
                             />
                         ))
                     ) : (
@@ -45,3 +54,4 @@ const SubCategoryTable = ({ items = [] }) => {
 };
 
 export default SubCategoryTable;
+

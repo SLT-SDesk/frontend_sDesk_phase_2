@@ -28,6 +28,20 @@ import {
   fetchSubCategoriesRequest,
   fetchSubCategoriesSuccess,
   fetchSubCategoriesFailure,
+  // SubCategory CRUD
+  updateSubCategoryRequest,
+  updateSubCategorySuccess,
+  updateSubCategoryFailure,
+  deleteSubCategoryRequest,
+  deleteSubCategorySuccess,
+  deleteSubCategoryFailure,
+  // MainCategory CRUD
+  updateMainCategoryRequest,
+  updateMainCategorySuccess,
+  updateMainCategoryFailure,
+  deleteMainCategoryRequest,
+  deleteMainCategorySuccess,
+  deleteMainCategoryFailure,
 } from "./categorySlice";
 import {
   createMainCategory,
@@ -39,6 +53,10 @@ import {
   fetchCategoryItems,
   deleteCategoryItem,
   updateCategoryItem,
+  updateSubCategory,
+  deleteSubCategory,
+  updateMainCategory,
+  deleteMainCategory,
 } from "./categoryService";
 import { PayloadAction } from "@reduxjs/toolkit";
 import {
@@ -285,6 +303,71 @@ function* handleFetchSubCategories() {
   }
 }
 
+// ── Update SubCategory ──────────────────────────────────────────────────────
+function* handleUpdateSubCategory(
+  action: PayloadAction<{ id: string; name: string; mainCategoryId: string }>
+) {
+  try {
+    const { id, name, mainCategoryId } = action.payload;
+    const response = yield call(updateSubCategory, id, { name, mainCategoryId });
+    yield put(updateSubCategorySuccess(response.data));
+    // Refresh the filtered list for the current parent so UI stays consistent
+    yield put(fetchSubCategoriesByMainCategoryIdRequest(mainCategoryId));
+  } catch (error: any) {
+    const msg =
+      error?.code === "DUPLICATE_NAME" ||
+      (typeof error?.message === "string" && error.message.includes("already exists"))
+        ? "DUPLICATE_NAME"
+        : error?.message || "Error updating sub category";
+    yield put(updateSubCategoryFailure(msg));
+  }
+}
+
+// ── Delete SubCategory ──────────────────────────────────────────────────────
+function* handleDeleteSubCategory(
+  action: PayloadAction<{ id: string; mainCategoryId: string }>
+) {
+  try {
+    yield call(deleteSubCategory, action.payload.id);
+    yield put(deleteSubCategorySuccess(action.payload.id));
+    // Refresh the filtered list for the current parent
+    yield put(fetchSubCategoriesByMainCategoryIdRequest(action.payload.mainCategoryId));
+  } catch (error: any) {
+    yield put(deleteSubCategoryFailure(error?.message || "Error deleting sub category"));
+  }
+}
+
+// ── Update MainCategory ─────────────────────────────────────────────────────
+function* handleUpdateMainCategory(
+  action: PayloadAction<{ id: string; name: string }>
+) {
+  try {
+    const { id, name } = action.payload;
+    const response = yield call(updateMainCategory, id, { name });
+    yield put(updateMainCategorySuccess(response.data));
+    // Refresh full list
+    yield put(fetchMainCategoriesRequest());
+  } catch (error: any) {
+    const msg =
+      error?.code === "DUPLICATE_NAME" ||
+      (typeof error?.message === "string" && error.message.includes("already exists"))
+        ? "DUPLICATE_NAME"
+        : error?.message || "Error updating category";
+    yield put(updateMainCategoryFailure(msg));
+  }
+}
+
+// ── Delete MainCategory ─────────────────────────────────────────────────────
+function* handleDeleteMainCategory(action: PayloadAction<string>) {
+  try {
+    yield call(deleteMainCategory, action.payload);
+    yield put(deleteMainCategorySuccess(action.payload));
+    yield put(fetchMainCategoriesRequest());
+  } catch (error: any) {
+    yield put(deleteMainCategoryFailure(error?.message || "Error deleting category"));
+  }
+}
+
 export default function* categorySaga() {
   yield takeLatest(fetchCategoriesRequest.type, handleFetchCategories);
   yield takeLatest(createCategoryRequest.type, handleCreateCategory);
@@ -299,4 +382,10 @@ export default function* categorySaga() {
   yield takeLatest(deleteCategoryItemRequest.type, handleDeleteCategoryItem);
   yield takeLatest(updateCategoryItemRequest.type, handleUpdateCategoryItem);
   yield takeLatest(createSubCategoryRequest.type, handleCreateSubCategory);
+  // SubCategory CRUD
+  yield takeLatest(updateSubCategoryRequest.type, handleUpdateSubCategory);
+  yield takeLatest(deleteSubCategoryRequest.type, handleDeleteSubCategory);
+  // MainCategory CRUD
+  yield takeLatest(updateMainCategoryRequest.type, handleUpdateMainCategory);
+  yield takeLatest(deleteMainCategoryRequest.type, handleDeleteMainCategory);
 }
