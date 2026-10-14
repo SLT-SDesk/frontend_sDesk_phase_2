@@ -13,11 +13,11 @@ import {
 
 /**
  * SubCategoryModal - Modal for adding or editing a subcategory
- * @param {boolean} isOpen - Whether modal is visible
- * @param {function} onClose - Close handler
- * @param {function} onSave - Save handler ({ id, name })
- * @param {string} parentCategoryName - Name of current parent category
- * @param {object} initialData - Optional data if editing
+ * @param {boolean} isOpen             - Whether modal is visible
+ * @param {function} onClose           - Close handler
+ * @param {function} onSave            - Save handler ({ name }) — id & mainCategoryId handled by parent
+ * @param {string}   parentCategoryName - Name of current parent category
+ * @param {object}   initialData       - Optional data if editing (full subcategory object from API)
  */
 const SubCategoryModal = ({
     isOpen,
@@ -27,15 +27,12 @@ const SubCategoryModal = ({
     initialData = null,
 }) => {
     const [subCategoryName, setSubCategoryName] = useState("");
-    const [customId, setCustomId] = useState("");
 
     useEffect(() => {
         if (initialData) {
             setSubCategoryName(initialData.name || "");
-            setCustomId(initialData.id || "");
         } else {
             setSubCategoryName("");
-            setCustomId("");
         }
     }, [initialData, isOpen]);
 
@@ -44,11 +41,7 @@ const SubCategoryModal = ({
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!subCategoryName.trim()) return;
-
-        onSave({
-            id: customId || initialData?.id,
-            name: subCategoryName.trim(),
-        });
+        onSave({ name: subCategoryName.trim() });
         onClose();
     };
 
@@ -62,19 +55,21 @@ const SubCategoryModal = ({
 
                 <form onSubmit={handleSubmit}>
                     <ModalBody>
+                        {/* Parent category (read-only context) */}
                         <FormGroup>
                             <label>Parent Category</label>
                             <input type="text" value={parentCategoryName} disabled readOnly />
                         </FormGroup>
 
+                        {/* Show category_code in edit mode (read-only, API-managed) */}
                         {initialData && (
                             <FormGroup>
                                 <label>Sub Category ID</label>
                                 <input
                                     type="text"
-                                    value={customId}
-                                    onChange={(e) => setCustomId(e.target.value)}
-                                    required
+                                    value={initialData.category_code || initialData.id || ""}
+                                    readOnly
+                                    disabled
                                 />
                             </FormGroup>
                         )}
