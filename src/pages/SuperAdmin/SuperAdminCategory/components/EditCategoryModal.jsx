@@ -181,94 +181,110 @@ const SaveButton = styled.button`
  * @param {function} onSave - Function to save edited category
  * @param {object} category - Category object to edit { id, name, parentName }
  * @param {Array} parentOptions - Available parent category options
+ * @param {Array} existingNames - List of all existing parent category names (for duplicate check)
  */
 const EditCategoryModal = ({
-    isOpen,
-    onClose,
-    onSave,
-    category = null,
-    parentOptions = ["IT Help Desk", "Facilities", "HR Services", "OLD Categories"],
+  isOpen,
+  onClose,
+  onSave,
+  category = null,
+  parentOptions = [],
+  existingNames = [],
 }) => {
-    const [categoryId, setCategoryId] = useState("");
-    const [parentCategoryName, setParentCategoryName] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [parentCategoryName, setParentCategoryName] = useState("");
 
-    useEffect(() => {
-        if (category) {
-            setCategoryId(category.id || "");
-            setParentCategoryName(category.parentName || category.name || "IT Help Desk");
-        }
-    }, [category, isOpen]);
+  useEffect(() => {
+    if (category) {
+      // Show category_code (e.g. CAT006) not the raw UUID
+      const displayCode = (category.category_code || category.id || "").replace(/^MAIN/i, "CAT");
+      setCategoryId(displayCode);
+      setParentCategoryName(category.name || "");
+    }
+  }, [category, isOpen]);
 
-    if (!isOpen) return null;
+  if (!isOpen) return null;
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (onSave) {
-            onSave({
-                ...category,
-                id: categoryId,
-                name: parentCategoryName,
-            });
-        }
-        onClose();
-    };
+  // Check if the name is unchanged from original
+  const isNameUnchanged = parentCategoryName.trim() === (category?.name || "").trim();
 
-    return (
-        <ModalOverlay onClick={onClose}>
-            <ModalCard onClick={(e) => e.stopPropagation()}>
-                <HeaderRow>
-                    <HeaderTitles>
-                        <ModalTitle>Edit Category</ModalTitle>
-                        <ModalSubtitle>Select a parent category name.</ModalSubtitle>
-                    </HeaderTitles>
-                    <CloseButton onClick={onClose} title="Close">
-                        <FiX />
-                    </CloseButton>
-                </HeaderRow>
+  // Check if name already exists (exclude current category's original name)
+  const isDuplicate = !isNameUnchanged && existingNames.some(
+    (n) => n.trim().toLowerCase() === parentCategoryName.trim().toLowerCase()
+  );
 
-                <form onSubmit={handleSubmit}>
-                    <FormGrid>
-                        <FormGroup>
-                            <Label>Category ID</Label>
-                            <StyledInput
-                                type="text"
-                                value={categoryId}
-                                onChange={(e) => setCategoryId(e.target.value)}
-                                placeholder="CAT003"
-                            />
-                        </FormGroup>
+  const canSave = !isNameUnchanged && !isDuplicate && parentCategoryName.trim().length > 0;
 
-                        <FormGroup>
-                            <Label>
-                                Parent Category Name
-                                <span className="required-star">*</span>
-                            </Label>
-                            <StyledSelect
-                                value={parentCategoryName}
-                                onChange={(e) => setParentCategoryName(e.target.value)}
-                                required
-                            >
-                                {parentOptions.map((opt) => (
-                                    <option key={opt} value={opt}>
-                                        {opt}
-                                    </option>
-                                ))}
-                            </StyledSelect>
-                        </FormGroup>
-                    </FormGrid>
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!canSave) return;
+    if (onSave) {
+      onSave({
+        ...category,
+        id: categoryId,
+        name: parentCategoryName.trim(),
+      });
+    }
+    onClose();
+  };
 
-                    <ActionsRow>
-                        <CancelButton type="button" onClick={onClose}>
-                            Cancel
-                        </CancelButton>
-                        <SaveButton type="submit">
-                            Save Changes
-                        </SaveButton>
-                    </ActionsRow>
-                </form>
-            </ModalCard>
-        </ModalOverlay>
-    );
+  return (
+    <ModalOverlay onClick={onClose}>
+      <ModalCard onClick={(e) => e.stopPropagation()}>
+        <HeaderRow>
+          <HeaderTitles>
+            <ModalTitle>Edit Category</ModalTitle>
+            <ModalSubtitle>Select a parent category name.</ModalSubtitle>
+          </HeaderTitles>
+          <CloseButton onClick={onClose} title="Close">
+            <FiX />
+          </CloseButton>
+        </HeaderRow>
+
+        <form onSubmit={handleSubmit}>
+          <FormGrid>
+            <FormGroup>
+              <Label>Category ID</Label>
+              <StyledInput
+                type="text"
+                value={categoryId}
+                readOnly
+                disabled
+                style={{ backgroundColor: "#f9fafb", color: "#6b7280", cursor: "not-allowed" }}
+              />
+            </FormGroup>
+
+            <FormGroup>
+              <Label>
+                Parent Category Name
+                <span className="required-star">*</span>
+              </Label>
+              <StyledInput
+                type="text"
+                value={parentCategoryName}
+                onChange={(e) => setParentCategoryName(e.target.value)}
+                required
+                placeholder="Category name"
+              />
+            </FormGroup>
+          </FormGrid>
+
+          <ActionsRow>
+            <CancelButton type="button" onClick={onClose}>
+              Cancel
+            </CancelButton>
+            <SaveButton
+              type="submit"
+              disabled={isNameUnchanged}
+              style={isNameUnchanged ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+            >
+              Save Changes
+            </SaveButton>
+          </ActionsRow>
+        </form>
+      </ModalCard>
+    </ModalOverlay>
+  );
 };
 
 export default EditCategoryModal;
