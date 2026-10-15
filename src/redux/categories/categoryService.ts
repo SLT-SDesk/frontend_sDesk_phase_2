@@ -178,6 +178,7 @@ export const createCategoryItem = async (data: {
     });
   } catch (error) {
     if (axios.isAxiosError(error)) {
+      console.error("❌ 400 ERROR RESPONSE FROM SERVER:", error.response?.data);
       throw error.response?.data || error.message;
     }
     throw error;
