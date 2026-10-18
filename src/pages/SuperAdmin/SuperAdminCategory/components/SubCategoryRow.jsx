@@ -12,13 +12,14 @@ import {
  * @param {function} onEdit   - Callback when Edit button is clicked
  * @param {function} onDelete - Callback when Delete button is clicked
  */
-const SubCategoryRow = ({ item, onSelect, onEdit, onDelete }) => {
+const SubCategoryRow = ({ item, index = 0, onSelect, onEdit, onDelete }) => {
+    const displayId = `CAT${String(index + 1).padStart(3, "0")}`;
     return (
         <tr
             onClick={() => onSelect && onSelect(item)}
             style={{ cursor: onSelect ? "pointer" : "default" }}
         >
-            <CategoryCodeCell>{item.category_code || item.id}</CategoryCodeCell>
+            <CategoryCodeCell title={item.id}>{displayId}</CategoryCodeCell>
             <td>{item.name}</td>
             <td>
                 <ActionButton

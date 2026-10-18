@@ -73,13 +73,9 @@ const CloseButton = styled.button`
 
 const FormGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 16px;
   margin-bottom: 28px;
-
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
-  }
 `;
 
 const FormGroup = styled.div`
@@ -163,94 +159,80 @@ const AddButton = styled.button`
  * AddCategoryItemModal - Modal for adding a new category item
  * @param {boolean} isOpen
  * @param {function} onClose
- * @param {function} onSave - Save handler ({ id, name })
+ * @param {function} onSave - Save handler ({ name })
  * @param {string} parentCategoryName
  * @param {string} subCategoryName
  */
 const AddCategoryItemModal = ({
-    isOpen,
-    onClose,
-    onSave,
-    parentCategoryName = "",
-    subCategoryName = "",
+  isOpen,
+  onClose,
+  onSave,
+  parentCategoryName = "",
+  subCategoryName = "",
 }) => {
-    const [itemId, setItemId] = useState("");
-    const [itemName, setItemName] = useState("");
+  const [itemName, setItemName] = useState("");
 
-    useEffect(() => {
-        if (isOpen) {
-            setItemId("");
-            setItemName("");
-        }
-    }, [isOpen]);
+  useEffect(() => {
+    if (isOpen) {
+      setItemName("");
+    }
+  }, [isOpen]);
 
-    if (!isOpen) return null;
+  if (!isOpen) return null;
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!itemId.trim() || !itemName.trim()) return;
-        if (onSave) {
-            onSave({ id: itemId.trim(), name: itemName.trim() });
-        }
-        onClose();
-    };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!itemName.trim()) return;
+    if (onSave) {
+      onSave({ name: itemName.trim() });
+    }
+    onClose();
+  };
 
-    return (
-        <ModalOverlay onClick={onClose}>
-            <ModalCard onClick={(e) => e.stopPropagation()}>
-                <HeaderRow>
-                    <HeaderTitles>
-                        <ModalParentTitle>Parent Category - {parentCategoryName}</ModalParentTitle>
-                        <ModalParentTitle>Sub Category - {subCategoryName}</ModalParentTitle>
-                        <ModalTitle>Add Category Item</ModalTitle>
-                    </HeaderTitles>
-                    <CloseButton onClick={onClose} title="Close">
-                        <FiX />
-                    </CloseButton>
-                </HeaderRow>
+  return (
+    <ModalOverlay onClick={onClose}>
+      <ModalCard onClick={(e) => e.stopPropagation()}>
+        <HeaderRow>
+          <HeaderTitles>
+            <ModalParentTitle>Parent Category - {parentCategoryName}</ModalParentTitle>
+            <ModalParentTitle>Sub Category - {subCategoryName}</ModalParentTitle>
+            <ModalTitle>Add Category Item</ModalTitle>
+          </HeaderTitles>
+          <CloseButton onClick={onClose} title="Close">
+            <FiX />
+          </CloseButton>
+        </HeaderRow>
 
-                <form onSubmit={handleSubmit}>
-                    <FormGrid>
-                        <FormGroup>
-                            <Label>
-                                Category Item ID
-                                <span className="required-star">*</span>
-                            </Label>
-                            <StyledInput
-                                type="text"
-                                value={itemId}
-                                onChange={(e) => setItemId(e.target.value)}
-                                required
-                                autoFocus
-                            />
-                        </FormGroup>
+        <form onSubmit={handleSubmit}>
+          <FormGrid>
+            <FormGroup>
+              <Label>
+                Category Item Name
+                <span className="required-star">*</span>
+              </Label>
+              <StyledInput
+                type="text"
+                value={itemName}
+                onChange={(e) => setItemName(e.target.value)}
+                placeholder="Enter category item name"
+                required
+                autoFocus
+              />
+            </FormGroup>
+          </FormGrid>
 
-                        <FormGroup>
-                            <Label>
-                                Category Item Name
-                                <span className="required-star">*</span>
-                            </Label>
-                            <StyledInput
-                                type="text"
-                                value={itemName}
-                                onChange={(e) => setItemName(e.target.value)}
-                                required
-                            />
-                        </FormGroup>
-                    </FormGrid>
-
-                    <ActionsRow>
-                        <CancelButton type="button" onClick={onClose}>
-                            Cancel
-                        </CancelButton>
-                        <AddButton type="submit">
-                            Add Category
-                        </AddButton>
-                    </ActionsRow>
-                </form>
-            </ModalCard>
-        </ModalOverlay>
-    );
+          <ActionsRow>
+            <CancelButton type="button" onClick={onClose}>
+              Cancel
+            </CancelButton>
+            <AddButton type="submit">
+              Add Category
+            </AddButton>
+          </ActionsRow>
+        </form>
+      </ModalCard>
+    </ModalOverlay>
+  );
 };
 
 export default AddCategoryItemModal;

@@ -9,6 +9,10 @@ import {
 import {
     fetchMainCategoriesRequest,
     fetchSubCategoriesByMainCategoryIdRequest,
+    fetchCategoryItemsRequest,
+    deleteCategoryItemRequest,
+    createCategoryItemRequest,
+    updateCategoryItemRequest,
     createSubCategoryRequest,
     updateSubCategoryRequest,
     deleteSubCategoryRequest,
@@ -34,41 +38,6 @@ import EditCategoryItemModal from "./components/EditCategoryItemModal";
 import DeleteCategoryItemModal from "./components/DeleteCategoryItemModal";
 import AddCategoryItemModal from "./components/AddCategoryItemModal";
 
-const INITIAL_CATEGORY_ITEMS_MAP = {
-    "CAT004#1": [
-        { id: "CAT004#1/1", name: "E-Mail Not Receiving" },
-        { id: "CAT004#1/2", name: "E-Mail Backup Required" },
-        { id: "CAT004#1/3", name: "E-Mail Common Account password" },
-        { id: "CAT004#1/4", name: "E-Mail Lost" },
-        { id: "CAT004#1/5", name: "MailBox Filled" },
-        { id: "CAT004#1/6", name: "New Email Account" },
-        { id: "CAT004#1/7", name: "Email-TAB/Phone Configuration" },
-        { id: "CAT004#1/8", name: "Outlook Patch Update" },
-        { id: "CAT004#1/9", name: "Email Not Working" },
-    ],
-    "CAT004#2": [
-        { id: "CAT004#2/1", name: "Cashiering System Login" },
-        { id: "CAT004#2/2", name: "Cashiering Hardware Issue" },
-        { id: "CAT004#2/3", name: "Cashiering Software Error" },
-    ],
-    "CAT004#3": [
-        { id: "CAT004#3/1", name: "Laptop Issue" },
-        { id: "CAT004#3/2", name: "Desktop Issue" },
-        { id: "CAT004#3/3", name: "Printer Issue" },
-        { id: "CAT004#3/4", name: "Monitor Issue" },
-    ],
-    "CAT004#4": [
-        { id: "CAT004#4/1", name: "Software Installation" },
-        { id: "CAT004#4/2", name: "Software Update" },
-        { id: "CAT004#4/3", name: "License Issue" },
-    ],
-    "CAT004#5": [
-        { id: "CAT004#5/1", name: "Network Down" },
-        { id: "CAT004#5/2", name: "Slow Internet" },
-        { id: "CAT004#5/3", name: "Wi-Fi Not Working" },
-    ],
-};
-
 /**
  * SuperAdminCategory - Parent Component (API-connected)
  * Coordinates Redux state, filtering, and props passing to child components.
@@ -82,6 +51,7 @@ const SuperAdminCategory = () => {
     const subCategories = useSelector((state) => state.categories.subCategories);
     const subCategoriesLoading = useSelector((state) => state.categories.subCategoriesLoading);
     const subCategoriesError = useSelector((state) => state.categories.subCategoriesError);
+    const categoryItems = useSelector((state) => state.categories.categoryItems || []);
     const createSubCategorySuccess = useSelector((state) => state.categories.createSubCategorySuccess);
     const createSubCategoryError = useSelector((state) => state.categories.createSubCategoryError);
     const updateSubCategorySuccess = useSelector((state) => state.categories.updateSubCategorySuccess);
@@ -95,7 +65,6 @@ const SuperAdminCategory = () => {
     const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [statusMessage, setStatusMessage] = useState(null); // { text, type: 'success'|'error' }
-    const [categoryItemsMap, setCategoryItemsMap] = useState(INITIAL_CATEGORY_ITEMS_MAP);
 
     // Subcategory modal
     const [isSubCategoryModalOpen, setIsSubCategoryModalOpen] = useState(false);
@@ -123,9 +92,10 @@ const SuperAdminCategory = () => {
     const [isDeleteErrorModalOpen, setIsDeleteErrorModalOpen] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState(null);
 
-    // ── On mount: fetch main categories ───────────────────────────────────────
+    // ── On mount: fetch main categories and all category items ────────────────
     useEffect(() => {
         dispatch(fetchMainCategoriesRequest());
+        dispatch(fetchCategoryItemsRequest());
     }, [dispatch]);
 
     // ── When selectedParentId changes: fetch its sub categories ───────────────
@@ -134,6 +104,13 @@ const SuperAdminCategory = () => {
             dispatch(fetchSubCategoriesByMainCategoryIdRequest(selectedParentId));
         }
     }, [dispatch, selectedParentId]);
+
+    // ── When selectedSubCategoryId changes: refresh category items ────────────
+    useEffect(() => {
+        if (selectedSubCategoryId) {
+            dispatch(fetchCategoryItemsRequest());
+        }
+    }, [dispatch, selectedSubCategoryId]);
 
     // ── React to Redux async results (show toast-style status) ────────────────
     useEffect(() => {
@@ -192,18 +169,20 @@ const SuperAdminCategory = () => {
         );
     }, [currentParent, subCategories, searchQuery]);
 
-    // Filtered Category Items based on search
+    // Filtered Category Items based on selected subcategory (from Redux)
     const displayedCategoryItems = useMemo(() => {
         if (!currentSubCategory) return [];
-        const list = categoryItemsMap[currentSubCategory.id] || [];
+        const list = categoryItems.filter(
+            (item) => item.subCategory?.id === currentSubCategory.id
+        );
         if (!searchQuery.trim()) return list;
         const query = searchQuery.toLowerCase().trim();
         return list.filter(
             (item) =>
-                item.id.toLowerCase().includes(query) ||
+                (item.category_code || item.id || "").toLowerCase().includes(query) ||
                 item.name.toLowerCase().includes(query)
         );
-    }, [currentSubCategory, categoryItemsMap, searchQuery]);
+    }, [currentSubCategory, categoryItems, searchQuery]);
 
     // Filtered parent categories (client-side search)
     const displayedParentCategories = useMemo(() => {
@@ -324,15 +303,16 @@ const SuperAdminCategory = () => {
 
     // ── Category Item handlers ─────────────────────────────────────────────────
 
-    const handleSaveNewCategoryItem = ({ id, name }) => {
+    // handleSaveNewCategoryItem: dispatches the real create action
+    const handleSaveNewCategoryItem = ({ name }) => {
         if (!currentSubCategory) return;
-        setCategoryItemsMap((prev) => {
-            const subList = prev[currentSubCategory.id] || [];
-            return {
-                ...prev,
-                [currentSubCategory.id]: [...subList, { id, name }],
-            };
-        });
+        dispatch(
+            createCategoryItemRequest({
+                name,
+                subCategoryId: currentSubCategory.id,
+            })
+        );
+        showStatus(`Category item "${name}" created.`);
     };
 
     const handleEditCategoryItem = (item) => {
@@ -340,19 +320,17 @@ const SuperAdminCategory = () => {
         setIsEditCategoryItemModalOpen(true);
     };
 
+    // handleSaveEditedCategoryItem: dispatches the real update action
     const handleSaveEditedCategoryItem = ({ id, name }) => {
         if (!currentSubCategory) return;
-        setCategoryItemsMap((prev) => {
-            const subList = prev[currentSubCategory.id] || [];
-            return {
-                ...prev,
-                [currentSubCategory.id]: subList.map((item) =>
-                    item.id === (editingCategoryItem?.id || id)
-                        ? { ...item, name }
-                        : item
-                ),
-            };
-        });
+        dispatch(
+            updateCategoryItemRequest({
+                id,
+                name,
+                subCategoryId: currentSubCategory.id,
+            })
+        );
+        showStatus(`Category item updated.`);
     };
 
     const handleDeleteCategoryItem = (item) => {
@@ -362,7 +340,11 @@ const SuperAdminCategory = () => {
 
     const handleConfirmDeleteCategoryItem = () => {
         setIsDeleteCategoryItemModalOpen(false);
-        setIsDeleteCategoryItemErrorModalOpen(true);
+        if (categoryItemToDelete?.id) {
+            dispatch(deleteCategoryItemRequest(categoryItemToDelete.id));
+            showStatus(`Category item "${categoryItemToDelete.name}" deleted.`);
+        }
+        setCategoryItemToDelete(null);
     };
 
     // ── Parent Category Modal handlers ─────────────────────────────────────────
@@ -542,7 +524,7 @@ const SuperAdminCategory = () => {
                     }
                     totalCount={
                         isCategoryItemView
-                            ? (categoryItemsMap[currentSubCategory?.id] || []).length
+                            ? categoryItems.filter((item) => item.subCategory?.id === currentSubCategory?.id).length
                             : isSubCategoryView
                                 ? subCategories.length
                                 : mainCategories.length

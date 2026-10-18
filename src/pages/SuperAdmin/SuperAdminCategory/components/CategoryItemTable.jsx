@@ -27,10 +27,11 @@ const CategoryItemTable = ({ items = [], onEdit, onDelete }) => {
                 </TableHead>
                 <TableBody>
                     {items.length > 0 ? (
-                        items.map((item) => (
+                        items.map((item, index) => (
                             <CategoryItemRow
                                 key={item.id}
                                 item={item}
+                                index={index}
                                 onEdit={onEdit}
                                 onDelete={onDelete}
                             />

@@ -11,10 +11,13 @@ import {
  * @param {function} onEdit - Edit handler
  * @param {function} onDelete - Delete handler
  */
-const CategoryItemRow = ({ item, onEdit, onDelete }) => {
+const CategoryItemRow = ({ item, index = 0, onEdit, onDelete }) => {
+    const displayId = `CAT${String(index + 1).padStart(3, "0")}`;
     return (
         <tr>
-            <CategoryCodeCell>{item.id}</CategoryCodeCell>
+            <CategoryCodeCell title={item.id}>
+                {displayId}
+            </CategoryCodeCell>
             <td>{item.name}</td>
             <td>
                 <ActionButton $variant="edit" title="Edit" onClick={() => onEdit && onEdit(item)}>

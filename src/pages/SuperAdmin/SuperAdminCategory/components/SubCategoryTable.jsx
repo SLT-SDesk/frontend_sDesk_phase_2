@@ -33,10 +33,11 @@ const SubCategoryTable = ({ items = [], loading = false, onSelectSubCategory, on
                             <EmptyRowCell colSpan="3">Loading...</EmptyRowCell>
                         </tr>
                     ) : items.length > 0 ? (
-                        items.map((subCat) => (
+                        items.map((subCat, index) => (
                             <SubCategoryRow
                                 key={subCat.id}
                                 item={subCat}
+                                index={index}
                                 onSelect={onSelectSubCategory}
                                 onEdit={onEdit}
                                 onDelete={onDelete}
