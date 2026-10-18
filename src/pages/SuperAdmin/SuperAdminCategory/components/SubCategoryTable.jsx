@@ -10,12 +10,13 @@ import {
 
 /**
  * SubCategoryTable - Child component rendering table headers and list of subcategories
- * @param {Array} items - List of subcategories
- * @param {function} onSelectSubCategory - Callback when a subcategory row is clicked
- * @param {function} onEditSubCategory - Callback when edit button is clicked
- * @param {function} onDeleteSubCategory - Callback when delete button is clicked
+ * @param {Array}    items               - List of subcategories from Redux
+ * @param {boolean}  loading             - Loading state
+ * @param {function} onSelectSubCategory - Callback when a subcategory row is clicked (drills down)
+ * @param {function} onEdit              - Callback when Edit button is clicked on a row
+ * @param {function} onDelete            - Callback when Delete button is clicked on a row
  */
-const SubCategoryTable = ({ items = [], onSelectSubCategory, onEditSubCategory, onDeleteSubCategory }) => {
+const SubCategoryTable = ({ items = [], loading = false, onSelectSubCategory, onEdit, onDelete }) => {
     return (
         <TableWrapper>
             <Table>
@@ -27,14 +28,18 @@ const SubCategoryTable = ({ items = [], onSelectSubCategory, onEditSubCategory, 
                     </tr>
                 </TableHead>
                 <TableBody>
-                    {items.length > 0 ? (
+                    {loading ? (
+                        <tr>
+                            <EmptyRowCell colSpan="3">Loading...</EmptyRowCell>
+                        </tr>
+                    ) : items.length > 0 ? (
                         items.map((subCat) => (
                             <SubCategoryRow
                                 key={subCat.id}
                                 item={subCat}
                                 onSelect={onSelectSubCategory}
-                                onEdit={onEditSubCategory}
-                                onDelete={onDeleteSubCategory}
+                                onEdit={onEdit}
+                                onDelete={onDelete}
                             />
                         ))
                     ) : (

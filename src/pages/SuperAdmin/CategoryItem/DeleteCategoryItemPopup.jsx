@@ -7,15 +7,15 @@ import {
   Typography,
 } from "@mui/material";
 
-const DeleteCategoryItemPopup = ({ open, onClose, onConfirm }) => {
+const DeleteCategoryItemPopup = ({ open, item, onClose, onConfirm }) => {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
       <DialogContent sx={{ p: 4, pb: 3 }}>
         <Typography variant="h6" sx={{ fontWeight: 700, mb: 1.5, color: "#111" }}>
-          Delete Category?
+          Delete Category Item?
         </Typography>
         <Typography variant="body1" sx={{ color: "#64748b", lineHeight: 1.5 }}>
-          Are you sure you want to delete this category? This action cannot be undone.
+          Are you sure you want to delete {item ? `"${item.name}" (${item.category_code || item.id})` : "this category item"}? This action cannot be undone.
         </Typography>
       </DialogContent>
 

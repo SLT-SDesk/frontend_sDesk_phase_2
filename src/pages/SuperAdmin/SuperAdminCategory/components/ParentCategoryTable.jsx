@@ -12,13 +12,15 @@ import {
 
 /**
  * ParentCategoryTable - Child component for displaying parent categories list
- * @param {Array} items - List of parent categories
+ * @param {Array}    items          - List of parent categories
+ * @param {boolean}  loading        - Loading state
  * @param {function} onSelectParent - Callback when clicking a parent category to drilldown
- * @param {function} onEdit - Callback when clicking edit icon
- * @param {function} onDelete - Callback when clicking delete icon
+ * @param {function} onEdit         - Callback when clicking edit icon
+ * @param {function} onDelete       - Callback when clicking delete icon
  */
 const ParentCategoryTable = ({
     items = [],
+    loading = false,
     onSelectParent,
     onEdit,
     onDelete,
@@ -34,7 +36,11 @@ const ParentCategoryTable = ({
                     </tr>
                 </TableHead>
                 <TableBody>
-                    {items.length > 0 ? (
+                    {loading ? (
+                        <tr>
+                            <EmptyRowCell colSpan="3">Loading...</EmptyRowCell>
+                        </tr>
+                    ) : items.length > 0 ? (
                         items.map((cat) => (
                             <tr key={cat.id}>
                                 <CategoryCodeCell
