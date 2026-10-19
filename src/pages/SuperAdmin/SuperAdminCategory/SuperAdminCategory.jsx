@@ -369,17 +369,10 @@ const SuperAdminCategory = () => {
         setIsDeleteCategoryModalOpen(true);
     };
 
-    /** Step 2 from DeleteCategoryModal – attempt the API delete */
+    /** Step 2 from DeleteCategoryModal – Parent category cannot be deleted, show error modal */
     const handleConfirmDeleteCategory = (category) => {
         setIsDeleteCategoryModalOpen(false);
-        dispatch(deleteMainCategoryRequest(category.id));
-        // If the backend returns an error (e.g. has sub-categories), show error modal
-        // We use a short delay so the saga has time to dispatch failure if any
-        setTimeout(() => {
-            if (deleteMainCategoryError) {
-                setIsDeleteErrorModalOpen(true);
-            }
-        }, 800);
+        setIsDeleteErrorModalOpen(true);
     };
 
     // ── Derived helpers ────────────────────────────────────────────────────────
@@ -622,17 +615,23 @@ const SuperAdminCategory = () => {
             {/* Delete Parent Category Confirmation Modal */}
             <DeleteCategoryModal
                 isOpen={isDeleteCategoryModalOpen}
-                onClose={() => setIsDeleteCategoryModalOpen(false)}
+                onClose={() => {
+                    setIsDeleteCategoryModalOpen(false);
+                    setCategoryToDelete(null);
+                }}
                 onConfirm={handleConfirmDeleteCategory}
                 category={categoryToDelete}
             />
 
-            {/* Delete Unsuccessful Modal (backend rejected delete) */}
+            {/* Parent Category Delete Unsuccessfully Modal */}
             <ParentCategoryDeleteErrorModal
                 isOpen={isDeleteErrorModalOpen}
-                onClose={() => setIsDeleteErrorModalOpen(false)}
-                title="Parent Category Delete Unsuccessful"
-                message="The Parent Category could not be deleted. It may still have sub categories linked to it."
+                onClose={() => {
+                    setIsDeleteErrorModalOpen(false);
+                    setCategoryToDelete(null);
+                }}
+                title="Parent Category Delete Unsuccessfully"
+                message="The Parent Category could not be deleted."
             />
         </CategoryContainer>
     );

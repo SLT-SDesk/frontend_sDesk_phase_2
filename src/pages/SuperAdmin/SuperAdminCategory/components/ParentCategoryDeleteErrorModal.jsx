@@ -51,12 +51,13 @@ const ModalTitle = styled.h2`
 const ModalDescription = styled.p`
   margin: 0 0 24px 0;
   font-size: 13.5px;
-  color: #6b7280;
+  color: #4b5563;
   line-height: 1.5;
 `;
 
 const OkButton = styled.button`
-  padding: 8px 36px;
+  padding: 8px 40px;
+  min-width: 100px;
   border: none;
   border-radius: 6px;
   background-color: #dc2626;
