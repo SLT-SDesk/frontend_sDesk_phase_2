@@ -256,23 +256,19 @@ const SuperAdminCategory = () => {
     // ── SubCategory Modal handlers ─────────────────────────────────────────────
 
     const handleEditSubCategoryClick = (subCategory) => {
-        setEditingSubCategory(subCategory);
-        setIsSubCategoryModalOpen(true);
+        setEditingSubCategoryItem(subCategory);
+        setIsEditSubCategoryModalOpen(true);
     };
 
     const handleDeleteSubCategoryClick = (subCategory) => {
-        if (!currentParent) return;
-        const confirmed = window.confirm(
-            `Delete sub category "${subCategory.name}"? This cannot be undone.`
-        );
-        if (!confirmed) return;
-        dispatch(
-            deleteSubCategoryRequest({
-                id: subCategory.id,
-                mainCategoryId: currentParent.id,
-            })
-        );
-        showStatus(`Sub category "${subCategory.name}" deleted.`);
+        setSubCategoryToDelete(subCategory);
+        setIsDeleteSubCategoryModalOpen(true);
+    };
+
+    /** Step 2 from DeleteSubCategoryModal – Sub category cannot be deleted, show error modal */
+    const handleConfirmDeleteSubCategory = () => {
+        setIsDeleteSubCategoryModalOpen(false);
+        setIsDeleteSubCategoryErrorModalOpen(true);
     };
 
     /** Called by SubCategoryModal on Save (add or edit) */
@@ -299,6 +295,19 @@ const SuperAdminCategory = () => {
             );
             showStatus(`Sub category "${name}" created.`);
         }
+    };
+
+    /** Called by EditSubCategoryModal on Save */
+    const handleSaveEditedSubCategory = ({ id, name }) => {
+        if (!currentParent) return;
+        dispatch(
+            updateSubCategoryRequest({
+                id,
+                name,
+                mainCategoryId: currentParent.id,
+            })
+        );
+        showStatus(`Sub category updated successfully.`);
     };
 
     // ── Category Item handlers ─────────────────────────────────────────────────
@@ -338,13 +347,10 @@ const SuperAdminCategory = () => {
         setIsDeleteCategoryItemModalOpen(true);
     };
 
+    /** Step 2 from DeleteCategoryItemModal – Category item cannot be deleted, show error modal */
     const handleConfirmDeleteCategoryItem = () => {
         setIsDeleteCategoryItemModalOpen(false);
-        if (categoryItemToDelete?.id) {
-            dispatch(deleteCategoryItemRequest(categoryItemToDelete.id));
-            showStatus(`Category item "${categoryItemToDelete.name}" deleted.`);
-        }
-        setCategoryItemToDelete(null);
+        setIsDeleteCategoryItemErrorModalOpen(true);
     };
 
     // ── Parent Category Modal handlers ─────────────────────────────────────────
@@ -582,16 +588,17 @@ const SuperAdminCategory = () => {
             <EditSubCategoryModal
                 isOpen={isEditSubCategoryModalOpen}
                 onClose={() => { setIsEditSubCategoryModalOpen(false); setEditingSubCategoryItem(null); }}
-                onSave={() => { }}
+                onSave={handleSaveEditedSubCategory}
                 subCategory={editingSubCategoryItem}
                 parentCategoryName={currentParent ? currentParent.name : ""}
+                subCategoryOptions={subCategories}
             />
 
-            {/* Delete SubCategory Modal (legacy) */}
+            {/* Delete SubCategory Modal */}
             <DeleteSubCategoryModal
                 isOpen={isDeleteSubCategoryModalOpen}
                 onClose={() => { setIsDeleteSubCategoryModalOpen(false); setSubCategoryToDelete(null); }}
-                onConfirm={() => { setIsDeleteSubCategoryModalOpen(false); setIsDeleteSubCategoryErrorModalOpen(true); }}
+                onConfirm={handleConfirmDeleteSubCategory}
                 subCategory={subCategoryToDelete}
             />
 

@@ -120,7 +120,7 @@ const StyledInput = styled.input`
   }
 `;
 
-const StyledInput2 = styled.input`
+const StyledSelect = styled.select`
   padding: 9px 12px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
@@ -128,6 +128,7 @@ const StyledInput2 = styled.input`
   color: #111827;
   background-color: #ffffff;
   outline: none;
+  cursor: pointer;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
   &:focus {
@@ -181,12 +182,13 @@ const SaveButton = styled.button`
 
 /**
  * EditSubCategoryModal - Modal for editing a subcategory
- * Matching the design style of EditCategoryModal
+ * Matching the Figma design with dropdown for sub category name
  * @param {boolean} isOpen - Whether modal is visible
  * @param {function} onClose - Close handler
  * @param {function} onSave - Save handler ({ id, name })
- * @param {object} subCategory - SubCategory to edit { id, name }
+ * @param {object} subCategory - SubCategory to edit { id, name, category_code }
  * @param {string} parentCategoryName - Name of the parent category for the header
+ * @param {Array} subCategoryOptions - List of all subcategory objects for the dropdown
  */
 const EditSubCategoryModal = ({
     isOpen,
@@ -194,13 +196,15 @@ const EditSubCategoryModal = ({
     onSave,
     subCategory = null,
     parentCategoryName = "",
+    subCategoryOptions = [],
 }) => {
     const [subCategoryId, setSubCategoryId] = useState("");
     const [subCategoryName, setSubCategoryName] = useState("");
 
     useEffect(() => {
         if (subCategory) {
-            setSubCategoryId(subCategory.id || "");
+            const displayCode = (subCategory.category_code || subCategory.id || "").replace(/^SUB/i, "CAT");
+            setSubCategoryId(displayCode);
             setSubCategoryName(subCategory.name || "");
         }
     }, [subCategory, isOpen]);
@@ -249,14 +253,21 @@ const EditSubCategoryModal = ({
                                 Sub Category Name
                                 <span className="required-star">*</span>
                             </Label>
-                            <StyledInput2
-                                type="text"
+                            <StyledSelect
                                 value={subCategoryName}
                                 onChange={(e) => setSubCategoryName(e.target.value)}
-                                placeholder="Enter sub category name"
                                 required
-                                autoFocus
-                            />
+                            >
+                                {subCategoryOptions.length > 0 ? (
+                                    subCategoryOptions.map((sc) => (
+                                        <option key={sc.id} value={sc.name}>
+                                            {sc.name}
+                                        </option>
+                                    ))
+                                ) : (
+                                    <option value={subCategoryName}>{subCategoryName}</option>
+                                )}
+                            </StyledSelect>
                         </FormGroup>
                     </FormGrid>
 

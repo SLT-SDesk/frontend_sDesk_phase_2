@@ -97,8 +97,8 @@ const DeleteCategoryItemModal = ({ isOpen, onClose, onConfirm, categoryItem = nu
             <ModalCard onClick={(e) => e.stopPropagation()}>
                 <ModalTitle>Delete Category Item?</ModalTitle>
                 <ModalDescription>
-                    Are you sure you want to delete{" "}
-                    <strong>"{categoryItem?.name}"</strong>? This action cannot be undone.
+                    Are you sure you want to delete this category item? This action cannot be
+                    undone.
                 </ModalDescription>
                 <ActionsRow>
                     <CancelButton type="button" onClick={onClose}>

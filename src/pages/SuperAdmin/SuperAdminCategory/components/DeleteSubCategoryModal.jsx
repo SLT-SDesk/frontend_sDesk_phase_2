@@ -103,8 +103,8 @@ const DeleteSubCategoryModal = ({
             <ModalCard onClick={(e) => e.stopPropagation()}>
                 <ModalTitle>Delete Sub Category?</ModalTitle>
                 <ModalDescription>
-                    Are you sure you want to delete{" "}
-                    <strong>"{subCategory?.name}"</strong>? This action cannot be undone.
+                    Are you sure you want to delete this sub category? This action cannot be
+                    undone.
                 </ModalDescription>
                 <ActionsRow>
                     <CancelButton type="button" onClick={onClose}>
