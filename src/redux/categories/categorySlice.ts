@@ -148,6 +148,13 @@ const categorySlice = createSlice({
       state.createMainCategoryLoading = false;
       state.createMainCategorySuccess = true;
       state.list.push(action.payload);
+      // Also add to mainCategories so the table updates immediately
+      if (action.payload && action.payload.id) {
+        const exists = state.mainCategories.some((c) => c.id === action.payload.id);
+        if (!exists) {
+          state.mainCategories.push(action.payload);
+        }
+      }
     },
     createCategoryFailure(state, action) {
       state.createMainCategoryLoading = false;
@@ -187,6 +194,13 @@ const categorySlice = createSlice({
     createCategoryItemSuccess(state, action) {
       state.createCategoryItemLoading = false;
       state.createCategoryItemSuccess = true;
+      // Also add to categoryItems so the table updates immediately
+      if (action.payload && action.payload.id) {
+        const exists = (state.categoryItems || []).some((c) => c.id === action.payload.id);
+        if (!exists) {
+          state.categoryItems = [...(state.categoryItems || []), action.payload];
+        }
+      }
     },
     createCategoryItemFailure(state, action) {
       state.createCategoryItemLoading = false;

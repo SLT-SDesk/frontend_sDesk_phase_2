@@ -61,6 +61,10 @@ const SuperAdminCategory = () => {
     const deleteSubCategoryError = useSelector((state) => state.categories.deleteSubCategoryError);
     const updateMainCategoryError = useSelector((state) => state.categories.updateMainCategoryError);
     const deleteMainCategoryError = useSelector((state) => state.categories.deleteMainCategoryError);
+    const createMainCategorySuccess = useSelector((state) => state.categories.createMainCategorySuccess);
+    const createMainCategoryError = useSelector((state) => state.categories.createMainCategoryError);
+    const createCategoryItemSuccess = useSelector((state) => state.categories.createCategoryItemSuccess);
+    const createCategoryItemError = useSelector((state) => state.categories.createCategoryItemError);
 
     // ── Local UI state ─────────────────────────────────────────────────────────
     const [selectedParentId, setSelectedParentId] = useState(null);
@@ -115,6 +119,27 @@ const SuperAdminCategory = () => {
         }
     }, [dispatch, selectedSubCategoryId]);
 
+    // ── Re-fetch main categories after successful creation ────────────────────
+    useEffect(() => {
+        if (createMainCategorySuccess) {
+            dispatch(fetchMainCategoriesRequest());
+        }
+    }, [createMainCategorySuccess, dispatch]);
+
+    // ── Re-fetch subcategories after successful subcategory creation ───────────
+    useEffect(() => {
+        if (createSubCategorySuccess && selectedParentId) {
+            dispatch(fetchSubCategoriesByMainCategoryIdRequest(selectedParentId));
+        }
+    }, [createSubCategorySuccess, dispatch, selectedParentId]);
+
+    // ── Re-fetch category items after successful category item creation ───────
+    useEffect(() => {
+        if (createCategoryItemSuccess) {
+            dispatch(fetchCategoryItemsRequest());
+        }
+    }, [createCategoryItemSuccess, dispatch]);
+
     // ── React to Redux async results (show toast-style status) ────────────────
     useEffect(() => {
         const err =
@@ -123,7 +148,9 @@ const SuperAdminCategory = () => {
             updateSubCategoryError ||
             deleteSubCategoryError ||
             updateMainCategoryError ||
-            deleteMainCategoryError;
+            deleteMainCategoryError ||
+            createMainCategoryError ||
+            createCategoryItemError;
         if (err) {
             const msg = err === "DUPLICATE_NAME"
                 ? "A category with that name already exists."
@@ -137,6 +164,8 @@ const SuperAdminCategory = () => {
         deleteSubCategoryError,
         updateMainCategoryError,
         deleteMainCategoryError,
+        createMainCategoryError,
+        createCategoryItemError,
     ]);
 
     // ── Helpers ────────────────────────────────────────────────────────────────
@@ -406,7 +435,8 @@ const SuperAdminCategory = () => {
     }, [mainCategories]);
 
     const handleSaveNewParentCategory = ({ category_code, name }) => {
-        dispatch(createCategoryRequest({ category_code, name }));
+        // Only send { name } — backend auto-generates category_code
+        dispatch(createCategoryRequest({ name }));
         showStatus(`Parent category "${name}" created.`);
     };
 
