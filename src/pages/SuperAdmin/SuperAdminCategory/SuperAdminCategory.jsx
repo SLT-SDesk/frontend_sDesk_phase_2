@@ -160,6 +160,22 @@ const SuperAdminCategory = () => {
     const isSubCategoryView = Boolean(currentParent) && !currentSubCategory;
     const isCategoryItemView = Boolean(currentParent) && Boolean(currentSubCategory);
 
+    // Formatted current parent category code (e.g. CAT004 or CAT001)
+    const currentParentCode = useMemo(() => {
+        if (!currentParent) return "";
+        return (currentParent.category_code || currentParent.id || "").replace(/^MAIN/i, "CAT");
+    }, [currentParent]);
+
+    // Formatted current subcategory code (e.g. CAT004#1)
+    const currentSubCategoryCode = useMemo(() => {
+        if (!currentSubCategory || !currentParent) return "";
+        if (currentSubCategory.category_code && currentSubCategory.category_code.includes("#")) {
+            return currentSubCategory.category_code;
+        }
+        const idx = subCategories.findIndex((s) => s.id === currentSubCategory.id);
+        return `${currentParentCode}#${idx >= 0 ? idx + 1 : 1}`;
+    }, [currentSubCategory, currentParent, currentParentCode, subCategories]);
+
     // Filtered subcategories (client-side search over the Redux list)
     const displayedSubCategories = useMemo(() => {
         if (!currentParent) return [];
@@ -257,8 +273,8 @@ const SuperAdminCategory = () => {
 
     // ── SubCategory Modal handlers ─────────────────────────────────────────────
 
-    const handleEditSubCategoryClick = (subCategory) => {
-        setEditingSubCategoryItem(subCategory);
+    const handleEditSubCategoryClick = (subCategory, displayId) => {
+        setEditingSubCategoryItem({ ...subCategory, displayId: displayId || subCategory.displayId });
         setIsEditSubCategoryModalOpen(true);
     };
 
@@ -326,8 +342,8 @@ const SuperAdminCategory = () => {
         showStatus(`Category item "${name}" created.`);
     };
 
-    const handleEditCategoryItem = (item) => {
-        setEditingCategoryItem(item);
+    const handleEditCategoryItem = (item, displayId) => {
+        setEditingCategoryItem({ ...item, displayId: displayId || item.displayId });
         setIsEditCategoryItemModalOpen(true);
     };
 
@@ -530,12 +546,14 @@ const SuperAdminCategory = () => {
                 {isCategoryItemView ? (
                     <CategoryItemTable
                         items={displayedCategoryItems}
+                        subCategoryCode={currentSubCategoryCode}
                         onEdit={handleEditCategoryItem}
                         onDelete={handleDeleteCategoryItem}
                     />
                 ) : isSubCategoryView ? (
                     <SubCategoryTable
                         items={displayedSubCategories}
+                        parentCategoryCode={currentParentCode}
                         loading={subCategoriesLoading}
                         onSelectSubCategory={handleSelectSubCategoryRow}
                         onEdit={handleEditSubCategoryClick}

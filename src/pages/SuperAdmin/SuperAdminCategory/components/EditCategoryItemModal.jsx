@@ -232,7 +232,7 @@ const EditCategoryItemModal = ({
                             <Label>Category Item ID</Label>
                             <StyledInputReadOnly
                                 type="text"
-                                value={(categoryItem?.category_code || categoryItem?.id || "").replace(/^ITEM/i, "CAT")}
+                                value={categoryItem?.displayId || categoryItem?.category_code || categoryItem?.id || ""}
                                 disabled
                                 readOnly
                             />

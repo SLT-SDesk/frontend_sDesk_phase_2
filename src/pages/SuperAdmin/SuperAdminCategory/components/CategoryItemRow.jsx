@@ -8,15 +8,16 @@ import {
 /**
  * CategoryItemRow - Renders a single category item row
  * @param {object} item - Category item with { id, name }
+ * @param {string} displayId - Formatted unique Category Item ID (e.g. CAT004#1#1)
  * @param {function} onEdit - Edit handler
  * @param {function} onDelete - Delete handler
  */
-const CategoryItemRow = ({ item, index = 0, onEdit, onDelete }) => {
-    const displayId = `CAT${String(index + 1).padStart(3, "0")}`;
+const CategoryItemRow = ({ item, displayId, index = 0, onEdit, onDelete }) => {
+    const finalDisplayId = displayId || (item.category_code || `ITEM${String(index + 1).padStart(3, "0")}`);
     return (
         <tr>
             <CategoryCodeCell title={item.id}>
-                {displayId}
+                {finalDisplayId}
             </CategoryCodeCell>
             <td>{item.name}</td>
             <td>

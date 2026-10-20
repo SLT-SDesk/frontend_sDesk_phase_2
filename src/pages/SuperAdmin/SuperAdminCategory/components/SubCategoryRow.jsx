@@ -7,19 +7,20 @@ import {
 
 /**
  * SubCategoryRow - Child component representing an individual subcategory row
- * @param {object}   item     - Subcategory item with { id, name, category_code }
- * @param {function} onSelect - Callback when row is clicked (drills down to category items)
- * @param {function} onEdit   - Callback when Edit button is clicked
- * @param {function} onDelete - Callback when Delete button is clicked
+ * @param {object}   item      - Subcategory item with { id, name, category_code }
+ * @param {string}   displayId - Formatted unique Sub Category ID (e.g. CAT004#1)
+ * @param {function} onSelect  - Callback when row is clicked (drills down to category items)
+ * @param {function} onEdit    - Callback when Edit button is clicked
+ * @param {function} onDelete  - Callback when Delete button is clicked
  */
-const SubCategoryRow = ({ item, index = 0, onSelect, onEdit, onDelete }) => {
-    const displayId = `CAT${String(index + 1).padStart(3, "0")}`;
+const SubCategoryRow = ({ item, displayId, index = 0, onSelect, onEdit, onDelete }) => {
+    const finalDisplayId = displayId || (item.category_code && item.category_code.includes("#") ? item.category_code : `CAT#${index + 1}`);
     return (
         <tr
             onClick={() => onSelect && onSelect(item)}
             style={{ cursor: onSelect ? "pointer" : "default" }}
         >
-            <CategoryCodeCell title={item.id}>{displayId}</CategoryCodeCell>
+            <CategoryCodeCell title={item.id}>{finalDisplayId}</CategoryCodeCell>
             <td>{item.name}</td>
             <td>
                 <ActionButton

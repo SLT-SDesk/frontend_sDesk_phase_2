@@ -203,7 +203,11 @@ const EditSubCategoryModal = ({
 
     useEffect(() => {
         if (subCategory) {
-            const displayCode = (subCategory.category_code || subCategory.id || "").replace(/^SUB/i, "CAT");
+            const displayCode =
+                subCategory.displayId ||
+                (subCategory.category_code && subCategory.category_code.includes("#")
+                    ? subCategory.category_code
+                    : (subCategory.category_code || subCategory.id || "").replace(/^SUB/i, "CAT"));
             setSubCategoryId(displayCode);
             setSubCategoryName(subCategory.name || "");
         }
