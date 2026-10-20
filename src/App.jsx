@@ -42,6 +42,7 @@ import MainDashboard from "./pages/MainDashboard/MainDashboard.jsx";
 import KPIReport from "./pages/Admin/KPIHelpdesk/KPIReport.jsx";
 import SlaSettings from './pages/Admin/SlaSettings/SlaSettings.jsx';
 import Roster from "./pages/Admin/Roster/Roster.jsx";
+import CategoryItem from "./pages/SuperAdmin/CategoryItem/CategoryItem.jsx";
 
 
 
@@ -99,7 +100,7 @@ function App() {
               <Route path="LoggingTimeLine" element={<LoggingTimeLine />} />
               <Route path="AdminUserList" element={<AdminUserList />} />
               <Route path="manageteamadmin" element={<ManageTeamAdmin />} />
-              <Route path="SuperAdminCategory" element={<AdminCategory />} />
+              <Route path="SuperAdminCategory" element={<CategoryItem />} />
               <Route path="SuperAdminLocation" element={<AdminLocation />} />
               <Route
                 path="SuperAdminAllIncidents"

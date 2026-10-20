@@ -1,0 +1,19 @@
+node_modules
+dist
+.git
+.gitignore
+.env
+.env.local
+.env.*.local
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test and patch scratch files
+src/test-*.js
+testSLA.js
+fix_getUserName.*
+patch_get_user_name.js
+search_ui*.cjs
+update_pending_unassigned.cjs
