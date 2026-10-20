@@ -86,6 +86,7 @@ function* handleCreateCategory(
     }
     yield put(createCategorySuccess(newCategory.data));
     yield put(fetchCategoriesRequest());
+    yield put(fetchMainCategoriesRequest());
   } catch (error: any) {
     if (error && error.code === "DUPLICATE_NAME") {
       yield put(createCategoryFailure("DUPLICATE_NAME"));

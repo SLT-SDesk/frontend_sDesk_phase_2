@@ -13,6 +13,7 @@ import {
     deleteCategoryItemRequest,
     createCategoryItemRequest,
     updateCategoryItemRequest,
+    createCategoryRequest,
     createSubCategoryRequest,
     updateSubCategoryRequest,
     deleteSubCategoryRequest,
@@ -29,6 +30,7 @@ import CategoryItemTable from "./components/CategoryItemTable";
 import CategoryFooter from "./components/CategoryFooter";
 import SubCategoryModal from "./components/SubCategoryModal";
 import EditCategoryModal from "./components/EditCategoryModal";
+import AddParentCategoryModal from "./components/AddParentCategoryModal";
 import DeleteCategoryModal from "./components/DeleteCategoryModal";
 import ParentCategoryDeleteErrorModal from "./components/ParentCategoryDeleteErrorModal";
 import EditSubCategoryModal from "./components/EditSubCategoryModal";
@@ -86,6 +88,7 @@ const SuperAdminCategory = () => {
     const [isDeleteSubCategoryErrorModalOpen, setIsDeleteSubCategoryErrorModalOpen] = useState(false);
 
     // Parent category modals
+    const [isAddParentCategoryModalOpen, setIsAddParentCategoryModalOpen] = useState(false);
     const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState(null);
     const [isDeleteCategoryModalOpen, setIsDeleteCategoryModalOpen] = useState(false);
@@ -248,8 +251,7 @@ const SuperAdminCategory = () => {
             setEditingSubCategory(null);
             setIsSubCategoryModalOpen(true);
         } else {
-            setEditingSubCategory(null);
-            setIsSubCategoryModalOpen(true);
+            setIsAddParentCategoryModalOpen(true);
         }
     };
 
@@ -354,6 +356,43 @@ const SuperAdminCategory = () => {
     };
 
     // ── Parent Category Modal handlers ─────────────────────────────────────────
+
+    const existingParentCategoryIds = useMemo(() => {
+        return (mainCategories || []).map((c) => c.category_code || c.id).filter(Boolean);
+    }, [mainCategories]);
+
+    const existingParentCategoryNames = useMemo(() => {
+        return (mainCategories || []).map((c) => c.name).filter(Boolean);
+    }, [mainCategories]);
+
+    const nextParentCategoryId = useMemo(() => {
+        const existingCodes = (mainCategories || []).map((c) => (c.category_code || c.id || ""));
+        let maxNum = 0;
+        existingCodes.forEach((code) => {
+            const match = String(code).match(/\d+/);
+            if (match) {
+                const num = parseInt(match[0], 10);
+                if (!isNaN(num) && num > maxNum) {
+                    maxNum = num;
+                }
+            }
+        });
+        let nextNum = Math.max(maxNum + 1, (mainCategories || []).length + 1, 1);
+        let candidate = `CAT${String(nextNum).padStart(3, "0")}`;
+        while (existingCodes.some((code) => {
+            const cStr = String(code).trim().toLowerCase();
+            return cStr === candidate.toLowerCase() || cStr.replace(/^main/i, "cat") === candidate.toLowerCase();
+        })) {
+            nextNum += 1;
+            candidate = `CAT${String(nextNum).padStart(3, "0")}`;
+        }
+        return candidate;
+    }, [mainCategories]);
+
+    const handleSaveNewParentCategory = ({ category_code, name }) => {
+        dispatch(createCategoryRequest({ category_code, name }));
+        showStatus(`Parent category "${name}" created.`);
+    };
 
     const handleOpenEditCategory = (category) => {
         setEditingCategory(category);
@@ -608,6 +647,16 @@ const SuperAdminCategory = () => {
                 onClose={() => { setIsDeleteSubCategoryErrorModalOpen(false); setSubCategoryToDelete(null); }}
                 title="Sub Category Delete Unsuccessfully"
                 message="The Sub Category could not be deleted."
+            />
+
+            {/* Add Parent Category Modal */}
+            <AddParentCategoryModal
+                isOpen={isAddParentCategoryModalOpen}
+                onClose={() => setIsAddParentCategoryModalOpen(false)}
+                onSave={handleSaveNewParentCategory}
+                defaultCategoryId={nextParentCategoryId}
+                existingCategoryIds={existingParentCategoryIds}
+                existingCategoryNames={existingParentCategoryNames}
             />
 
             {/* Edit Parent Category Modal */}
