@@ -221,7 +221,9 @@ const EditCategoryModal = ({
     if (onSave) {
       onSave({
         ...category,
-        id: categoryId,
+        // Always send the real UUID from the original category object,
+        // NOT the display code (categoryId is only used for the read-only field)
+        id: category?.id,
         name: parentCategoryName.trim(),
       });
     }

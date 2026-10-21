@@ -143,10 +143,13 @@ function* handleCreateMainCategory(
       type: "categories/createCategorySuccess",
       payload: newCategory.data,
     });
-    
-    // Refresh main categories list so UI shows the new category
+
+    // Refresh BOTH lists so the entire system reflects the new category:
+    // - fetchCategoriesRequest → state.categories.list (CategoryDropdown, IncidentDetails, etc.)
+    // - fetchMainCategoriesRequest → state.categories.mainCategories (SuperAdminCategory, CategorySelector)
+    yield put(fetchCategoriesRequest());
     yield put(fetchMainCategoriesRequest());
-    
+
   } catch (error) {
     if (error && error.code === "DUPLICATE_NAME") {
       yield put({
@@ -192,11 +195,11 @@ function* handleCreateCategoryItem(
       type: "categories/createCategoryItemSuccess",
       payload: response.data,
     });
-    
+
     // Refresh subcategories to update category item counts
     yield put(fetchSubCategoriesRequest());
     yield put(fetchCategoryItemsRequest());
-    
+
   } catch (error: any) {
     let errorMsg = "Error creating category item";
     if (error) {
@@ -266,10 +269,10 @@ function* handleCreateSubCategory(
       type: "categories/createSubCategorySuccess",
       payload: newSubCategory.data,
     });
-    
+
     // Refresh subcategories list so UI shows the new subcategory
     yield put(fetchSubCategoriesRequest());
-    
+
   } catch (error) {
     if (error && error.code === "DUPLICATE_NAME") {
       yield put({
@@ -317,7 +320,7 @@ function* handleUpdateSubCategory(
   } catch (error: any) {
     const msg =
       error?.code === "DUPLICATE_NAME" ||
-      (typeof error?.message === "string" && error.message.includes("already exists"))
+        (typeof error?.message === "string" && error.message.includes("already exists"))
         ? "DUPLICATE_NAME"
         : error?.message || "Error updating sub category";
     yield put(updateSubCategoryFailure(msg));
@@ -346,12 +349,13 @@ function* handleUpdateMainCategory(
     const { id, name } = action.payload;
     const response = yield call(updateMainCategory, id, { name });
     yield put(updateMainCategorySuccess(response.data));
-    // Refresh full list
+    // Refresh BOTH lists so entire system reflects the renamed category
+    yield put(fetchCategoriesRequest());
     yield put(fetchMainCategoriesRequest());
   } catch (error: any) {
     const msg =
       error?.code === "DUPLICATE_NAME" ||
-      (typeof error?.message === "string" && error.message.includes("already exists"))
+        (typeof error?.message === "string" && error.message.includes("already exists"))
         ? "DUPLICATE_NAME"
         : error?.message || "Error updating category";
     yield put(updateMainCategoryFailure(msg));
@@ -363,6 +367,8 @@ function* handleDeleteMainCategory(action: PayloadAction<string>) {
   try {
     yield call(deleteMainCategory, action.payload);
     yield put(deleteMainCategorySuccess(action.payload));
+    // Refresh BOTH lists so entire system reflects the deletion
+    yield put(fetchCategoriesRequest());
     yield put(fetchMainCategoriesRequest());
   } catch (error: any) {
     yield put(deleteMainCategoryFailure(error?.message || "Error deleting category"));

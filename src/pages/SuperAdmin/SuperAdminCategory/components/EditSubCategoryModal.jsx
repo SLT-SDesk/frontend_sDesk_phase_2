@@ -191,102 +191,98 @@ const SaveButton = styled.button`
  * @param {Array} subCategoryOptions - List of all subcategory objects for the dropdown
  */
 const EditSubCategoryModal = ({
-    isOpen,
-    onClose,
-    onSave,
-    subCategory = null,
-    parentCategoryName = "",
-    subCategoryOptions = [],
+  isOpen,
+  onClose,
+  onSave,
+  subCategory = null,
+  parentCategoryName = "",
+  subCategoryOptions = [],
 }) => {
-    const [subCategoryId, setSubCategoryId] = useState("");
-    const [subCategoryName, setSubCategoryName] = useState("");
+  const [subCategoryId, setSubCategoryId] = useState("");
+  const [subCategoryName, setSubCategoryName] = useState("");
 
-    useEffect(() => {
-        if (subCategory) {
-            const displayCode =
-                subCategory.displayId ||
-                (subCategory.category_code && subCategory.category_code.includes("#")
-                    ? subCategory.category_code
-                    : (subCategory.category_code || subCategory.id || "").replace(/^SUB/i, "CAT"));
-            setSubCategoryId(displayCode);
-            setSubCategoryName(subCategory.name || "");
-        }
-    }, [subCategory, isOpen]);
+  useEffect(() => {
+    if (subCategory) {
+      const displayCode =
+        subCategory.displayId ||
+        (subCategory.category_code && subCategory.category_code.includes("#")
+          ? subCategory.category_code
+          : (subCategory.category_code || subCategory.id || "").replace(/^SUB/i, "CAT"));
+      setSubCategoryId(displayCode);
+      setSubCategoryName(subCategory.name || "");
+    }
+  }, [subCategory, isOpen]);
 
-    if (!isOpen) return null;
+  if (!isOpen) return null;
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!subCategoryName.trim()) return;
-        if (onSave) {
-            onSave({ id: subCategoryId, name: subCategoryName.trim() });
-        }
-        onClose();
-    };
+  const originalName = subCategory?.name?.trim() || "";
+  const canSave = subCategoryName.trim() && subCategoryName.trim() !== originalName;
 
-    return (
-        <ModalOverlay onClick={onClose}>
-            <ModalCard onClick={(e) => e.stopPropagation()}>
-                <HeaderRow>
-                    <HeaderTitles>
-                        <ModalParentTitle>
-                            Parent Category - {parentCategoryName}
-                        </ModalParentTitle>
-                        <ModalTitle>Edit Category</ModalTitle>
-                        <ModalSubtitle>Select a sub category name.</ModalSubtitle>
-                    </HeaderTitles>
-                    <CloseButton onClick={onClose} title="Close">
-                        <FiX />
-                    </CloseButton>
-                </HeaderRow>
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!canSave) return;
+    if (onSave) {
+      // Pass the real UUID (subCategory.id), NOT the display code
+      onSave({ id: subCategory?.id, name: subCategoryName.trim() });
+    }
+    onClose();
+  };
 
-                <form onSubmit={handleSubmit}>
-                    <FormGrid>
-                        <FormGroup>
-                            <Label>Sub Category ID</Label>
-                            <StyledInput
-                                type="text"
-                                value={subCategoryId}
-                                disabled
-                                readOnly
-                            />
-                        </FormGroup>
+  return (
+    <ModalOverlay onClick={onClose}>
+      <ModalCard onClick={(e) => e.stopPropagation()}>
+        <HeaderRow>
+          <HeaderTitles>
+            <ModalParentTitle>
+              Parent Category - {parentCategoryName}
+            </ModalParentTitle>
+            <ModalTitle>Edit Category</ModalTitle>
+            <ModalSubtitle>Select a sub category name.</ModalSubtitle>
+          </HeaderTitles>
+          <CloseButton onClick={onClose} title="Close">
+            <FiX />
+          </CloseButton>
+        </HeaderRow>
 
-                        <FormGroup>
-                            <Label>
-                                Sub Category Name
-                                <span className="required-star">*</span>
-                            </Label>
-                            <StyledSelect
-                                value={subCategoryName}
-                                onChange={(e) => setSubCategoryName(e.target.value)}
-                                required
-                            >
-                                {subCategoryOptions.length > 0 ? (
-                                    subCategoryOptions.map((sc) => (
-                                        <option key={sc.id} value={sc.name}>
-                                            {sc.name}
-                                        </option>
-                                    ))
-                                ) : (
-                                    <option value={subCategoryName}>{subCategoryName}</option>
-                                )}
-                            </StyledSelect>
-                        </FormGroup>
-                    </FormGrid>
+        <form onSubmit={handleSubmit}>
+          <FormGrid>
+            <FormGroup>
+              <Label>Sub Category ID</Label>
+              <StyledInput
+                type="text"
+                value={subCategoryId}
+                disabled
+                readOnly
+              />
+            </FormGroup>
 
-                    <ActionsRow>
-                        <CancelButton type="button" onClick={onClose}>
-                            Cancel
-                        </CancelButton>
-                        <SaveButton type="submit">
-                            Save Changes
-                        </SaveButton>
-                    </ActionsRow>
-                </form>
-            </ModalCard>
-        </ModalOverlay>
-    );
+            <FormGroup>
+              <Label>
+                Sub Category Name
+                <span className="required-star">*</span>
+              </Label>
+              <StyledInput
+                type="text"
+                value={subCategoryName}
+                onChange={(e) => setSubCategoryName(e.target.value)}
+                placeholder="Enter sub category name"
+                required
+              />
+            </FormGroup>
+          </FormGrid>
+
+          <ActionsRow>
+            <CancelButton type="button" onClick={onClose}>
+              Cancel
+            </CancelButton>
+            <SaveButton type="submit" disabled={!canSave} style={{ opacity: canSave ? 1 : 0.5, cursor: canSave ? 'pointer' : 'not-allowed' }}>
+              Save Changes
+            </SaveButton>
+          </ActionsRow>
+        </form>
+      </ModalCard>
+    </ModalOverlay>
+  );
 };
 
 export default EditSubCategoryModal;

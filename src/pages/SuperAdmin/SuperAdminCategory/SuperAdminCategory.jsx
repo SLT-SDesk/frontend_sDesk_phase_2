@@ -60,7 +60,9 @@ const SuperAdminCategory = () => {
     const updateSubCategoryError = useSelector((state) => state.categories.updateSubCategoryError);
     const deleteSubCategoryError = useSelector((state) => state.categories.deleteSubCategoryError);
     const updateMainCategoryError = useSelector((state) => state.categories.updateMainCategoryError);
+    const updateMainCategorySuccess = useSelector((state) => state.categories.updateMainCategorySuccess);
     const deleteMainCategoryError = useSelector((state) => state.categories.deleteMainCategoryError);
+    const deleteMainCategorySuccess = useSelector((state) => state.categories.deleteMainCategorySuccess);
     const createMainCategorySuccess = useSelector((state) => state.categories.createMainCategorySuccess);
     const createMainCategoryError = useSelector((state) => state.categories.createMainCategoryError);
     const createCategoryItemSuccess = useSelector((state) => state.categories.createCategoryItemSuccess);
@@ -125,6 +127,20 @@ const SuperAdminCategory = () => {
             dispatch(fetchMainCategoriesRequest());
         }
     }, [createMainCategorySuccess, dispatch]);
+
+    // ── Re-fetch main categories after successful edit ────────────────────────
+    useEffect(() => {
+        if (updateMainCategorySuccess) {
+            dispatch(fetchMainCategoriesRequest());
+        }
+    }, [updateMainCategorySuccess, dispatch]);
+
+    // ── Re-fetch main categories after successful delete ──────────────────────
+    useEffect(() => {
+        if (deleteMainCategorySuccess) {
+            dispatch(fetchMainCategoriesRequest());
+        }
+    }, [deleteMainCategorySuccess, dispatch]);
 
     // ── Re-fetch subcategories after successful subcategory creation ───────────
     useEffect(() => {
@@ -205,42 +221,68 @@ const SuperAdminCategory = () => {
         return `${currentParentCode}#${idx >= 0 ? idx + 1 : 1}`;
     }, [currentSubCategory, currentParent, currentParentCode, subCategories]);
 
-    // Filtered subcategories (client-side search over the Redux list)
+    // Helper: extract all numeric segments from a code string for sorting
+    // e.g. "CAT004" → [4], "CAT004#2#1" → [4,2,1]
+    const extractNums = (code = "") =>
+        (String(code).match(/\d+/g) || []).map(Number);
+
+    // Sort comparator by code number (ascending)
+    const byCodeOrder = (a, b) => {
+        const aCode = a.category_code || a.id || "";
+        const bCode = b.category_code || b.id || "";
+        const aNums = extractNums(aCode);
+        const bNums = extractNums(bCode);
+        for (let i = 0; i < Math.max(aNums.length, bNums.length); i++) {
+            const diff = (aNums[i] ?? 0) - (bNums[i] ?? 0);
+            if (diff !== 0) return diff;
+        }
+        return aCode.localeCompare(bCode);
+    };
+
+    // Filtered + sorted subcategories
     const displayedSubCategories = useMemo(() => {
         if (!currentParent) return [];
-        if (!searchQuery.trim()) return subCategories;
-        const q = searchQuery.toLowerCase().trim();
-        return subCategories.filter(
-            (item) =>
-                (item.category_code || "").toLowerCase().includes(q) ||
-                item.name.toLowerCase().includes(q)
-        );
+        let list = subCategories;
+        if (searchQuery.trim()) {
+            const q = searchQuery.toLowerCase().trim();
+            list = list.filter(
+                (item) =>
+                    (item.category_code || "").toLowerCase().includes(q) ||
+                    item.name.toLowerCase().includes(q)
+            );
+        }
+        return [...list].sort(byCodeOrder);
     }, [currentParent, subCategories, searchQuery]);
 
-    // Filtered Category Items based on selected subcategory (from Redux)
+    // Filtered + sorted Category Items
     const displayedCategoryItems = useMemo(() => {
         if (!currentSubCategory) return [];
-        const list = categoryItems.filter(
+        let list = categoryItems.filter(
             (item) => item.subCategory?.id === currentSubCategory.id
         );
-        if (!searchQuery.trim()) return list;
-        const query = searchQuery.toLowerCase().trim();
-        return list.filter(
-            (item) =>
-                (item.category_code || item.id || "").toLowerCase().includes(query) ||
-                item.name.toLowerCase().includes(query)
-        );
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase().trim();
+            list = list.filter(
+                (item) =>
+                    (item.category_code || item.id || "").toLowerCase().includes(query) ||
+                    item.name.toLowerCase().includes(query)
+            );
+        }
+        return [...list].sort(byCodeOrder);
     }, [currentSubCategory, categoryItems, searchQuery]);
 
-    // Filtered parent categories (client-side search)
+    // Filtered + sorted parent categories
     const displayedParentCategories = useMemo(() => {
-        if (!searchQuery.trim()) return mainCategories;
-        const q = searchQuery.toLowerCase().trim();
-        return mainCategories.filter(
-            (cat) =>
-                (cat.category_code || "").toLowerCase().includes(q) ||
-                cat.name.toLowerCase().includes(q)
-        );
+        let list = mainCategories;
+        if (searchQuery.trim()) {
+            const q = searchQuery.toLowerCase().trim();
+            list = list.filter(
+                (cat) =>
+                    (cat.category_code || "").toLowerCase().includes(q) ||
+                    cat.name.toLowerCase().includes(q)
+            );
+        }
+        return [...list].sort(byCodeOrder);
     }, [mainCategories, searchQuery]);
 
     // Dropdown options for the CategoryControls filter
@@ -312,10 +354,20 @@ const SuperAdminCategory = () => {
         setIsDeleteSubCategoryModalOpen(true);
     };
 
-    /** Step 2 from DeleteSubCategoryModal – Sub category cannot be deleted, show error modal */
+    /** Step 2 from DeleteSubCategoryModal – check items first, then delete or show error */
     const handleConfirmDeleteSubCategory = () => {
         setIsDeleteSubCategoryModalOpen(false);
-        setIsDeleteSubCategoryErrorModalOpen(true);
+        const targetId = subCategoryToDelete?.id;
+        const hasItems = categoryItems.some(
+            (item) => item.subCategory?.id === targetId || item.subCategoryId === targetId
+        );
+        if (hasItems) {
+            setIsDeleteSubCategoryErrorModalOpen(true);
+        } else {
+            dispatch(deleteSubCategoryRequest({ id: targetId, mainCategoryId: currentParent?.id }));
+            showStatus(`Sub category deleted successfully.`);
+            setSubCategoryToDelete(null);
+        }
     };
 
     /** Called by SubCategoryModal on Save (add or edit) */
@@ -460,10 +512,33 @@ const SuperAdminCategory = () => {
         setIsDeleteCategoryModalOpen(true);
     };
 
-    /** Step 2 from DeleteCategoryModal – Parent category cannot be deleted, show error modal */
+    /** Step 2 from DeleteCategoryModal – check if category has subcategories or category items */
     const handleConfirmDeleteCategory = (category) => {
         setIsDeleteCategoryModalOpen(false);
-        setIsDeleteErrorModalOpen(true);
+
+        const targetId = category?.id || categoryToDelete?.id;
+
+        // Check for subcategories belonging to this parent
+        const hasSubCategories = subCategories.some(
+            (s) => s.mainCategory?.id === targetId || s.mainCategoryId === targetId
+        );
+
+        // Check for category items that belong to any subcategory of this parent
+        const hasItems = categoryItems.some(
+            (item) =>
+                item.subCategory?.mainCategory?.id === targetId ||
+                item.subCategory?.mainCategoryId === targetId
+        );
+
+        if (hasSubCategories || hasItems) {
+            // Has children — cannot delete
+            setIsDeleteErrorModalOpen(true);
+        } else {
+            // No children — dispatch real delete
+            dispatch(deleteMainCategoryRequest(targetId));
+            showStatus(`Category deleted successfully.`);
+            setCategoryToDelete(null);
+        }
     };
 
     // ── Derived helpers ────────────────────────────────────────────────────────
@@ -714,6 +789,7 @@ const SuperAdminCategory = () => {
                 onSave={handleSaveEditedCategory}
                 category={editingCategory}
                 parentOptions={parentCategoryNames}
+                existingNames={existingParentCategoryNames}
             />
 
             {/* Delete Parent Category Confirmation Modal */}
