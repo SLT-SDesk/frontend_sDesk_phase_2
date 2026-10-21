@@ -446,10 +446,14 @@ const SuperAdminCategory = () => {
         setIsDeleteCategoryItemModalOpen(true);
     };
 
-    /** Step 2 from DeleteCategoryItemModal – Category item cannot be deleted, show error modal */
+    /** Step 2 from DeleteCategoryItemModal – dispatch real delete action */
     const handleConfirmDeleteCategoryItem = () => {
         setIsDeleteCategoryItemModalOpen(false);
-        setIsDeleteCategoryItemErrorModalOpen(true);
+        const targetId = categoryItemToDelete?.id;
+        if (!targetId) return;
+        dispatch(deleteCategoryItemRequest(targetId));
+        showStatus(`Category item deleted successfully.`);
+        setCategoryItemToDelete(null);
     };
 
     // ── Parent Category Modal handlers ─────────────────────────────────────────
