@@ -41,7 +41,17 @@ const SocketProvider = ({ children }) => {
  
 
    useEffect(() => {
-    if (!user) return; // Only set up socket listeners for logged-in users
+    if (!user) {
+      if (socket.connected) {
+        socket.disconnect();
+      }
+      return;
+    }
+
+    // Connect socket for authenticated user
+    if (!socket.connected) {
+      socket.connect();
+    }
 
     // Send user info to server for targeted notifications
     socket.emit("user_connected", {

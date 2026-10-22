@@ -37,11 +37,13 @@ import ManageTeamAdmin from "./pages/SuperAdmin/ManageTeamAdmin/ManageTeamAdmin.
 import SuperAdminAddIncident from "./pages/SuperAdmin/SuperAdminAddIncident/SuperAdminAddIncident.jsx";
 import SocketProvider from "./components/SocketProvider/SocketProvider.jsx";
 import SuperAdminAllIncident from "./pages/SuperAdmin/SuperAdminAllIncident/SuperAdminAllIncident.jsx";
+import SuperAdminCategory from "./pages/SuperAdmin/SuperAdminCategory/SuperAdminCategory.jsx";
 import AdminReportedMyIncidents from "./pages/Admin/AdminReportedMyIncidents/AdminReportedMyIncidents.jsx";
 import MainDashboard from "./pages/MainDashboard/MainDashboard.jsx";
 import KPIReport from "./pages/Admin/KPIHelpdesk/KPIReport.jsx";
 import SlaSettings from './pages/Admin/SlaSettings/SlaSettings.jsx';
 import Roster from "./pages/Admin/Roster/Roster.jsx";
+import CategoryItem from "./pages/SuperAdmin/CategoryItem/CategoryItem.jsx";
 
 
 
@@ -99,7 +101,7 @@ function App() {
               <Route path="LoggingTimeLine" element={<LoggingTimeLine />} />
               <Route path="AdminUserList" element={<AdminUserList />} />
               <Route path="manageteamadmin" element={<ManageTeamAdmin />} />
-              <Route path="SuperAdminCategory" element={<AdminCategory />} />
+              <Route path="SuperAdminCategory" element={<SuperAdminCategory />} />
               <Route path="SuperAdminLocation" element={<AdminLocation />} />
               <Route
                 path="SuperAdminAllIncidents"
