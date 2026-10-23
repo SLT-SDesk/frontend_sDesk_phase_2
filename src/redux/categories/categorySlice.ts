@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import * as XLSX from "xlsx";
 import {
   MainCategory,
   MainCategoryState,

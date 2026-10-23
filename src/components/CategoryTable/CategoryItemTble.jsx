@@ -13,11 +13,11 @@ import {
   Typography,
   TextField,
 } from "@mui/material";
-import { 
-  dummyIncidentData, 
-  filterIncidentsByDateRange 
+import {
+  dummyIncidentData,
+  filterIncidentsByDateRange
 } from '../../data/dummyIncidentData';
-import * as XLSX from 'xlsx';
+import XLSX from '../../utils/excelUtils';
 
 const CategoryItemTble = ({ data, categoryName, selectedDateRange, selectedTeam }) => {
   const [search, setSearch] = useState("");
@@ -32,21 +32,21 @@ const CategoryItemTble = ({ data, categoryName, selectedDateRange, selectedTeam 
     let incidents = dummyIncidentData;
     if (selectedDateRange) {
       incidents = filterIncidentsByDateRange(
-        dummyIncidentData, 
-        selectedDateRange.startDate, 
+        dummyIncidentData,
+        selectedDateRange.startDate,
         selectedDateRange.endDate
       );
     }
 
     // Apply team filter if specific team is selected
     if (selectedTeam && selectedTeam !== "All Teams") {
-      incidents = incidents.filter(incident => 
+      incidents = incidents.filter(incident =>
         (incident.assignedTeam || incident.team || 'Unassigned') === selectedTeam
       );
     }
 
     // Filter incidents by the selected category
-    const categoryIncidents = incidents.filter(incident => 
+    const categoryIncidents = incidents.filter(incident =>
       incident.category && incident.category.toLowerCase() === categoryName.toLowerCase()
     );
 
@@ -103,19 +103,19 @@ const CategoryItemTble = ({ data, categoryName, selectedDateRange, selectedTeam 
 
   const exportToExcel = () => {
     const wb = XLSX.utils.book_new();
-    
-        const description=[
-          ['Category Items'],
-          ['Team: ' + (selectedTeam)],
-          ['Sub Category: ' + (categoryName)],
-          ['Generated on: ' + new Date().toLocaleDateString()],
-          ['Total Records: ' + data.length],
-          [''],
-          ['Description: This report provides a breakdown of incidents by category item, including the number of incidents and their percentage distribution.'],
-          [''],
-        ];
 
-    const headers =[['Category Item Id', 'Category Item Name', 'Incidents Count', 'Percentage', 'Category Item Code', 'Created At', 'Updated At', 'Sub Category Id', 'Main Category Id']];
+    const description = [
+      ['Category Items'],
+      ['Team: ' + (selectedTeam)],
+      ['Sub Category: ' + (categoryName)],
+      ['Generated on: ' + new Date().toLocaleDateString()],
+      ['Total Records: ' + data.length],
+      [''],
+      ['Description: This report provides a breakdown of incidents by category item, including the number of incidents and their percentage distribution.'],
+      [''],
+    ];
+
+    const headers = [['Category Item Id', 'Category Item Name', 'Incidents Count', 'Percentage', 'Category Item Code', 'Created At', 'Updated At', 'Sub Category Id', 'Main Category Id']];
 
     const wsData = data.map(row => [
       row.id,
@@ -142,7 +142,7 @@ const CategoryItemTble = ({ data, categoryName, selectedDateRange, selectedTeam 
       { wch: 22.1 },
       { wch: 22.1 },
       { wch: 35.5 },
-      {wch: 34.5},
+      { wch: 34.5 },
     ];
 
     ws['!merges'] = [
@@ -171,18 +171,18 @@ const CategoryItemTble = ({ data, categoryName, selectedDateRange, selectedTeam 
       {/* Title */}
       <Typography
         variant="h5"
-        sx={{ 
-          mb: 1, 
-          fontWeight: "bold", 
-          color: "#000", 
-          alignSelf: "flex-start" 
+        sx={{
+          mb: 1,
+          fontWeight: "bold",
+          color: "#000",
+          alignSelf: "flex-start"
         }}
       >
         {getTitle()}
       </Typography>
 
       {/* Subtitle with date range and total count */}
-      
+
 
       {/* Search */}
       <TextField
@@ -259,9 +259,9 @@ const CategoryItemTble = ({ data, categoryName, selectedDateRange, selectedTeam 
           <TableBody>
             {filteredData.length > 0 ? (
               filteredData.map((row, index) => (
-                <TableRow 
-                  key={index} 
-                  sx={{ 
+                <TableRow
+                  key={index}
+                  sx={{
                     height: 48,
                     "&:hover": {
                       bgcolor: "#90ee90"
@@ -309,25 +309,25 @@ const CategoryItemTble = ({ data, categoryName, selectedDateRange, selectedTeam 
         </Table>
       </TableContainer>
       <Box sx={{ mt: 2, textAlign: "right", width: "90%", ml: 8 }}>
-              <Button
-                variant="contained"
-                sx={{
-                  bgcolor: "#4caf50",
-                  color: "#fff",
-                  textTransform: "none",
-                  borderRadius: "8px",
-                  fontWeight: "bold",
-                  px: 4,
-                  py: 1,
-                  fontSize: "1rem",
-                  boxShadow: "none",
-                  "&:hover": { bgcolor: "#388e3c" },
-                }}
-                onClick={exportToExcel}
-              >
-                Export Data
-              </Button>
-            </Box>
+        <Button
+          variant="contained"
+          sx={{
+            bgcolor: "#4caf50",
+            color: "#fff",
+            textTransform: "none",
+            borderRadius: "8px",
+            fontWeight: "bold",
+            px: 4,
+            py: 1,
+            fontSize: "1rem",
+            boxShadow: "none",
+            "&:hover": { bgcolor: "#388e3c" },
+          }}
+          onClick={exportToExcel}
+        >
+          Export Data
+        </Button>
+      </Box>
     </Box>
   );
 };

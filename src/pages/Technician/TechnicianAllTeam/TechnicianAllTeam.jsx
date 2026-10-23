@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { FaHistory, FaSearch } from "react-icons/fa";
 
 import { TiExportOutline } from "react-icons/ti";
-import * as XLSX from "xlsx";
+import XLSX from "../../../utils/excelUtils";
 
 import { IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";

@@ -9,7 +9,7 @@ import { TiExportOutline } from "react-icons/ti";
 import { useSelector, useDispatch } from "react-redux";
 import socket from "../../../utils/socket.js";
 import { API_BASE } from "../../../utils/apiUtils";
-import * as XLSX from "xlsx";
+import XLSX from "../../../utils/excelUtils";
 
 import {
   fetchTechniciansRequest,

@@ -4,8 +4,7 @@ import { FaHistory, FaSearch } from "react-icons/fa";
 import { TiExportOutline } from "react-icons/ti";
 import { useNavigate, useLocation } from "react-router-dom";
 import { IoIosArrowForward } from "react-icons/io";
-import * as XLSX from "xlsx";          // ✅ Excel export
-import { saveAs } from "file-saver";   // ✅ File download
+import XLSX from '../../../utils/excelUtils';
 import {
   fetchAssignedByMeRequest,
   fetchIncidentHistoryRequest,
@@ -75,7 +74,7 @@ const AdminReportedMyIncidents = () => {
   };
 
   // ✅ Excel Export Function with headers and auto-width
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
     if (filteredData.length === 0) {
       alert("No data to export!");
       return;
@@ -116,9 +115,7 @@ const AdminReportedMyIncidents = () => {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Reported Incidents");
 
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(blob, `My_Reported_Incidents_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    await XLSX.writeFile(wb, `My_Reported_Incidents_${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
 

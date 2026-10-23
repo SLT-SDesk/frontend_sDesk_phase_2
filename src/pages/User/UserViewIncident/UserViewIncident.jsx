@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { FaHistory, FaSearch } from "react-icons/fa";
 import { TiExportOutline } from "react-icons/ti";
-import * as XLSX from 'xlsx';
+import XLSX from '../../../utils/excelUtils';
 import {
   fetchAssignedByMeRequest,
   fetchCategoriesRequest,

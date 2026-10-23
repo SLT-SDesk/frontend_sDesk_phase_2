@@ -5,8 +5,7 @@ import { TiExportOutline } from "react-icons/ti";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAdminTeamDataRequest } from "../../../redux/incident/incidentSlice";
 import { useNavigate } from "react-router-dom";
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
+import XLSX from '../../../utils/excelUtils';
 import "./SuperAdminAllIncident.css";
 import IncidentTimelineDialog from "../../../components/IncidentTimelinePopup/IncidentTimelineDialog"; // ⭐ use popup
 
@@ -175,7 +174,7 @@ const SuperAdminAllIncident = () => {
   };
 
   // ✅ UPDATED Export to Excel with header details
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
     if (filteredData.length === 0) {
       alert("No data to export!");
       return;
@@ -242,12 +241,7 @@ const SuperAdminAllIncident = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "All Incidents");
 
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-
-    const blob = new Blob([excelBuffer], {
-      type: "application/octet-stream",
-    });
-    saveAs(blob, `All_Incidents_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    await XLSX.writeFile(workbook, `All_Incidents_${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
   // ✅ Render table rows

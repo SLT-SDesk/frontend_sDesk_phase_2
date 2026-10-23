@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { FaHistory, FaSearch } from 'react-icons/fa';
 import { TiExportOutline } from 'react-icons/ti';
-import * as XLSX from 'xlsx';
+import XLSX from '../../../utils/excelUtils';
 import { IoIosArrowForward } from 'react-icons/io';
 import { fetchAssignedByMeRequest, fetchIncidentHistoryRequest } from '../../../redux/incident/incidentSlice';
 import { fetchAllUsersRequest } from '../../../redux/sltusers/sltusersSlice';

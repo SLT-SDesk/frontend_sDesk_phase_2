@@ -14,14 +14,14 @@ import {
 } from "@mui/material";
 // eslint-disable-next-line no-unused-vars
 import { useNavigate } from "react-router-dom";
-import * as XLSX from 'xlsx';
+import XLSX from '../../utils/excelUtils';
 
 const DistributionTable = ({ data, onRowClick, selectedTeam }) => {
-  
+
   const exportToExcel = () => {
     const wb = XLSX.utils.book_new();
 
-    const description=[
+    const description = [
       ['Distribution by SubCategory'],
       ['Team: ' + (selectedTeam)],
       ['Generated on: ' + new Date().toLocaleDateString()],
@@ -31,7 +31,7 @@ const DistributionTable = ({ data, onRowClick, selectedTeam }) => {
       [''],
     ];
 
-    const headers =[['Category Id','Category Name','Incidents Count','Percentage', 'Category Code', 'Created At', 'Updated At', 'Main Category Id']];
+    const headers = [['Category Id', 'Category Name', 'Incidents Count', 'Percentage', 'Category Code', 'Created At', 'Updated At', 'Main Category Id']];
 
     const wsData = data.map(row => [
       row.id,
@@ -87,7 +87,7 @@ const DistributionTable = ({ data, onRowClick, selectedTeam }) => {
         variant="h6"
         sx={{ mb: 2, fontWeight: "bold", color: "#222", ml: 8, mt: 2 }}
       >
-        Distribution by Sub Category 
+        Distribution by Sub Category
       </Typography>
       <TableContainer
         component={Paper}

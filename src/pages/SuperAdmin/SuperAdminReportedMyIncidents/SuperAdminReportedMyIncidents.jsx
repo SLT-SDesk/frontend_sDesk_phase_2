@@ -10,9 +10,7 @@ import AffectedUserDetail from '../../../components/AffectedUserDetail/AffectedU
 import IncidentHistory from '../../../components/IncidentHistory/IncidentHistory';
 import './SuperAdminReportedMyIncidents.css';
 
-// ✅ Excel export imports
-import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
+import XLSX from '../../../utils/excelUtils';
 
 const SuperAdminReportedMyIncidents = () => {
   const dispatch = useDispatch();
@@ -167,7 +165,7 @@ const SuperAdminReportedMyIncidents = () => {
   };
 
   // ✅ Excel export with report header
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
     if (filteredData.length === 0) {
       alert('No data to export!');
       return;
@@ -212,9 +210,7 @@ const SuperAdminReportedMyIncidents = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Incidents');
 
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    saveAs(blob, `My_Incidents_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    await XLSX.writeFile(workbook, `My_Incidents_${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
   const uniqueCategories = [...new Set(tableData.map(item => item.category))];

@@ -12,7 +12,7 @@ import {
   deleteCategoryItemRequest,
   fetchMainCategoriesRequest,
 } from "../../../redux/categories/categorySlice";
-import * as XLSX from "xlsx";
+import XLSX from "../../../utils/excelUtils";
 
 const AdminCategory = () => {
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);

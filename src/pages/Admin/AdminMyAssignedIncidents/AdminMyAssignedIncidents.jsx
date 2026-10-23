@@ -5,8 +5,7 @@ import { FaHistory, FaSearch } from 'react-icons/fa';
 import { TiExportOutline } from 'react-icons/ti';
 import { IoIosArrowForward } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
+import XLSX from '../../../utils/excelUtils';
 
 import {
     fetchAssignedToMeRequest,
@@ -141,7 +140,7 @@ const AdminMyAssignedIncidents = () => {
     };
 
     // ---------------- EXPORT TO EXCEL ----------------
-    const exportToExcel = () => {
+    const exportToExcel = async () => {
         if (!filteredData || filteredData.length === 0) {
             alert("No data to export!");
             return;
@@ -166,9 +165,7 @@ const AdminMyAssignedIncidents = () => {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Assigned Incidents");
 
         // Export
-        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-        const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-        saveAs(data, `My_Assigned_Incidents_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        await XLSX.writeFile(workbook, `My_Assigned_Incidents_${new Date().toISOString().slice(0, 10)}.xlsx`);
     };
 
     const renderTableRows = () => {
