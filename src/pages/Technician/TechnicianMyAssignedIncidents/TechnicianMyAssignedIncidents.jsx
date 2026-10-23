@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FaHistory, FaSearch } from 'react-icons/fa';
 import { TiExportOutline } from 'react-icons/ti';
-import * as XLSX from 'xlsx';
+import XLSX from '../../../utils/excelUtils';
 import { IoIosArrowForward } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
 import { fetchAssignedToMeRequest } from '../../../redux/incident/incidentSlice';
@@ -158,11 +158,11 @@ const TechnicianMyAssignedIncidents = () => {
 
     const getUserName = (serviceNumber, status = null) => {
         if (!serviceNumber || String(serviceNumber).trim() === '') {
-      if (status === "Pending Tier2 Assignment") return "Tier 2 Support";
-      if (status === "Pending Tier3 Assignment") return "Tier 3 Support";
-      return "Unassigned";
-    }
-    if (!Array.isArray(allUsers)) return serviceNumber;
+            if (status === "Pending Tier2 Assignment") return "Tier 2 Support";
+            if (status === "Pending Tier3 Assignment") return "Tier 3 Support";
+            return "Unassigned";
+        }
+        if (!Array.isArray(allUsers)) return serviceNumber;
         const foundUser = allUsers.find(
             (user) => String(user.service_number) === String(serviceNumber) || String(user.serviceNum) === String(serviceNumber)
         );
