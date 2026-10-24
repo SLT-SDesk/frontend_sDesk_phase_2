@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { FaHistory, FaSearch } from 'react-icons/fa';
 import { TiExportOutline } from 'react-icons/ti';
-import * as XLSX from 'xlsx';
+import XLSX from '../../../utils/excelUtils.js';
 import { IoIosArrowForward } from 'react-icons/io';
 import { fetchAssignedByMeRequest, fetchIncidentHistoryRequest } from '../../../redux/incident/incidentSlice';
 import { fetchAllUsersRequest } from '../../../redux/sltusers/sltusersSlice';
@@ -127,7 +127,7 @@ const TechnicianReportedMyIncidents = () => {
     ));
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
     const dataToExport = filteredData.map(item => {
 
       // Assuming 'item' also contains information about the affected user's service number, if not, you might need to adjust how you get this.
@@ -181,7 +181,7 @@ const TechnicianReportedMyIncidents = () => {
     const date = today.toISOString().split('T')[0];
     const fileName = `MyReportedIncidentsData_${date}.xlsx`;
 
-    XLSX.writeFile(wb, fileName);
+    await XLSX.writeFile(wb, fileName);
   };
 
   const uniqueCategories = [...new Set(tableData.map(item => item.category))];

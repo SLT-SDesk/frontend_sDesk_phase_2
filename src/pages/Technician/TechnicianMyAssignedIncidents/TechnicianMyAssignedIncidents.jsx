@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FaHistory, FaSearch } from 'react-icons/fa';
 import { TiExportOutline } from 'react-icons/ti';
-import * as XLSX from 'xlsx';
+import XLSX from '../../../utils/excelUtils.js';
 import { IoIosArrowForward } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
 import { fetchAssignedToMeRequest } from '../../../redux/incident/incidentSlice';
@@ -280,7 +280,7 @@ const TechnicianMyAssignedIncidents = () => {
         name: getCategoryName(catNumber)
     }));
 
-    const handleExport = () => {
+    const handleExport = async () => {
         const dataToExport = filteredData.map(item => ({
             "Ref No": item.refNo,
             "Affected User": item.affectedUser,
@@ -326,7 +326,7 @@ const TechnicianMyAssignedIncidents = () => {
         const date = today.toISOString().split('T')[0];
         const fileName = `MyAssignIncidentData_${date}.xlsx`;
 
-        XLSX.writeFile(wb, fileName);
+        await XLSX.writeFile(wb, fileName);
     };
 
     return (

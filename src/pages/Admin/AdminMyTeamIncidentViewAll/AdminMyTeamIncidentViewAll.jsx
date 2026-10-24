@@ -7,7 +7,7 @@ import {
   fetchAdminTeamDataRequest,
 } from "../../../redux/incident/incidentSlice";
 import { useNavigate } from "react-router-dom";
-import * as XLSX from "xlsx";
+import XLSX from "../../../utils/excelUtils.js";
 import { saveAs } from "file-saver";
 import "./AdminMyTeamIncidentViewAll.css";
 import IncidentTimelineDialog from "../../../components/IncidentTimelinePopup/IncidentTimelineDialog"; // ⭐ use new popup
@@ -209,7 +209,7 @@ const AdminMyTeamIncidentViewAll = () => {
   };
 
   // 🟢 UPDATED Excel Export Function with Header Info
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
     if (filteredData.length === 0) {
       alert("No data to export!");
       return;
@@ -273,7 +273,7 @@ const AdminMyTeamIncidentViewAll = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "My Team Incidents");
 
-    const excelBuffer = XLSX.write(workbook, {
+    const excelBuffer = await XLSX.write(workbook, {
       bookType: "xlsx",
       type: "array",
     });

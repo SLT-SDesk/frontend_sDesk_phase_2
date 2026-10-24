@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { FaHistory, FaSearch } from "react-icons/fa";
 import { TiExportOutline } from "react-icons/ti";
-import * as XLSX from 'xlsx';
+import XLSX from '../../../utils/excelUtils.js';
 import {
   fetchAssignedByMeRequest,
   fetchCategoriesRequest,
@@ -87,7 +87,7 @@ const UserViewIncident = () => {
 
   const currentRows = filteredIncidents;
 
-  const handleExport = () => {
+  const handleExport = async () => {
     const dataToExport = currentRows.map(incident => {
 
 
@@ -135,7 +135,7 @@ const UserViewIncident = () => {
 
     const today = new Date();
     const dateString = `${today.getFullYear()}_${today.getMonth() + 1}_${today.getDate()}`;
-    XLSX.writeFile(wb, `UserViewIncidentData_${dateString}.xlsx`);
+    await XLSX.writeFile(wb, `UserViewIncidentData_${dateString}.xlsx`);
   };
 
   // Popup open handler

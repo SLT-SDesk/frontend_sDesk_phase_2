@@ -17,7 +17,7 @@ import {
   dummyIncidentData, 
   filterIncidentsByDateRange 
 } from '../../data/dummyIncidentData';
-import * as XLSX from 'xlsx';
+import XLSX from '../../utils/excelUtils.js';
 
 const CategoryItemTble = ({ data, categoryName, selectedDateRange, selectedTeam }) => {
   const [search, setSearch] = useState("");
@@ -101,7 +101,7 @@ const CategoryItemTble = ({ data, categoryName, selectedDateRange, selectedTeam 
     return ` (${start} - ${end})`;
   };
 
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
     const wb = XLSX.utils.book_new();
     
         const description=[
@@ -151,7 +151,7 @@ const CategoryItemTble = ({ data, categoryName, selectedDateRange, selectedTeam 
 
     XLSX.utils.book_append_sheet(wb, ws, 'Category Items');
 
-    XLSX.writeFile(wb, 'Category Items Report ' + new Date().toLocaleDateString() + '.xlsx');
+    await XLSX.writeFile(wb, 'Category Items Report ' + new Date().toLocaleDateString() + '.xlsx');
 
   };
 

@@ -12,7 +12,7 @@ import {
   deleteCategoryItemRequest,
   fetchMainCategoriesRequest,
 } from "../../../redux/categories/categorySlice";
-import * as XLSX from "xlsx";
+import XLSX from "../../../utils/excelUtils.js";
 
 const AdminCategory = () => {
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
@@ -92,7 +92,7 @@ const AdminCategory = () => {
     setSearchQuery(e.target.value);
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
     // Prepare data for export (use filteredCategories for current view, or categories for all)
     const exportData = filteredCategories.map((row) => ({
       "CAT ID": row.catID,
@@ -103,7 +103,7 @@ const AdminCategory = () => {
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Categories");
-    XLSX.writeFile(workbook, "categories.xlsx");
+    await XLSX.writeFile(workbook, "categories.xlsx");
   };
 
   const filteredCategories = categories.filter((category) => {
