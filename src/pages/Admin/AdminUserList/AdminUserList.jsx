@@ -9,7 +9,7 @@ import { TiExportOutline } from "react-icons/ti";
 import { useSelector, useDispatch } from "react-redux";
 import socket from "../../../utils/socket.js";
 import { API_BASE } from "../../../utils/apiUtils";
-import * as XLSX from "xlsx";
+import XLSX from "../../../utils/excelUtils.js";
 
 import {
   fetchTechniciansRequest,
@@ -163,7 +163,7 @@ function AdminUserList() {
       });
   }, [users, selectShowOption, searchQuery]);
 
-  const handleExport = () => {
+  const handleExport = async () => {
     const exportData = filteredUsers.map((user) => ({
       "Service Number": user.serviceNum,
       "Name": user.name,
@@ -176,7 +176,7 @@ function AdminUserList() {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Technical Officers");
     const date = new Date().toISOString().slice(0, 10);
-    XLSX.writeFile(workbook, `Technical_Officers_${date}.xlsx`);
+    await XLSX.writeFile(workbook, `Technical_Officers_${date}.xlsx`);
   };
 
   const handleChange = (e) => setSelectShowOption(e.target.value);

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { FaHistory, FaSearch } from "react-icons/fa";
 
 import { TiExportOutline } from "react-icons/ti";
-import * as XLSX from "xlsx";
+import XLSX from "../../../utils/excelUtils.js";
 
 import { IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
@@ -453,7 +453,7 @@ const TechnicianAllTeam = () => {
     );
   }
 
-  const handleExport = () => {
+  const handleExport = async () => {
     const dataToExport = filteredData.map((item) => {
       const assignedToUser = (allUsers || []).find(u => u.service_number === item.assignedTo || u.user_name === item.assignedTo);
       const affectedUser = (allUsers || []).find(u => u.service_number === item.affectedUser || u.user_name === item.affectedUser);
@@ -509,7 +509,7 @@ const TechnicianAllTeam = () => {
     const date = today.toISOString().split('T')[0];
     const fileName = `TechnicianAllTeamData_${date}.xlsx`;
 
-    XLSX.writeFile(wb, fileName);
+    await XLSX.writeFile(wb, fileName);
   };
 
   const uniqueCategories = categoryItems

@@ -11,7 +11,7 @@ import IncidentHistory from '../../../components/IncidentHistory/IncidentHistory
 import './SuperAdminReportedMyIncidents.css';
 
 // ✅ Excel export imports
-import * as XLSX from 'xlsx';
+import XLSX from '../../../utils/excelUtils.js';
 import { saveAs } from 'file-saver';
 
 const SuperAdminReportedMyIncidents = () => {
@@ -167,7 +167,7 @@ const SuperAdminReportedMyIncidents = () => {
   };
 
   // ✅ Excel export with report header
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
     if (filteredData.length === 0) {
       alert('No data to export!');
       return;
@@ -212,7 +212,7 @@ const SuperAdminReportedMyIncidents = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Incidents');
 
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const excelBuffer = await XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(blob, `My_Incidents_${new Date().toISOString().slice(0, 10)}.xlsx`);
   };

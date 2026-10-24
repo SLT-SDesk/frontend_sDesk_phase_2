@@ -14,11 +14,11 @@ import {
 } from "@mui/material";
 // eslint-disable-next-line no-unused-vars
 import { useNavigate } from "react-router-dom";
-import * as XLSX from 'xlsx';
+import XLSX from '../../utils/excelUtils.js';
 
 const DistributionTable = ({ data, onRowClick, selectedTeam }) => {
   
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
     const wb = XLSX.utils.book_new();
 
     const description=[
@@ -65,7 +65,7 @@ const DistributionTable = ({ data, onRowClick, selectedTeam }) => {
 
     XLSX.utils.book_append_sheet(wb, ws, 'Distribution by Sub Category');
 
-    XLSX.writeFile(wb, 'Distribution by Sub Category Report ' + new Date().toLocaleDateString() + '.xlsx');
+    await XLSX.writeFile(wb, 'Distribution by Sub Category Report ' + new Date().toLocaleDateString() + '.xlsx');
 
   };
 
