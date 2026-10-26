@@ -40,7 +40,7 @@ const SuperAdminAllIncident = () => {
   } = useSelector((state) => state.incident);
   const { user } = useSelector((state) => state.auth);
 
-  console.log("Raw Incidents from Redux:", incidents);
+  // VA-13: raw incident dump removed — contained server timestamps (create_on, update_on, createdAt, updatedAt)
 
 
   useEffect(() => {
@@ -141,11 +141,6 @@ const SuperAdminAllIncident = () => {
     const matchesCategory = categoryFilter
       ? (() => {
         const match = item.mainCategory?.toLowerCase()?.trim() === categoryFilter?.toLowerCase()?.trim();
-        console.log(`Checking incident ${item.refNo}:`, {
-          itemMainCategory: item.mainCategory,
-          filter: categoryFilter,
-          match
-        });
         return match;
       })()
       : true;

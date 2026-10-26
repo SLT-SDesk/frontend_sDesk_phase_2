@@ -320,7 +320,7 @@ const TechnicianInsident = ({
       if (updateStatusData.description) jsonPayload.description = updateStatusData.description;
       if (updateStatusData.updatedBy) jsonPayload.update_by = updateStatusData.updatedBy;
 
-      console.log("TechnicianInsident: Dispatching JSON update for incident_number:", currentIncident.incident_number, jsonPayload);
+      // VA-13: jsonPayload console.log removed — contained updatedOn as raw ISO timestamp
 
       dispatch({
         type: "incident/updateIncidentRequest",
@@ -365,11 +365,7 @@ const TechnicianInsident = ({
 
       formData.append('file', updateStatusData.selectedFile);
 
-      console.log("TechnicianInsident: Dispatching FormData update for incident_number:", currentIncident.incident_number);
-      // Log formData contents
-      for (let pair of formData.entries()) {
-        console.log(pair[0] + ', ' + pair[1]);
-      }
+      // VA-13: FormData console.log removed — logged raw field values including timestamps to browser console
 
       // Dispatch Redux action to update incident with attachment
       dispatch({
@@ -538,7 +534,7 @@ const TechnicianInsident = ({
       return {
         assignedTo: h.assignedTo,
         updatedBy: h.updatedBy,
-        updatedOn: validDate.toISOString(),
+        updatedOn: validDate.toLocaleString(), // VA-13: toLocaleString() used — toISOString() exposed raw server timestamp precision
         status: h.status,
         comments: h.comments,
         category: getCategoryName(h.category),

@@ -146,10 +146,7 @@ const SlaSettings = () => {
   }, [filteredIncidents, performances]);
 
   // console.log('Incident by Main Category Code Data:', teamIncidents);
-  console.log("Filtered Incidents:", filteredIncidents);
-  console.log("Technician Performance Data:", performances);
-  console.log("Technicians Data:", technicians);
-  console.log("teamTechnicians Data:", teamTechnicians);
+  // VA-13: debug console.log removed — exposed server timestamps inside filteredIncidents, performances, technicians, teamTechnicians
   //Incident summary data end
 
   const [datePopupOpen, setDatePopupOpen] = useState(false);
